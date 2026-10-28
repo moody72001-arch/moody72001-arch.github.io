@@ -10,8 +10,8 @@
 <style>
   body { font-family: system-ui, 'Segoe UI', Tahoma, sans-serif; }
   .tab-active { color:#10b981; border-top:3px solid #10b981; font-weight:700; }
-  /* تصغير خط الشريط السفلي عشان 6 تابات يدخلوا في الشاشة */
-  .nav-btn { font-size: 11px; padding: 6px 2px; }
+  /* تصغير خط الشريط السفلي عشان التابات تدخل في الشاشة */
+  .nav-btn { font-size: 10px; padding: 6px 2px; }
 </style>
 </head>
 <body class="bg-gray-100 pb-24">
@@ -103,6 +103,27 @@
     <div id="announcements-list" class="space-y-2"></div>
   </section>
 
+  <!-- الإدارة (التاب السري) -->
+  <section id="tab-admin" class="tab-content hidden">
+    <!-- شاشة القفل -->
+    <div id="admin-lock" class="bg-white rounded-xl p-6 shadow-sm text-center">
+      <h2 class="font-bold text-lg mb-2 text-red-600">🔒 منطقة الإدارة</h2>
+      <p class="text-xs text-gray-500 mb-4">ادخل كود الإدارة عشان تبعت إشعارات</p>
+      <input id="admin-code" type="password" placeholder="كود الإدارة" class="w-full border rounded-lg p-3 mb-3 text-center text-lg tracking-widest">
+      <button onclick="unlockAdmin()" class="w-full bg-gray-800 text-white rounded-lg p-3 font-semibold">دخول</button>
+    </div>
+
+    <!-- لوحة الإرسال -->
+    <div id="admin-panel" class="bg-white rounded-xl p-4 shadow-sm hidden">
+      <h2 class="font-bold text-lg mb-2 text-emerald-700">📢 إرسال إشعار للفريق</h2>
+      <p class="text-xs text-gray-500 mb-4">هيتبعت لكل اللاعيبة اللي مفعلين الإشعارات فورًا.</p>
+      <input id="push-title" placeholder="عنوان الإشعار (مثلاً: ماتش بكرة)" class="w-full border rounded-lg p-2 mb-2">
+      <textarea id="push-msg" rows="3" placeholder="نص الرسالة (مثلاً: التمرين الساعة 8 في الملعب)" class="w-full border rounded-lg p-2 mb-3"></textarea>
+      <button onclick="sendPushNotification()" class="w-full bg-red-600 text-white rounded-lg p-3 font-semibold">🚀 إرسال الآن</button>
+      <p id="push-status" class="text-center text-sm mt-2 hidden"></p>
+    </div>
+  </section>
+
   <div class="text-center mt-4 space-y-3">
     <button onclick="enableNotifications()" class="text-xs bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg">🔔 فعّل الإشعارات</button>
     <div><button onclick="logout()" class="text-xs text-red-400 underline">تسجيل خروج</button></div>
@@ -117,6 +138,7 @@
   <button id="nav-money"   class="nav-btn text-gray-500 text-center flex-1" onclick="showTab('money')">💸<br>فلوس</button>
   <button id="nav-rules"   class="nav-btn text-gray-500 text-center flex-1" onclick="showTab('rules')">📜<br>القوانين</button>
   <button id="nav-announcements" class="nav-btn text-gray-500 text-center flex-1" onclick="showTab('announcements')">📢<br>إعلانات</button>
+  <button id="nav-admin"   class="nav-btn text-gray-500 text-center flex-1" onclick="showTab('admin')">⚙️<br>إدارة</button>
 </nav>
 
 <script type="module">
@@ -140,7 +162,8 @@ const firebaseConfig = {
 const TEAM_CODE = "MOODY2025";
 
 /* ======== 3) إعدادات OneSignal ======== */
-const ONESIGNAL_APP_ID = "a05829ee-dd76-44d5-929a-793ea08664c7"; // تم وضع الكود بتاعك
+const ONESIGNAL_APP_ID = "a05829ee-dd76-44d5-929a-793ea08664c7";
+const REST_API_KEY = "os_v2_app_ubmct3w5ozcn1eu2pe7kbbtey7cpaqoysydum4fi5wi4zss371hccyfqcpv2xwwy1rozmannnzs6gnrkw2p7v65mqzy4cte7hc1hpba";
 
 const TEAM_ID = "my-team";
 
@@ -513,6 +536,63 @@ function renderAnnouncements() {
     </div>
   `).join('');
 }
+
+/* ======== الإدارة والإشعارات ======== */
+window.unlockAdmin = function() {
+  const code = $('#admin-code').value.trim();
+  if (code === TEAM_CODE) {
+    $('#admin-lock').classList.add('hidden');
+    $('#admin-panel').classList.remove('hidden');
+  } else {
+    alert('الكود غلط ❌');
+  }
+};
+
+window.sendPushNotification = async function() {
+  const title = $('#push-title').value.trim() || 'إعلان من الفريق ⚽';
+  const msg = $('#push-msg').value.trim();
+  const status = $('#push-status');
+
+  if (!msg) {
+    alert('اكتب الرسالة الأول!');
+    return;
+  }
+
+  status.textContent = "جاري الإرسال...";
+  status.className = "text-center text-sm mt-2 text-blue-600";
+  status.classList.remove('hidden');
+
+  try {
+    const response = await fetch('https://onesignal.com/api/v1/notifications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json;charset=utf-8',
+        'Authorization': 'Basic ' + REST_API_KEY
+      },
+      body: JSON.stringify({
+        app_id: ONESIGNAL_APP_ID,
+        included_segments: ['Subscribed Users'],
+        headings: { en: title, ar: title },
+        contents: { en: msg, ar: msg }
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.id) {
+      status.textContent = "تم الإرسال بنجاح ✅";
+      status.className = "text-center text-sm mt-2 text-green-600";
+      $('#push-msg').value = '';
+      $('#push-title').value = '';
+    } else {
+      status.textContent = "فشل الإرسال: تأكد من المفتاح أو وجود مشتركين";
+      status.className = "text-center text-sm mt-2 text-red-600";
+    }
+  } catch (e) {
+    status.textContent = "خطأ في الاتصال: " + e.message;
+    status.className = "text-center text-sm mt-2 text-red-600";
+  }
+};
 
 /* ======== رندر ======== */
 function render() {
