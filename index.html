@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#059669">
+<title>فريقنا - كرة خماسية</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<style>
+  body { font-family: system-ui, 'Segoe UI', Tahoma, sans-serif; }
+  .tab-active { color:#10b981; border-top:3px solid #10b981; font-weight:700; }
+</style>
+</head>
+<body class="bg-gray-100 pb-24">
+
+<!-- شاشة الدخول -->
+<div id="login-screen" class="fixed inset-0 bg-emerald-700 flex items-center justify-center p-4 z-50">
+  <div class="bg-white rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl">
+    <div class="text-5xl mb-2">⚽</div>
+    <h1 class="text-xl font-bold mb-1">فريقنا</h1>
+    <p class="text-sm text-gray-500 mb-4">ادخل كود الفريق عشان تكمل</p>
+    <input id="team-code" type="password" placeholder="كود الفريق" class="w-full border rounded-lg p-3 mb-3 text-center text-lg tracking-widest">
+    <button onclick="tryLogin()" class="w-full bg-emerald-600 text-white rounded-lg p-3 font-semibold">دخول</button>
+    <p id="login-error" class="text-red-500 text-sm mt-2 hidden">الكود غلط ❌</p>
+  </div>
+</div>
+
+<header class="bg-emerald-600 text-white p-4 text-center">
+  <h1 class="text-xl font-bold">⚽ فريقنا</h1>
+  <p class="text-xs opacity-80" id="team-summary"></p>
+</header>
+
+<main class="p-3 max-w-md mx-auto">
+
+  <!-- اللاعبين -->
+  <section id="tab-players" class="tab-content">
+    <form onsubmit="addPlayer(event)" class="bg-white rounded-xl p-3 shadow-sm mb-3 space-y-2">
+      <input name="name" placeholder="اسم اللاعب" required class="w-full border rounded-lg p-2">
+      <div class="flex gap-2">
+        <input name="number" placeholder="الرقم" type="number" class="w-1/3 border rounded-lg p-2">
+        <select name="position" class="w-2/3 border rounded-lg p-2">
+          <option value="">المركز</option>
+          <option>حارس</option><option>مدافع</option><option>وسط</option><option>مهاجم</option>
+        </select>
+      </div>
+      <input name="phone" placeholder="التليفون (اختياري)" class="w-full border rounded-lg p-2">
+      <button class="w-full bg-emerald-600 text-white rounded-lg p-2 font-semibold">➕ ضيف لاعب</button>
+    </form>
+    <div id="players-list"></div>
+  </section>
+
+  <!-- الماتشات -->
+  <section id="tab-matches" class="tab-content hidden">
+    <form onsubmit="addMatch(event)" class="bg-white rounded-xl p-3 shadow-sm mb-3 space-y-2">
+      <input name="opponent" placeholder="اسم الفريق المنافس" required class="w-full border rounded-lg p-2">
+      <div class="flex gap-2">
+        <input name="date" type="date" required class="w-1/2 border rounded-lg p-2">
+        <input name="time" type="time" class="w-1/2 border rounded-lg p-2">
+      </div>
+      <input name="location" placeholder="المكان (اختياري)" class="w-full border rounded-lg p-2">
+      <button class="w-full bg-emerald-600 text-white rounded-lg p-2 font-semibold">➕ ضيف ماتش</button>
+    </form>
+    <div id="matches-list"></div>
+  </section>
+
+  <!-- الإحصائيات -->
+  <section id="tab-stats" class="tab-content hidden">
+    <div id="stats-content"></div>
+  </section>
+
+  <!-- الفلوس -->
+  <section id="tab-money" class="tab-content hidden">
+    <form onsubmit="addPayment(event)" class="bg-white rounded-xl p-3 shadow-sm mb-3 space-y-2">
+      <select name="playerId" required class="w-full border rounded-lg p-2">
+        <option value="">اختار اللاعب</option>
+        <option value="__team__">💼 مصروف للفريق ككل</option>
+      </select>
+      <input name="amount" type="number" placeholder="المبلغ (جنيه)" required class="w-full border rounded-lg p-2">
+      <input name="note" placeholder="ملاحظة (اشتراك / ملعب / طقم...)" class="w-full border rounded-lg p-2">
+      <button class="w-full bg-emerald-600 text-white rounded-lg p-2 font-semibold">➕ تسجيل دفعة</button>
+    </form>
+    <div id="money-content"></div>
+  </section>
+
+  <div class="text-center mt-4 space-y-3">
+    <button onclick="enableNotifications()" class="text-xs bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg">🔔 فعّل الإشعارات</button>
+    <div><button onclick="logout()" class="text-xs text-red-400 underline">تسجيل خروج</button></div>
+  </div>
+
+</main>
+
+<nav class="fixed bottom-0 inset-x-0 bg-white border-t flex justify-around py-2 z-40">
+  <button id="nav-players" class="nav-btn tab-active px-3 py-1 text-sm" onclick="showTab('players')">👥 اللاعبين</button>
+  <button id="nav-matches" class="nav-btn px-3 py-1 text-sm text-gray-500" onclick="showTab('matches')">📅 الماتشات</button>
+  <button id="nav-stats"   class="nav-btn px-3 py-1 text-sm text-gray-500" onclick="showTab('stats')">📊 إحصائيات</button>
+  <button id="nav-money"   class="nav-btn px-3 py-1 text-sm text-gray-500" onclick="showTab('money')">💸 فلوس</button>
+</nav>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInAnonymously, onAuthStateChanged, signOut }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, onSnapshot }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+/* ======== 1) إعدادات Firebase ======== */
+const firebaseConfig = {
+  apiKey: "AIzaSyD4PqVEdU1NI7_5eZGntteEyRbZ519KYbg",
+  authDomain: "my-team-4d879.firebaseapp.com",
+  projectId: "my-team-4d879",
+  storageBucket: "my-team-4d879.firebasestorage.app",
+  messagingSenderId: "837918664225",
+  appId: "1:837918664225:web:28a56f2a7065228faae560"
+};
+
+/* ======== 2) كود الفريق ======== */
+const TEAM_CODE = "MOODY2025";
+
+/* ======== 3) إعدادات OneSignal ======== */
+const ONESIGNAL_APP_ID = "YOUR_ONESIGNAL_APP_ID"; // هنعدلها بعدين
+const SAFARI_WEB_ID = "YOUR_SAFARI_WEB_ID"; // هنعدلها بعدين
+
+const TEAM_ID = "my-team";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const teamDocRef = doc(db, "teams", TEAM_ID);
+
+let state = { players: [], matches: [], payments: [] };
+let unsubscribe = null;
+let osReady = false;
+
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+const fmt = n => Number(n||0).toLocaleString('ar-EG');
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+
+/* ======== OneSignal ======== */
+window.OneSignalDeferred = window.OneSignalDeferred || [];
+function initOneSignal() {
+  if (osReady) return;
+  osReady = true;
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: ONESIGNAL_APP_ID,
+      safari_web_id: SAFARI_WEB_ID,
+      notifyButton: { enable: false },
+      allowLocalhostAsSecureOrigin: false
+    });
+    OneSignal.Slidedown.promptPush();
+  });
+}
+window.enableNotifications = async function() {
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.Notifications.requestPermission();
+    await OneSignal.User.PushSubscription.optIn();
+    alert('تم تفعيل الإشعارات ✅');
+  });
+};
+
+/* ======== الدخول ======== */
+window.tryLogin = async function() {
+  const code = $('#team-code').value.trim();
+  if (code !== TEAM_CODE) {
+    $('#login-error').classList.remove('hidden');
+    return;
+  }
+  $('#login-error').classList.add('hidden');
+  try {
+    await signInAnonymously(auth);
+  } catch (e) {
+    alert('خطأ في الاتصال: ' + e.message);
+  }
+};
+
+window.logout = function() {
+  if (unsubscribe) unsubscribe();
+  signOut(auth).then(() => location.reload());
+};
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    $('#login-screen').classList.add('hidden');
+    initOneSignal();
+    startSync();
+  } else {
+    $('#login-screen').classList.remove('hidden');
+  }
+});
+
+/* ======== المزامنة ======== */
+function startSync() {
+  if (unsubscribe) return;
+  unsubscribe = onSnapshot(teamDocRef, (snap) => {
+    if (snap.exists()) {
+      state = snap.data();
+      state.players = state.players || [];
+      state.matches = state.matches || [];
+      state.payments = state.payments || [];
+    }
+    render();
+  }, (err) => {
+    console.error(err);
+  });
+}
+
+async function save() {
+  try { await setDoc(teamDocRef, state); }
+  catch (e) { alert('مشكلة في الحفظ: ' + e.message); }
+}
+
+/* ======== التبويبات ======== */
+window.showTab = function(name) {
+  $$('.tab-content').forEach(e => e.classList.add('hidden'));
+  $('#tab-' + name).classList.remove('hidden');
+  $$('.nav-btn').forEach(b => { b.classList.remove('tab-active'); b.classList.add('text-gray-500'); });
+  const btn = $('#nav-' + name);
+  btn.classList.add('tab-active'); btn.classList.remove('text-gray-500');
+};
+
+/* ======== اللاعبين ======== */
+window.addPlayer = function(e) {
+  e.preventDefault();
+  const f = e.target;
+  state.players.push({
+    id: uid(),
+    name: f.name.value.trim(),
+    number: f.number.value.trim(),
+    position: f.position.value,
+    phone: f.phone.value.trim()
+  });
+  f.reset(); save();
+};
+
+window.deletePlayer = function(id) {
+  if (!confirm('متأكد تحذف اللاعب؟')) return;
+  state.players = state.players.filter(p => p.id !== id);
+  save();
+};
+
+function renderPlayers() {
+  const box = $('#players-list');
+  if (!state.players.length) {
+    box.innerHTML = '<p class="text-center text-gray-400 py-8">مفيش لاعبين لسه. ضيف أول لاعب 👆</p>';
+    return;
+  }
+  box.innerHTML = state.players.map(p => `
+    <div class="bg-white rounded-xl p-3 mb-2 flex items-center justify-between shadow-sm">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold">
+          ${p.number || '?'}
+        </div>
+        <div>
+          <div class="font-semibold">${p.name}</div>
+          <div class="text-xs text-gray-500">${p.position || '—'}${p.phone ? ' · ' + p.phone : ''}</div>
+        </div>
+      </div>
+      <button onclick="deletePlayer('${p.id}')" class="text-red-400 text-sm">حذف</button>
+    </div>
+  `).join('');
+}
+
+/* ======== الماتشات ======== */
+window.addMatch = function(e) {
+  e.preventDefault();
+  const f = e.target;
+  state.matches.push({
+    id: uid(),
+    opponent: f.opponent.value.trim(),
+    date: f.date.value,
+    time: f.time.value,
+    location: f.location.value.trim(),
+    attendance: {}, goals: {}, assists: {}
+  });
+  f.reset(); save();
+};
+
+window.deleteMatch = function(id) {
+  if (!confirm('تحذف الماتش وكل إحصائياته؟')) return;
+  state.matches = state.matches.filter(m => m.id !== id);
+  save();
+};
+
+window.toggleAtt = function(mid, pid) {
+  const m = state.matches.find(x => x.id === mid);
+  m.attendance[pid] = m.attendance[pid] === 'present' ? 'absent' : 'present';
+  save();
+};
+
+window.addGoal = function(mid, pid, delta) {
+  const m = state.matches.find(x => x.id === mid);
+  m.goals[pid] = Math.max(0, (m.goals[pid] || 0) + delta);
+  save();
+};
+
+window.addAssist = function(mid, pid, delta) {
+  const m = state.matches.find(x => x.id === mid);
+  m.assists[pid] = Math.max(0, (m.assists[pid] || 0) + delta);
+  save();
+};
+
+function renderMatches() {
+  const box = $('#matches-list');
+  if (!state.matches.length) {
+    box.innerHTML = '<p class="text-center text-gray-400 py-8">مفيش ماتشات. ضيف ماتش 👆</p>';
+    return;
+  }
+  const sorted = [...state.matches].sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  box.innerHTML = sorted.map(m => {
+    const present = Object.values(m.attendance||{}).filter(v => v === 'present').length;
+    return `
+    <div class="bg-white rounded-xl p-3 mb-3 shadow-sm">
+      <div class="flex justify-between items-start mb-1">
+        <div>
+          <div class="font-semibold">ضد ${m.opponent}</div>
+          <div class="text-xs text-gray-500">📅 ${m.date || '—'} ${m.time || ''}${m.location ? ' · 📍 ' + m.location : ''}</div>
+        </div>
+        <button onclick="deleteMatch('${m.id}')" class="text-red-400 text-sm">حذف</button>
+      </div>
+      <div class="text-xs text-gray-500 mb-2">حضور: ${present}/${state.players.length}</div>
+      <details class="text-sm">
+        <summary class="cursor-pointer text-emerald-600 font-semibold">الحضور والإحصائيات</summary>
+        <div class="mt-2 space-y-1">
+          ${state.players.length ? state.players.map(p => {
+            const att = (m.attendance||{})[p.id] || 'absent';
+            const g = (m.goals||{})[p.id] || 0;
+            const a = (m.assists||{})[p.id] || 0;
+            return `<div class="flex items-center justify-between border-t py-1.5 gap-1 flex-wrap">
+              <span class="text-sm">${p.name}</span>
+              <div class="flex gap-1 items-center">
+                <button onclick="toggleAtt('${m.id}','${p.id}')"
+                  class="px-2 py-1 rounded text-xs ${att==='present'?'bg-emerald-600 text-white':'bg-gray-200'}">
+                  ${att==='present'?'حاضر':'غايب'}
+                </button>
+                <span class="text-xs">⚽${g}</span>
+                <button onclick="addGoal('${m.id}','${p.id}',1)" class="px-1.5 rounded bg-blue-100">+</button>
+                <button onclick="addGoal('${m.id}','${p.id}',-1)" class="px-1.5 rounded bg-gray-100">−</button>
+                <span class="text-xs">🅰️${a}</span>
+                <button onclick="addAssist('${m.id}','${p.id}',1)" class="px-1.5 rounded bg-purple-100">+</button>
+                <button onclick="addAssist('${m.id}','${p.id}',-1)" class="px-1.5 rounded bg-gray-100">−</button>
+              </div>
+            </div>`;
+          }).join('') : '<p class="text-gray-400 text-xs py-2">ضيف لاعبين الأول.</p>'}
+        </div>
+      </details>
+    </div>`;
+  }).join('');
+}
+
+/* ======== الإحصائيات ======== */
+function renderStats() {
+  const totals = state.players.map(p => {
+    let goals=0, assists=0, present=0;
+    state.matches.forEach(m => {
+      goals += (m.goals||{})[p.id] || 0;
+      assists += (m.assists||{})[p.id] || 0;
+      if ((m.attendance||{})[p.id] === 'present') present++;
+    });
+    return { ...p, goals, assists, present };
+  });
+  const topScorer = [...totals].sort((a,b)=>b.goals-a.goals)[0];
+  const topAssist = [...totals].sort((a,b)=>b.assists-a.assists)[0];
+  $('#stats-content').innerHTML = `
+    <div class="grid grid-cols-2 gap-2 mb-3">
+      <div class="bg-white rounded-xl p-3 shadow-sm text-center">
+        <div class="text-xs text-gray-500">الهداف</div>
+        <div class="font-bold text-emerald-600">${topScorer?.goals ? topScorer.name : '—'}</div>
+        <div class="text-xs">⚽ ${topScorer?.goals || 0}</div>
+      </div>
+      <div class="bg-white rounded-xl p-3 shadow-sm text-center">
+        <div class="text-xs text-gray-500">أكثر أسيست</div>
+        <div class="font-bold text-emerald-600">${topAssist?.assists ? topAssist.name : '—'}</div>
+        <div class="text-xs">🅰️ ${topAssist?.assists || 0}</div>
+      </div>
+    </div>
+    <div class="bg-white rounded-xl p-3 shadow-sm">
+      <div class="text-sm font-semibold mb-2">ترتيب اللاعبين</div>
+      ${totals.length ? [...totals].sort((a,b)=> b.goals-a.goals || b.assists-a.assists).map(p => `
+        <div class="flex justify-between items-center border-t py-1.5 text-sm">
+          <span>${p.number ? '#'+p.number+' ' : ''}${p.name}</span>
+          <span class="text-xs text-gray-600">⚽${p.goals} · 🅰️${p.assists} · ✅${p.present}</span>
+        </div>
+      `).join('') : '<p class="text-gray-400 text-xs">مفيش بيانات.</p>'}
+    </div>
+  `;
+}
+
+/* ======== الفلوس ======== */
+window.addPayment = function(e) {
+  e.preventDefault();
+  const f = e.target;
+  state.payments.push({
+    id: uid(),
+    playerId: f.playerId.value,
+    amount: Number(f.amount.value),
+    note: f.note.value.trim(),
+    date: new Date().toISOString().slice(0,10)
+  });
+  f.reset(); save();
+};
+
+function renderPayments() {
+  const sel = document.querySelector('select[name="playerId"]');
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = '<option value="">اختار اللاعب</option><option value="__team__">💼 مصروف للفريق ككل</option>' +
+    state.players.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+  sel.value = current;
+
+  const perPlayer = {};
+  state.payments.forEach(pay => {
+    perPlayer[pay.playerId] = (perPlayer[pay.playerId] || 0) + pay.amount;
+  });
+  const total = state.payments.reduce((s,p)=> s+p.amount, 0);
+  const nameOf = id => id === '__team__' ? '💼 الفريق' : (state.players.find(p=>p.id===id)?.name || 'محذوف');
+
+  $('#money-content').innerHTML = `
+    <div class="bg-white rounded-xl p-3 shadow-sm mb-3">
+      <div class="text-xs text-gray-500">إجمالي المتحصل</div>
+      <div class="text-2xl font-bold text-emerald-600">${fmt(total)} ج.م</div>
+    </div>
+    <div class="bg-white rounded-xl p-3 shadow-sm mb-3">
+      <div class="text-sm font-semibold mb-2">ملخص لكل لاعب</div>
+      ${Object.keys(perPlayer).length ? Object.entries(perPlayer).map(([id,amt]) => `
+        <div class="flex justify-between border-t py-1.5 text-sm">
+          <span>${nameOf(id)}</span>
+          <span class="font-semibold">${fmt(amt)} ج.م</span>
+        </div>
+      `).join('') : '<p class="text-gray-400 text-xs">مفيش دفعات لسه.</p>'}
+    </div>
+    <div class="bg-white rounded-xl p-3 shadow-sm">
+      <div class="text-sm font-semibold mb-2">آخر الدفعات</div>
+      ${state.payments.length ? [...state.payments].reverse().slice(0,15).map(p => `
+        <div class="flex justify-between border-t py-1.5 text-sm">
+          <span>${nameOf(p.playerId)} ${p.note ? '· '+p.note : ''}</span>
+          <span class="text-xs text-gray-500">${p.date} · ${fmt(p.amount)} ج</span>
+        </div>
+      `).join('') : '<p class="text-gray-400 text-xs">—</p>'}
+    </div>
+  `;
+}
+
+/* ======== رندر ======== */
+function render() {
+  renderPlayers(); renderMatches(); renderStats(); renderPayments();
+  const paid = state.payments.reduce((s,p)=>s+p.amount,0);
+  $('#team-summary').textContent =
+    `${state.players.length} لاعب · ${state.matches.length} ماتش · ${fmt(paid)} ج.م`;
+}
+</script>
+</body>
+</html>
