@@ -10,6 +10,8 @@
 <style>
   body { font-family: system-ui, 'Segoe UI', Tahoma, sans-serif; }
   .tab-active { color:#10b981; border-top:3px solid #10b981; font-weight:700; }
+  /* تصغير خط الشريط السفلي عشان 6 تابات يدخلوا في الشاشة */
+  .nav-btn { font-size: 11px; padding: 6px 2px; }
 </style>
 </head>
 <body class="bg-gray-100 pb-24">
@@ -83,6 +85,24 @@
     <div id="money-content"></div>
   </section>
 
+  <!-- القوانين -->
+  <section id="tab-rules" class="tab-content hidden">
+    <div class="bg-white rounded-xl p-4 shadow-sm mb-3">
+      <h2 class="font-bold text-lg mb-2 text-emerald-700">📜 قوانين الفريق</h2>
+      <textarea id="rules-text" rows="10" class="w-full border rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500" placeholder="اكتب هنا قوانين الفريق والغرامات..."></textarea>
+      <button onclick="saveRules()" class="w-full mt-3 bg-emerald-600 text-white rounded-lg p-2 font-semibold">حفظ التعديلات</button>
+    </div>
+  </section>
+
+  <!-- الإعلانات -->
+  <section id="tab-announcements" class="tab-content hidden">
+    <form onsubmit="addAnnouncement(event)" class="bg-white rounded-xl p-3 shadow-sm mb-3 space-y-2">
+      <input name="text" placeholder="اكتب إعلان جديد هنا..." required class="w-full border rounded-lg p-2">
+      <button class="w-full bg-emerald-600 text-white rounded-lg p-2 font-semibold">📢 نشر الإعلان</button>
+    </form>
+    <div id="announcements-list" class="space-y-2"></div>
+  </section>
+
   <div class="text-center mt-4 space-y-3">
     <button onclick="enableNotifications()" class="text-xs bg-emerald-100 text-emerald-700 px-3 py-2 rounded-lg">🔔 فعّل الإشعارات</button>
     <div><button onclick="logout()" class="text-xs text-red-400 underline">تسجيل خروج</button></div>
@@ -90,11 +110,13 @@
 
 </main>
 
-<nav class="fixed bottom-0 inset-x-0 bg-white border-t flex justify-around py-2 z-40">
-  <button id="nav-players" class="nav-btn tab-active px-3 py-1 text-sm" onclick="showTab('players')">👥 اللاعبين</button>
-  <button id="nav-matches" class="nav-btn px-3 py-1 text-sm text-gray-500" onclick="showTab('matches')">📅 الماتشات</button>
-  <button id="nav-stats"   class="nav-btn px-3 py-1 text-sm text-gray-500" onclick="showTab('stats')">📊 إحصائيات</button>
-  <button id="nav-money"   class="nav-btn px-3 py-1 text-sm text-gray-500" onclick="showTab('money')">💸 فلوس</button>
+<nav class="fixed bottom-0 inset-x-0 bg-white border-t flex justify-between px-1 py-1 z-40 overflow-x-auto">
+  <button id="nav-players" class="nav-btn tab-active text-center flex-1" onclick="showTab('players')">👥<br>اللاعبين</button>
+  <button id="nav-matches" class="nav-btn text-gray-500 text-center flex-1" onclick="showTab('matches')">📅<br>الماتشات</button>
+  <button id="nav-stats"   class="nav-btn text-gray-500 text-center flex-1" onclick="showTab('stats')">📊<br>إحصائيات</button>
+  <button id="nav-money"   class="nav-btn text-gray-500 text-center flex-1" onclick="showTab('money')">💸<br>فلوس</button>
+  <button id="nav-rules"   class="nav-btn text-gray-500 text-center flex-1" onclick="showTab('rules')">📜<br>القوانين</button>
+  <button id="nav-announcements" class="nav-btn text-gray-500 text-center flex-1" onclick="showTab('announcements')">📢<br>إعلانات</button>
 </nav>
 
 <script type="module">
@@ -128,7 +150,8 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const teamDocRef = doc(db, "teams", TEAM_ID);
 
-let state = { players: [], matches: [], payments: [] };
+// ضفنا rules و announcements للحالة
+let state = { players: [], matches: [], payments: [], rules: "", announcements: [] };
 let unsubscribe = null;
 let osReady = false;
 
@@ -196,9 +219,12 @@ function startSync() {
   unsubscribe = onSnapshot(teamDocRef, (snap) => {
     if (snap.exists()) {
       state = snap.data();
+      // تأكد إن كل الحقول موجودة عشان ميحصلش خطأ
       state.players = state.players || [];
       state.matches = state.matches || [];
       state.payments = state.payments || [];
+      state.rules = state.rules || "";
+      state.announcements = state.announcements || [];
     }
     render();
   }, (err) => {
@@ -442,9 +468,60 @@ function renderPayments() {
   `;
 }
 
+/* ======== القوانين ======== */
+window.saveRules = function() {
+  const text = $('#rules-text').value.trim();
+  state.rules = text;
+  save();
+  alert('تم حفظ القوانين ✅');
+};
+
+function renderRules() {
+  const txt = $('#rules-text');
+  // لو المستخدم مش بيكتب دلوقتي، نحدث القيمة
+  if (document.activeElement !== txt) {
+    txt.value = state.rules || "";
+  }
+}
+
+/* ======== الإعلانات ======== */
+window.addAnnouncement = function(e) {
+  e.preventDefault();
+  const f = e.target;
+  state.announcements.push({
+    id: uid(),
+    text: f.text.value.trim(),
+    date: new Date().toLocaleString('ar-EG', { dateStyle: 'short', timeStyle: 'short' })
+  });
+  f.reset(); save();
+};
+
+window.deleteAnnouncement = function(id) {
+  if (!confirm('متأكد تحذف الإعلان؟')) return;
+  state.announcements = state.announcements.filter(a => a.id !== id);
+  save();
+};
+
+function renderAnnouncements() {
+  const box = $('#announcements-list');
+  if (!state.announcements.length) {
+    box.innerHTML = '<p class="text-center text-gray-400 py-4">مفيش إعلانات لسه.</p>';
+    return;
+  }
+  box.innerHTML = [...state.announcements].reverse().map(a => `
+    <div class="bg-white rounded-xl p-3 shadow-sm border-r-4 border-emerald-500">
+      <div class="text-sm font-semibold mb-1">${a.text}</div>
+      <div class="flex justify-between items-center">
+        <span class="text-[10px] text-gray-400">${a.date}</span>
+        <button onclick="deleteAnnouncement('${a.id}')" class="text-red-400 text-xs">حذف</button>
+      </div>
+    </div>
+  `).join('');
+}
+
 /* ======== رندر ======== */
 function render() {
-  renderPlayers(); renderMatches(); renderStats(); renderPayments();
+  renderPlayers(); renderMatches(); renderStats(); renderPayments(); renderRules(); renderAnnouncements();
   const paid = state.payments.reduce((s,p)=>s+p.amount,0);
   $('#team-summary').textContent =
     `${state.players.length} لاعب · ${state.matches.length} ماتش · ${fmt(paid)} ج.م`;
