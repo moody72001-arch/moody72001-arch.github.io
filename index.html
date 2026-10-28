@@ -140,8 +140,7 @@ const firebaseConfig = {
 const TEAM_CODE = "MOODY2025";
 
 /* ======== 3) إعدادات OneSignal ======== */
-const ONESIGNAL_APP_ID = "YOUR_ONESIGNAL_APP_ID"; // هنعدلها بعدين
-const SAFARI_WEB_ID = "YOUR_SAFARI_WEB_ID"; // هنعدلها بعدين
+const ONESIGNAL_APP_ID = "a05829ee-dd76-44d5-929a-793ea08664c7"; // تم وضع الكود بتاعك
 
 const TEAM_ID = "my-team";
 
@@ -150,7 +149,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const teamDocRef = doc(db, "teams", TEAM_ID);
 
-// ضفنا rules و announcements للحالة
 let state = { players: [], matches: [], payments: [], rules: "", announcements: [] };
 let unsubscribe = null;
 let osReady = false;
@@ -168,7 +166,6 @@ function initOneSignal() {
   OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
       appId: ONESIGNAL_APP_ID,
-      safari_web_id: SAFARI_WEB_ID,
       notifyButton: { enable: false },
       allowLocalhostAsSecureOrigin: false
     });
@@ -219,7 +216,6 @@ function startSync() {
   unsubscribe = onSnapshot(teamDocRef, (snap) => {
     if (snap.exists()) {
       state = snap.data();
-      // تأكد إن كل الحقول موجودة عشان ميحصلش خطأ
       state.players = state.players || [];
       state.matches = state.matches || [];
       state.payments = state.payments || [];
@@ -478,7 +474,6 @@ window.saveRules = function() {
 
 function renderRules() {
   const txt = $('#rules-text');
-  // لو المستخدم مش بيكتب دلوقتي، نحدث القيمة
   if (document.activeElement !== txt) {
     txt.value = state.rules || "";
   }
