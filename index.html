@@ -18,19 +18,39 @@
   .nav-btn.active { color: #10b981; background-color: rgba(16, 185, 129, 0.1); }
   
   /* تأثير قلب الكارت (Flip Card) */
-  .flip-card { perspective: 1000px; width: 100%; height: 210px; cursor: pointer; }
+  .flip-card { perspective: 1000px; width: 100%; height: 220px; cursor: pointer; }
   .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
   .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
   .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 1.2rem; overflow: hidden; }
   .flip-card-back { transform: rotateY(180deg); }
   
-  /* تصميم كارت فيفا */
+  /* ألوان الكروت */
   .fifa-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 2px solid #334155; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
-  .fifa-bg.gold { border-color: #eab308; box-shadow: 0 10px 25px -5px rgba(234, 179, 8, 0.2); background: linear-gradient(135deg, #422006 0%, #0f172a 100%); }
-  .fifa-bg.silver { border-color: #94a3b8; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
-  .fifa-bg.bronze { border-color: #b45309; background: linear-gradient(135deg, #431407 0%, #0f172a 100%); }
-  .fifa-bg.glow { box-shadow: 0 0 15px rgba(234, 179, 8, 0.6); }
   
+  .card-silver { border-color: #cbd5e1; background: linear-gradient(135deg, #334155 0%, #0f172a 100%); }
+  
+  .card-orange { border-color: #f97316; background: linear-gradient(135deg, #431407 0%, #0f172a 100%); }
+  .card-orange .text-rating { color: #f97316; }
+
+  .card-green { border-color: #10b981; background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%); }
+  .card-green .text-rating { color: #10b981; }
+
+  .card-glow-red { border-color: #ef4444; background: linear-gradient(135deg, #450a0a 0%, #0f172a 100%); box-shadow: 0 0 15px rgba(239, 68, 68, 0.6); }
+  .card-glow-red .text-rating { color: #ef4444; }
+
+  /* كارت النيران (أكبر من 95) */
+  @keyframes fireGlow {
+    0% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500, 0 0 30px #ff8c00; border-color: #ff0000; }
+    50% { box-shadow: 0 0 20px #ff4500, 0 0 30px #ff8c00, 0 0 40px #ff0000; border-color: #ff8c00; }
+    100% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500, 0 0 30px #ff8c00; border-color: #ff0000; }
+  }
+  .card-fire { 
+    background: linear-gradient(135deg, #7f1d1d 0%, #0f172a 100%); 
+    border: 3px solid #ff0000; 
+    animation: fireGlow 1.5s infinite alternate; 
+  }
+  .card-fire .text-rating { color: #fbbf24; text-shadow: 0 0 10px #ff4500; }
+
   input, select, textarea { outline: none; transition: border-color 0.2s; color: #fff; }
   input:focus, select:focus, textarea:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
 
@@ -134,13 +154,11 @@
 
     <!-- الماتشات -->
     <section id="tab-matches" class="tab-content">
-      <!-- أزرار التنقل الداخلي للماتشات -->
       <div class="flex bg-slate-800 p-1 rounded-xl mb-4 border border-slate-700">
         <button onclick="switchMatchTab('active')" id="btn-match-active" class="flex-1 py-2 text-sm font-bold rounded-lg bg-emerald-600 text-white transition-all">الماتشات الحالية</button>
         <button onclick="switchMatchTab('history')" id="btn-match-history" class="flex-1 py-2 text-sm font-bold rounded-lg text-slate-400 hover:text-white transition-all">سجل الماتشات</button>
       </div>
 
-      <!-- محتوى الماتشات الحالية -->
       <div id="matches-active-container">
         <div id="add-match-form" class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 hidden">
           <h2 class="font-bold text-sm mb-3 text-emerald-400">إضافة ماتش جديد</h2>
@@ -165,7 +183,6 @@
         <div id="matches-active-list" class="space-y-3"></div>
       </div>
 
-      <!-- محتوى سجل الماتشات -->
       <div id="matches-history-container" class="hidden space-y-3">
       </div>
     </section>
@@ -214,7 +231,6 @@
 
     <!-- الإدارة -->
     <section id="tab-admin" class="tab-content">
-      <!-- رفع شعار الفريق -->
       <div class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 flex justify-between items-center">
         <div>
            <h2 class="font-bold text-sm text-emerald-400">شعار الفريق</h2>
@@ -536,18 +552,13 @@ function calculateOVR(p) {
   const data = getPlayerData(p);
   const stats = p.stats || { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 };
   
-  // حساب متوسط الإحصائيات
   const statsAvg = (stats.sho + stats.pas + stats.spd + stats.def + stats.phy) / 5;
-  
-  // بونص مقابل الأداء في الماتشات
   const goalsBonus = data.goals * 0.5; 
   const assistsBonus = data.assists * 0.3;
   const motmBonus = data.motmCount * 1.5;
-  const ratingBonus = data.avgRating * 0.5; // لو تقييمه 10 بياخد +5
+  const ratingBonus = data.avgRating * 0.5;
   
   let ovr = statsAvg + goalsBonus + assistsBonus + motmBonus + ratingBonus;
-  
-  // الحد الأقصى 99 والحد الأدنى 40
   return Math.min(99, Math.max(40, Math.round(ovr)));
 }
 
@@ -560,21 +571,38 @@ function renderCards() {
     const ovr = calculateOVR(p);
     const stats = p.stats || { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 };
     
-    let cardClass = "bronze";
-    let textClass = "text-orange-400";
-    if(ovr >= 85) { cardClass = "gold glow"; textClass = "text-yellow-400"; }
-    else if(ovr >= 75) { cardClass = "silver"; textClass = "text-slate-300"; }
-    else { cardClass = "bronze"; textClass = "text-orange-500"; }
+    let cardClass = "fifa-bg"; // Default
+    let ratingTextColor = "text-white"; // Default
+
+    if (ovr > 95) {
+        cardClass = "card-fire";
+        ratingTextColor = "text-rating"; 
+    } else if (ovr >= 91) {
+        cardClass = "card-glow-red";
+        ratingTextColor = "text-rating";
+    } else if (ovr >= 86) {
+        cardClass = "card-green";
+        ratingTextColor = "text-rating";
+    } else if (ovr >= 80) {
+        cardClass = "card-orange";
+        ratingTextColor = "text-rating";
+    } else if (ovr >= 70) {
+        cardClass = "card-silver";
+        ratingTextColor = "text-slate-300";
+    } else {
+        cardClass = "fifa-bg border-slate-600";
+        ratingTextColor = "text-slate-500";
+    }
 
     return `
       <div class="flip-card" id="card-${p.id}" onclick="flipCard('${p.id}')">
         <div class="flip-card-inner">
           
           <!-- الوجه الأول (الأساسي) -->
-          <div class="flip-card-front fifa-bg ${cardClass} p-3 flex flex-col items-center justify-between">
+          <div class="flip-card-front ${cardClass} p-3 flex flex-col items-center justify-between">
             <div class="w-full flex justify-between items-start">
               <div class="text-right">
-                <div class="text-3xl font-black ${textClass}">${ovr}</div>
+                <div class="text-3xl font-black ${ratingTextColor}">${ovr}</div>
                 <div class="text-[10px] font-bold text-slate-300 uppercase">${p.position ? p.position.substring(0,3) : 'PLY'}</div>
               </div>
               <div class="text-2xl font-black text-slate-500">${p.number ? '#'+p.number : ''}</div>
@@ -588,7 +616,6 @@ function renderCards() {
               <div class="font-black text-xs text-white truncate px-1">${p.name}</div>
             </div>
             
-            <!-- إحصائيات الماتشات -->
             <div class="w-full flex justify-around text-[10px] font-bold text-slate-300 mt-1">
               <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">مباريات</span>${data.present}</div>
               <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">أهداف</span>${data.goals}</div>
@@ -597,7 +624,7 @@ function renderCards() {
           </div>
           
           <!-- الوجه الثاني (الإحصائيات التفصيلية) -->
-          <div class="flip-card-back fifa-bg ${cardClass} p-3 flex flex-col justify-between">
+          <div class="flip-card-back ${cardClass} p-3 flex flex-col justify-between">
             <div class="text-center border-b border-slate-600 pb-2 mb-2">
               <div class="font-black text-sm text-white">${p.name}</div>
               <div class="text-[10px] text-slate-400">إحصائيات اللاعب</div>
@@ -609,11 +636,11 @@ function renderCards() {
               <div class="flex justify-between"><span>SPD</span><span class="text-white">${stats.spd}</span></div>
               <div class="flex justify-between"><span>DEF</span><span class="text-white">${stats.def}</span></div>
               <div class="flex justify-between"><span>PHY</span><span class="text-white">${stats.phy}</span></div>
-              <div class="flex justify-between"><span>OVR</span><span class="${textClass}">${ovr}</span></div>
+              <div class="flex justify-between"><span>OVR</span><span class="${ratingTextColor}">${ovr}</span></div>
             </div>
             
             <div class="text-center mt-2">
-              <span class="text-[9px] text-slate-500 bg-slate-800 px-2 py-1 rounded">اضغط للعودة</span>
+              <span class="text-[9px] text-slate-500 bg-slate-800/50 px-2 py-1 rounded">اضغط للعودة</span>
             </div>
           </div>
           
@@ -641,7 +668,6 @@ window.editPlayerStats = function(playerId) {
 
   p.stats = { sho: Number(sho), pas: Number(pas), spd: Number(spd), def: Number(def), phy: Number(phy) };
   save();
-  // التحديث هيعمل ريندر أوتوماتيك وهتلاقي التقييم اتغير في الكروت
 };
 
 /* ================== الماتشات ================== */
@@ -689,6 +715,15 @@ function buildMatchCard(m, isArchived) {
     const present = Object.values(m.attendance||{}).filter(v => v === 'present').length;
     const hasScore = (m.ourScore !== null && m.theirScore !== null && m.ourScore !== "" && m.theirScore !== "");
     
+    let resultBadge = "";
+    if (hasScore) {
+        const our = Number(m.ourScore);
+        const their = Number(m.theirScore);
+        if (our > their) resultBadge = `<span class="bg-emerald-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md mr-2">فوز</span>`;
+        else if (our < their) resultBadge = `<span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md mr-2">خسارة</span>`;
+        else resultBadge = `<span class="bg-slate-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md mr-2">تعادل</span>`;
+    }
+    
     return `
     <div class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-3 ${isArchived ? 'opacity-80' : ''}">
       <div class="flex justify-between items-center mb-3">
@@ -698,8 +733,11 @@ function buildMatchCard(m, isArchived) {
       
       <div class="flex justify-between items-center bg-slate-900 rounded-xl p-3 mb-3 border border-slate-700">
         <div class="text-center flex-1"><div class="font-black text-white text-sm">فريقنا</div></div>
-        <div class="text-xl font-black px-4 ${hasScore ? 'text-emerald-400' : 'text-slate-600'}">
-          ${hasScore ? `${m.ourScore} - ${m.theirScore}` : 'vs'}
+        <div class="flex items-center">
+            ${resultBadge}
+            <div class="text-xl font-black px-2 ${hasScore ? 'text-emerald-400' : 'text-slate-600'}">
+              ${hasScore ? `${m.ourScore} - ${m.theirScore}` : 'vs'}
+            </div>
         </div>
         <div class="text-center flex-1"><div class="font-black text-white text-sm">${m.opponent}</div></div>
       </div>
