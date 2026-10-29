@@ -7,13 +7,6 @@
 <title>فريقنا - كرة خماسية</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
-<script>
-  // دي عشان تظهرلك أي مشكلة في الكود
-  window.onerror = function(msg, url, line) {
-    alert("حدث خطأ برمجي:\n" + msg + "\nالسطر: " + line);
-    return false;
-  };
-</script>
 <style>
   body { font-family: 'Cairo', system-ui, sans-serif; background-color: #f8fafc; }
   .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
@@ -208,12 +201,12 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, on
 import { getFirestore, doc, setDoc, updateDoc, onSnapshot, collection }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// إعدادات مشروعك الصحيحة
+// 🔴 الإعدادات الصح 100% من صورتك
 const firebaseConfig = {
   apiKey: "AIzaSyD4PqVEdU1NI7_5eZGntteEyRbZ519KYbg",
-  authDomain: "fariqi-4d879.firebaseapp.com",
-  projectId: "fariqi-4d879",
-  storageBucket: "fariqi-4d879.firebasestorage.app",
+  authDomain: "my-team-4d879.firebaseapp.com",
+  projectId: "my-team-4d879",
+  storageBucket: "my-team-4d879.firebasestorage.app",
   messagingSenderId: "837918664225",
   appId: "1:837918664225:web:28a56f2a7065228faae560"
 };
@@ -319,15 +312,9 @@ onAuthStateChanged(auth, (user) => {
 function checkUserStatus(uid) {
   const userRef = doc(db, "users", uid);
   onSnapshot(userRef, async (snap) => {
-    // لو المستخدم مش موجود في قاعدة البيانات
     if (!snap.exists()) {
       if (currentUserPhone.toLowerCase() === SUPER_ADMIN_PHONE) {
-        // لو هو الأدمن، نعمله على طول
-        await setDoc(userRef, {
-          phone: SUPER_ADMIN_PHONE,
-          role: "admin",
-          joinedAt: new Date().toISOString()
-        });
+        await setDoc(userRef, { phone: SUPER_ADMIN_PHONE, role: "admin", joinedAt: new Date().toISOString() });
         return;
       } else {
         $('#auth-screen').classList.add('hidden');
@@ -347,16 +334,11 @@ function checkUserStatus(uid) {
       $('#auth-screen').classList.add('hidden');
       $('#app-screen').classList.remove('hidden');
       
-      if (data.phone.toLowerCase() === SUPER_ADMIN_PHONE) {
-        isAdmin = true;
-      } else {
-        isAdmin = state.admins.includes(data.phone);
-      }
+      if (data.phone.toLowerCase() === SUPER_ADMIN_PHONE) isAdmin = true;
+      else isAdmin = state.admins.includes(data.phone);
       
       startAppSync();
     }
-  }, (error) => {
-    alert("مشكلة في الاتصال بقاعدة البيانات (تأكد من قواعد Firestore): " + error.message);
   });
 }
 
@@ -380,8 +362,6 @@ function startAppSync() {
 
     updateUI();
     render();
-  }, (error) => {
-    alert("مشكلة في قراءة بيانات الفريق: " + error.message);
   });
 
   if (isAdmin) {
