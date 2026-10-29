@@ -284,15 +284,25 @@ window.handleAuth = async function() {
     if(e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') msg = "رقم التليفون أو الباسورد غلط ❌";
     if(e.code === 'auth/email-already-in-use') msg = "رقم التليفون ده مسجل بالفعل ❌";
     if(e.code === 'auth/weak-password') msg = "الباسورد ضعيف (6 أرقام/حروف على الأقل) ❌";
+    if(e.code === 'auth/too-many-requests') msg = "تم حظر المحاولات مؤقتاً بسبب تكرار الأخطاء. يرجى الانتظار ساعة ❌";
     errorEl.textContent = msg;
     errorEl.classList.remove('hidden');
   }
 };
 
-window.logout = function() {
+// 🔴 تعديل تسجيل الخروج عشان يمنع مشكلة الـ too-many-requests
+window.logout = async function() {
   if (unsubscribeTeam) unsubscribeTeam();
   if (unsubscribeUsers) unsubscribeUsers();
-  signOut(auth);
+  try {
+    await signOut(auth);
+    // مسح أي بيانات مؤقتة
+    sessionStorage.clear();
+    // إعادة تحميل الصفحة بعد الخروج
+    window.location.reload();
+  } catch (e) {
+    window.location.reload();
+  }
 };
 
 onAuthStateChanged(auth, (user) => {
@@ -364,6 +374,7 @@ function startAppSync() {
     render();
   });
 
+  // الاستماع للمستخدمين (حتى لو لسه مفيش ولا واحد)
   if (isAdmin) {
     unsubscribeUsers = onSnapshot(collection(db, "users"), (snap) => {
       pendingUsers = []; approvedUsers = [];
@@ -373,6 +384,8 @@ function startAppSync() {
         else approvedUsers.push({uid: d.id, ...u});
       });
       renderAdminPanel();
+    }, (error) => {
+      console.error("خطأ في قراءة الأعضاء:", error);
     });
   }
 }
