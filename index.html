@@ -17,52 +17,62 @@
   .nav-btn span { font-size: 1.3rem; margin-bottom: 0.1rem; }
   .nav-btn.active { color: #10b981; background-color: rgba(16, 185, 129, 0.1); }
   
-  /* ====== تصميم كارت فيفا (Flip Card) ====== */
-  .flip-card { perspective: 1000px; width: 100%; height: 230px; cursor: pointer; }
+  /* ====== تصميم كارت فيفا (الشكل المشطوف) ====== */
+  .flip-card { perspective: 1000px; width: 100%; height: 240px; cursor: pointer; }
   .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; }
   .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+  
   .flip-card-front, .flip-card-back { 
     position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; 
-    border-radius: 1.2rem; overflow: hidden; 
-    box-shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.7);
   }
   .flip-card-back { transform: rotateY(180deg); }
-  
-  /* الخلفية المعدنية (تأثير الخطوط القطرية) */
-  .card-bg-texture {
-    position: absolute; inset: 0; z-index: 0; opacity: 0.3;
-    background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.05) 10px, rgba(255,255,255,0.05) 20px);
+
+  /* قوقعة الكارت (الشكل المشطوف) */
+  .card-wrapper {
+    position: absolute; inset: 0;
+    clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px);
+    padding: 3px; /* سمك الإطار */
+    box-sizing: border-box;
+  }
+  .card-inner {
+    width: 100%; height: 100%;
+    clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
+    position: relative; overflow: hidden;
+    display: flex; flex-direction: column;
   }
 
-  /* الألوان الأساسية للكروت (مع تأثير الإضاءة) */
-  .fifa-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 2px solid #334155; }
-  
-  .card-silver { background: linear-gradient(135deg, #475569 0%, #1e293b 100%); border: 2px solid #94a3b8; box-shadow: 0 0 15px rgba(148, 163, 184, 0.3); }
-  .card-silver .text-rating { color: #f1f5f9; text-shadow: 0 0 10px rgba(255,255,255,0.8); }
-  
-  .card-orange { background: linear-gradient(135deg, #7c2d12 0%, #1e293b 100%); border: 2px solid #f97316; box-shadow: 0 0 15px rgba(249, 115, 22, 0.4); }
-  .card-orange .text-rating { color: #fdba74; text-shadow: 0 0 10px rgba(249, 115, 22, 0.8); }
+  /* الخلفية المعدنية */
+  .card-bg-texture {
+    position: absolute; inset: 0; z-index: 0; opacity: 0.2;
+    background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px);
+  }
 
-  .card-green { background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%); border: 2px solid #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
-  .card-green .text-rating { color: #6ee7b7; text-shadow: 0 0 10px rgba(16, 185, 129, 0.8); }
+  /* ألوان الكروت */
+  .wrapper-silver { background: #cbd5e1; }
+  .inner-silver { background: linear-gradient(135deg, #334155 0%, #0f172a 100%); }
+  .inner-silver .text-rating { color: #f1f5f9; text-shadow: 0 0 10px rgba(255,255,255,0.8); }
 
-  .card-glow-red { background: linear-gradient(135deg, #7f1d1d 0%, #0f172a 100%); border: 2px solid #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
-  .card-glow-red .text-rating { color: #fca5a5; text-shadow: 0 0 15px rgba(239, 68, 68, 1); }
+  .wrapper-orange { background: #f97316; }
+  .inner-orange { background: linear-gradient(135deg, #431407 0%, #0f172a 100%); }
+  .inner-orange .text-rating { color: #fdba74; text-shadow: 0 0 10px rgba(249, 115, 22, 0.8); }
+
+  .wrapper-green { background: #10b981; }
+  .inner-green { background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%); }
+  .inner-green .text-rating { color: #6ee7b7; text-shadow: 0 0 10px rgba(16, 185, 129, 0.8); }
+
+  .wrapper-red { background: #ef4444; }
+  .inner-red { background: linear-gradient(135deg, #7f1d1d 0%, #0f172a 100%); }
+  .inner-red .text-rating { color: #fca5a5; text-shadow: 0 0 15px rgba(239, 68, 68, 1); }
 
   /* كارت النيران (أكبر من 95) */
   @keyframes fireGlow {
     0% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500; border-color: #ff0000; }
-    50% { box-shadow: 0 0 25px #ff4500, 0 0 40px #ff8c00; border-color: #ff8c00; }
-    100% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500; border-color: #ff0000; }
+    100% { box-shadow: 0 0 20px #ff4500, 0 0 30px #ff8c00; border-color: #ff8c00; }
   }
-  .card-fire { 
-    background: linear-gradient(135deg, #450a0a 0%, #000000 100%); 
-    border: 3px solid #ff0000; 
-    animation: fireGlow 1.5s infinite alternate; 
-  }
-  .card-fire .text-rating { color: #fbbf24; text-shadow: 0 0 15px #ff4500, 0 0 30px #ff0000; }
+  .wrapper-fire { background: linear-gradient(135deg, #ff0000, #ff8c00, #ff0000); animation: fireGlow 1.5s infinite alternate; }
+  .inner-fire { background: linear-gradient(135deg, #450a0a 0%, #000000 100%); }
+  .inner-fire .text-rating { color: #fbbf24; text-shadow: 0 0 15px #ff4500, 0 0 30px #ff0000; }
 
-  /* تنسيق الأرقام الرياضية */
   .fifa-number { font-family: 'Teko', sans-serif; font-weight: 600; line-height: 0.9; }
   
   input, select, textarea { outline: none; transition: border-color 0.2s; color: #fff; }
@@ -585,75 +595,84 @@ function renderCards() {
     const ovr = calculateOVR(p);
     const stats = p.stats || { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 };
     
-    let cardClass = "fifa-bg"; 
-    let ratingTextColor = "text-white"; 
+    let wrapperClass = "wrapper-bronze"; 
+    let innerClass = "inner-bronze"; 
+    let ratingTextColor = "text-amber-700"; 
 
-    if (ovr > 95) { cardClass = "card-fire"; ratingTextColor = "text-rating"; }
-    else if (ovr >= 91) { cardClass = "card-glow-red"; ratingTextColor = "text-rating"; }
-    else if (ovr >= 86) { cardClass = "card-green"; ratingTextColor = "text-rating"; }
-    else if (ovr >= 80) { cardClass = "card-orange"; ratingTextColor = "text-rating"; }
-    else if (ovr >= 70) { cardClass = "card-silver"; ratingTextColor = "text-slate-300"; }
-    else { cardClass = "fifa-bg border-slate-600"; ratingTextColor = "text-slate-500"; }
+    if (ovr > 95) { wrapperClass = "wrapper-fire"; innerClass = "inner-fire"; ratingTextColor = "text-rating"; }
+    else if (ovr >= 91) { wrapperClass = "wrapper-red"; innerClass = "inner-red"; ratingTextColor = "text-rating"; }
+    else if (ovr >= 86) { wrapperClass = "wrapper-green"; innerClass = "inner-green"; ratingTextColor = "text-rating"; }
+    else if (ovr >= 80) { wrapperClass = "wrapper-orange"; innerClass = "inner-orange"; ratingTextColor = "text-rating"; }
+    else if (ovr >= 70) { wrapperClass = "wrapper-silver"; innerClass = "inner-silver"; ratingTextColor = "text-slate-300"; }
+    else { wrapperClass = "wrapper-silver"; innerClass = "inner-silver"; ratingTextColor = "text-slate-400"; }
 
     return `
       <div class="flip-card" id="card-${p.id}" onclick="flipCard('${p.id}')">
         <div class="flip-card-inner">
           
           <!-- الوجه الأول (الأساسي) -->
-          <div class="flip-card-front ${cardClass}">
-            <div class="card-bg-texture"></div>
-            
-            <div class="relative z-10 w-full h-full p-3 flex flex-col items-center justify-between">
-              <!-- التقييم والرقم -->
-              <div class="w-full flex justify-between items-start">
-                <div class="text-right flex flex-col items-center">
-                  <div class="text-4xl fifa-number ${ratingTextColor}">${ovr}</div>
-                  <div class="text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-1">${p.position ? p.position.substring(0,3) : 'PLY'}</div>
+          <div class="flip-card-front">
+            <div class="card-wrapper ${wrapperClass}">
+              <div class="card-inner ${innerClass} p-4 flex flex-col justify-between">
+                <div class="card-bg-texture"></div>
+                
+                <div class="relative z-10 w-full h-full flex flex-col items-center justify-between">
+                  <!-- التقييم والرقم -->
+                  <div class="w-full flex justify-between items-start">
+                    <div class="text-right flex flex-col items-center">
+                      <div class="text-4xl fifa-number ${ratingTextColor}">${ovr}</div>
+                      <div class="text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-1">${p.position ? p.position.substring(0,3) : 'PLY'}</div>
+                    </div>
+                    <div class="text-2xl font-black text-white/30 fifa-number">${p.number ? '#'+p.number : ''}</div>
+                  </div>
+                  
+                  <!-- صورة اللاعب -->
+                  <div class="relative -mt-4">
+                    ${p.image ? `<img src="${p.image}" class="w-20 h-20 rounded-full object-cover border-2 border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.2)]">` : `<div class="w-20 h-20 rounded-full bg-slate-800/80 flex items-center justify-center font-black text-3xl text-white/50 border-2 border-white/10">${p.name.charAt(0)}</div>`}
+                  </div>
+                  
+                  <!-- الاسم -->
+                  <div class="w-full border-b border-white/20 pb-1 text-center mt-1">
+                    <div class="font-black text-sm text-white truncate px-1 drop-shadow-md">${p.name}</div>
+                  </div>
+                  
+                  <!-- إحصائيات سريعة -->
+                  <div class="w-full flex justify-around text-[10px] font-bold text-slate-300 mt-1 bg-black/30 rounded-lg py-1 border border-white/5">
+                    <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">مباريات</span><span class="fifa-number text-sm">${data.present}</span></div>
+                    <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">أهداف</span><span class="fifa-number text-sm text-emerald-400">${data.goals}</span></div>
+                    <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">أسيست</span><span class="fifa-number text-sm text-blue-400">${data.assists}</span></div>
+                  </div>
                 </div>
-                <div class="text-2xl font-black text-white/30 fifa-number">${p.number ? '#'+p.number : ''}</div>
-              </div>
-              
-              <!-- صورة اللاعب -->
-              <div class="relative -mt-4">
-                ${p.image ? `<img src="${p.image}" class="w-20 h-20 rounded-full object-cover border-2 border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.2)]">` : `<div class="w-20 h-20 rounded-full bg-slate-800/80 flex items-center justify-center font-black text-3xl text-white/50 border-2 border-white/10">${p.name.charAt(0)}</div>`}
-              </div>
-              
-              <!-- الاسم -->
-              <div class="w-full border-b border-white/20 pb-1 text-center mt-1">
-                <div class="font-black text-sm text-white truncate px-1 drop-shadow-md">${p.name}</div>
-              </div>
-              
-              <!-- إحصائيات سريعة -->
-              <div class="w-full flex justify-around text-[10px] font-bold text-slate-300 mt-1 bg-black/30 rounded-lg py-1 border border-white/5">
-                <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">مباريات</span><span class="fifa-number text-sm">${data.present}</span></div>
-                <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">أهداف</span><span class="fifa-number text-sm text-emerald-400">${data.goals}</span></div>
-                <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">أسيست</span><span class="fifa-number text-sm text-blue-400">${data.assists}</span></div>
               </div>
             </div>
           </div>
           
           <!-- الوجه الثاني (الإحصائيات التفصيلية) -->
-          <div class="flip-card-back ${cardClass}">
-            <div class="card-bg-texture"></div>
-            <div class="relative z-10 w-full h-full p-3 flex flex-col justify-between items-center">
-              
-              <div class="w-full text-center border-b border-white/20 pb-2 mb-2">
-                <div class="font-black text-sm text-white">${p.name}</div>
-                <div class="text-[10px] text-slate-400">إحصائيات اللاعب</div>
-              </div>
-              
-              <!-- شبكة الإحصائيات -->
-              <div class="w-full grid grid-cols-2 gap-x-4 gap-y-3 text-sm font-bold text-slate-300 px-2">
-                <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">SHO</span><span class="fifa-number text-xl text-white">${stats.sho}</span></div>
-                <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">PAS</span><span class="fifa-number text-xl text-white">${stats.pas}</span></div>
-                <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">SPD</span><span class="fifa-number text-xl text-white">${stats.spd}</span></div>
-                <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">DEF</span><span class="fifa-number text-xl text-white">${stats.def}</span></div>
-                <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">PHY</span><span class="fifa-number text-xl text-white">${stats.phy}</span></div>
-                <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">OVR</span><span class="fifa-number text-xl ${ratingTextColor}">${ovr}</span></div>
-              </div>
-              
-              <div class="text-center mt-2">
-                <span class="text-[9px] text-slate-400 bg-black/40 px-3 py-1 rounded-full border border-white/10">اضغط للعودة</span>
+          <div class="flip-card-back">
+            <div class="card-wrapper ${wrapperClass}">
+              <div class="card-inner ${innerClass} p-4 flex flex-col justify-between items-center">
+                <div class="card-bg-texture"></div>
+                <div class="relative z-10 w-full h-full flex flex-col justify-between items-center">
+                  
+                  <div class="w-full text-center border-b border-white/20 pb-2 mb-2">
+                    <div class="font-black text-sm text-white">${p.name}</div>
+                    <div class="text-[10px] text-slate-400">إحصائيات اللاعب</div>
+                  </div>
+                  
+                  <!-- شبكة الإحصائيات -->
+                  <div class="w-full grid grid-cols-2 gap-x-4 gap-y-3 text-sm font-bold text-slate-300 px-2">
+                    <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">SHO</span><span class="fifa-number text-xl text-white">${stats.sho}</span></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">PAS</span><span class="fifa-number text-xl text-white">${stats.pas}</span></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">SPD</span><span class="fifa-number text-xl text-white">${stats.spd}</span></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">DEF</span><span class="fifa-number text-xl text-white">${stats.def}</span></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">PHY</span><span class="fifa-number text-xl text-white">${stats.phy}</span></div>
+                    <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">OVR</span><span class="fifa-number text-xl ${ratingTextColor}">${ovr}</span></div>
+                  </div>
+                  
+                  <div class="text-center mt-2">
+                    <span class="text-[9px] text-slate-400 bg-black/40 px-3 py-1 rounded-full border border-white/10">اضغط للعودة</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
