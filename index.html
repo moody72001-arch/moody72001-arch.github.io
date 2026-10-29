@@ -166,13 +166,11 @@
 
     <!-- الإدارة -->
     <section id="tab-admin" class="tab-content">
-      <!-- طلبات الانضمام -->
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 mb-4">
         <h2 class="font-bold text-lg mb-4 text-slate-800 flex items-center gap-2"><span class="text-2xl">📥</span> طلبات الانضمام</h2>
         <div id="pending-users-list" class="space-y-3"></div>
       </div>
       
-      <!-- إدارة الأعضاء والمشرفين -->
       <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-100">
         <h2 class="font-bold text-lg mb-2 text-slate-800 flex items-center gap-2"><span class="text-2xl">👑</span> إدارة الأعضاء والمشرفين</h2>
         <p class="text-xs text-slate-500 mb-4 font-semibold">ارفع رتبة أي عضو لمشرف ليمتلك نفس صلاحياتك.</p>
@@ -185,7 +183,6 @@
     </div>
   </main>
 
-  <!-- شريط التنقل السفلي -->
   <nav class="fixed bottom-0 inset-x-0 bg-white border-t border-slate-200 flex justify-around p-2 z-40 pb-safe shadow-[0_-5px_20px_-5px_rgba(0,0,0,0.05)]">
     <button id="nav-players" class="nav-btn active" onclick="showTab('players')"><span>👥</span> اللاعبين</button>
     <button id="nav-matches" class="nav-btn" onclick="showTab('matches')"><span>📅</span> الماتشات</button>
@@ -303,27 +300,40 @@ onAuthStateChanged(auth, (user) => {
 
 function checkUserStatus(uid) {
   const userRef = doc(db, "users", uid);
-  onSnapshot(userRef, (snap) => {
-    if (snap.exists()) {
-      const data = snap.data();
-      if (data.role === 'pending') {
+  onSnapshot(userRef, async (snap) => {
+    if (!snap.exists()) {
+      if (currentUserPhone.toLowerCase() === SUPER_ADMIN_PHONE) {
+        await setDoc(userRef, {
+          phone: SUPER_ADMIN_PHONE,
+          role: "admin",
+          joinedAt: new Date().toISOString()
+        });
+        return;
+      } else {
         $('#auth-screen').classList.add('hidden');
         $('#app-screen').classList.add('hidden');
         $('#pending-screen').classList.remove('hidden');
-      } else {
-        $('#pending-screen').classList.add('hidden');
-        $('#auth-screen').classList.add('hidden');
-        $('#app-screen').classList.remove('hidden');
-        
-        // لو الرقم admin يبقى هو المدير الأعلى تلقائياً
-        if (data.phone.toLowerCase() === SUPER_ADMIN_PHONE) {
-          isAdmin = true;
-        } else {
-          isAdmin = state.admins.includes(data.phone);
-        }
-        
-        startAppSync();
+        return;
       }
+    }
+
+    const data = snap.data();
+    if (data.role === 'pending') {
+      $('#auth-screen').classList.add('hidden');
+      $('#app-screen').classList.add('hidden');
+      $('#pending-screen').classList.remove('hidden');
+    } else {
+      $('#pending-screen').classList.add('hidden');
+      $('#auth-screen').classList.add('hidden');
+      $('#app-screen').classList.remove('hidden');
+      
+      if (data.phone.toLowerCase() === SUPER_ADMIN_PHONE) {
+        isAdmin = true;
+      } else {
+        isAdmin = state.admins.includes(data.phone);
+      }
+      
+      startAppSync();
     }
   });
 }
@@ -341,7 +351,6 @@ function startAppSync() {
       state.rules = state.rules || ""; state.announcements = state.announcements || []; state.admins = state.admins || [];
     }
     
-    // تحديث صلاحية المشرف
     if (currentUserPhone.toLowerCase() !== SUPER_ADMIN_PHONE) {
        isAdmin = state.admins.includes(currentUserPhone);
        $('#user-info').textContent = isAdmin ? `👑 مشرف` : `⚽ لاعب`;
@@ -351,7 +360,6 @@ function startAppSync() {
     render();
   });
 
-  // لو المدير أو مشرف، اعرض قائمة المستخدمين
   if (isAdmin) {
     unsubscribeUsers = onSnapshot(collection(db, "users"), (snap) => {
       pendingUsers = []; approvedUsers = [];
