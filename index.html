@@ -17,12 +17,19 @@
   .nav-btn span { font-size: 1.3rem; margin-bottom: 0.1rem; }
   .nav-btn.active { color: #10b981; background-color: rgba(16, 185, 129, 0.1); }
   
+  /* تأثير قلب الكارت (Flip Card) */
+  .flip-card { perspective: 1000px; width: 100%; height: 210px; cursor: pointer; }
+  .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
+  .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+  .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 1.2rem; overflow: hidden; }
+  .flip-card-back { transform: rotateY(180deg); }
+  
   /* تصميم كارت فيفا */
-  .fifa-card { position: relative; overflow: hidden; border-radius: 1.2rem; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 2px solid #334155; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
-  .fifa-card.gold { border-color: #eab308; box-shadow: 0 10px 25px -5px rgba(234, 179, 8, 0.2); background: linear-gradient(135deg, #422006 0%, #0f172a 100%); }
-  .fifa-card.silver { border-color: #94a3b8; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
-  .fifa-card.bronze { border-color: #b45309; background: linear-gradient(135deg, #431407 0%, #0f172a 100%); }
-  .fifa-card.glow { box-shadow: 0 0 15px rgba(234, 179, 8, 0.6); }
+  .fifa-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 2px solid #334155; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
+  .fifa-bg.gold { border-color: #eab308; box-shadow: 0 10px 25px -5px rgba(234, 179, 8, 0.2); background: linear-gradient(135deg, #422006 0%, #0f172a 100%); }
+  .fifa-bg.silver { border-color: #94a3b8; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); }
+  .fifa-bg.bronze { border-color: #b45309; background: linear-gradient(135deg, #431407 0%, #0f172a 100%); }
+  .fifa-bg.glow { box-shadow: 0 0 15px rgba(234, 179, 8, 0.6); }
   
   input, select, textarea { outline: none; transition: border-color 0.2s; color: #fff; }
   input:focus, select:focus, textarea:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
@@ -265,7 +272,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const teamDocRef = doc(db, "teams", TEAM_ID);
 
-// ضفنا teamLogo في الحالة
 let state = { players: [], matches: [], payments: [], rules: "", announcements: [], admins: [], coaches: [], teamLogo: null };
 let pendingUsers = [];
 let approvedUsers = [];
@@ -441,7 +447,6 @@ function updateUI() {
   if(!(isAdmin || isCoach)) $('#rules-text').classList.add('bg-slate-900/50');
   else $('#rules-text').classList.remove('bg-slate-900/50');
 
-  // تحديث اللوجو
   if(state.teamLogo) {
     $('#header-logo').innerHTML = `<img src="${state.teamLogo}" class="w-full h-full object-cover">`;
   } else {
@@ -475,6 +480,11 @@ window.switchMatchTab = function(type) {
   }
 };
 
+window.flipCard = function(playerId) {
+  const card = document.getElementById('card-' + playerId);
+  if(card) card.classList.toggle('flipped');
+};
+
 function render() {
   renderPlayers(); renderCards(); renderMatches(); renderStats(); renderPayments(); renderRules(); renderAnnouncements();
   $('#team-summary').textContent = `${state.players.length} لاعب · ${state.matches.length} ماتش`;
@@ -504,17 +514,51 @@ function renderPlayers() {
 }
 
 /* ================== كروت فيفا ================== */
+function getPlayerData(p) {
+  let goals=0, assists=0, present=0, motmCount=0, totalRating=0, ratingCount=0;
+  
+  state.matches.forEach(m => {
+    goals += (m.goals||{})[p.id] || 0;
+    assists += (m.assists||{})[p.id] || 0;
+    if ((m.attendance||{})[p.id] === 'present') present++;
+    if (m.motm === p.id) motmCount++;
+    if (m.ratings && m.ratings[p.id]) {
+      totalRating += m.ratings[p.id];
+      ratingCount++;
+    }
+  });
+  
+  const avgRating = ratingCount > 0 ? (totalRating / ratingCount) : 0;
+  return { ...p, goals, assists, present, motmCount, avgRating };
+}
+
+function calculateOVR(p) {
+  const data = getPlayerData(p);
+  const stats = p.stats || { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 };
+  
+  // حساب متوسط الإحصائيات
+  const statsAvg = (stats.sho + stats.pas + stats.spd + stats.def + stats.phy) / 5;
+  
+  // بونص مقابل الأداء في الماتشات
+  const goalsBonus = data.goals * 0.5; 
+  const assistsBonus = data.assists * 0.3;
+  const motmBonus = data.motmCount * 1.5;
+  const ratingBonus = data.avgRating * 0.5; // لو تقييمه 10 بياخد +5
+  
+  let ovr = statsAvg + goalsBonus + assistsBonus + motmBonus + ratingBonus;
+  
+  // الحد الأقصى 99 والحد الأدنى 40
+  return Math.min(99, Math.max(40, Math.round(ovr)));
+}
+
 function renderCards() {
   const box = $('#cards-list');
   if (!state.players.length) { box.innerHTML = '<div class="col-span-2 text-center py-10 opacity-50 text-slate-400 font-bold">مفيش لاعبين لعرض الكروت.</div>'; return; }
   
   box.innerHTML = state.players.map(p => {
-    let totalRating = 0; let ratingCount = 0;
-    state.matches.forEach(m => {
-      if(m.ratings && m.ratings[p.id]) { totalRating += m.ratings[p.id]; ratingCount++; }
-    });
-    // التقييم العام (OVR)
-    const ovr = ratingCount > 0 ? Math.round(totalRating / ratingCount) : 70;
+    const data = getPlayerData(p);
+    const ovr = calculateOVR(p);
+    const stats = p.stats || { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 };
     
     let cardClass = "bronze";
     let textClass = "text-orange-400";
@@ -522,36 +566,57 @@ function renderCards() {
     else if(ovr >= 75) { cardClass = "silver"; textClass = "text-slate-300"; }
     else { cardClass = "bronze"; textClass = "text-orange-500"; }
 
-    const stats = p.stats || { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 };
-    
     return `
-      <div class="fifa-card ${cardClass} p-3 flex flex-col items-center">
-        <!-- التقييم والمركز -->
-        <div class="w-full flex justify-between items-start mb-1">
-          <div class="text-right">
-            <div class="text-3xl font-black ${textClass}">${ovr}</div>
-            <div class="text-[10px] font-bold text-slate-300 uppercase">${p.position ? p.position.substring(0,3) : 'PLY'}</div>
+      <div class="flip-card" id="card-${p.id}" onclick="flipCard('${p.id}')">
+        <div class="flip-card-inner">
+          
+          <!-- الوجه الأول (الأساسي) -->
+          <div class="flip-card-front fifa-bg ${cardClass} p-3 flex flex-col items-center justify-between">
+            <div class="w-full flex justify-between items-start">
+              <div class="text-right">
+                <div class="text-3xl font-black ${textClass}">${ovr}</div>
+                <div class="text-[10px] font-bold text-slate-300 uppercase">${p.position ? p.position.substring(0,3) : 'PLY'}</div>
+              </div>
+              <div class="text-2xl font-black text-slate-500">${p.number ? '#'+p.number : ''}</div>
+            </div>
+            
+            <div class="relative -mt-2">
+              ${p.image ? `<img src="${p.image}" class="w-16 h-16 rounded-full object-cover border-2 border-slate-500">` : `<div class="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center font-black text-xl text-white border-2 border-slate-500">${p.name.charAt(0)}</div>`}
+            </div>
+            
+            <div class="w-full border-b border-slate-600 pb-1 text-center">
+              <div class="font-black text-xs text-white truncate px-1">${p.name}</div>
+            </div>
+            
+            <!-- إحصائيات الماتشات -->
+            <div class="w-full flex justify-around text-[10px] font-bold text-slate-300 mt-1">
+              <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">مباريات</span>${data.present}</div>
+              <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">أهداف</span>${data.goals}</div>
+              <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">أسيست</span>${data.assists}</div>
+            </div>
           </div>
-          <div class="text-2xl">${p.number ? '#'+p.number : ''}</div>
-        </div>
-        
-        <!-- الصورة -->
-        <div class="relative mb-1">
-          ${p.image ? `<img src="${p.image}" class="w-16 h-16 rounded-full object-cover border-2 border-slate-500">` : `<div class="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center font-black text-xl text-white border-2 border-slate-500">${p.name.charAt(0)}</div>`}
-        </div>
-        
-        <!-- الاسم -->
-        <div class="w-full border-b border-slate-600 pb-1 mb-2 text-center">
-          <div class="font-black text-xs text-white truncate px-1">${p.name}</div>
-        </div>
-        
-        <!-- الاحصائيات -->
-        <div class="w-full grid grid-cols-2 gap-x-2 gap-y-1 text-[10px] font-bold text-slate-300">
-          <div class="flex justify-between"><span>SHO</span><span class="text-white">${stats.sho}</span></div>
-          <div class="flex justify-between"><span>PAS</span><span class="text-white">${stats.pas}</span></div>
-          <div class="flex justify-between"><span>SPD</span><span class="text-white">${stats.spd}</span></div>
-          <div class="flex justify-between"><span>DEF</span><span class="text-white">${stats.def}</span></div>
-          <div class="flex justify-between"><span>PHY</span><span class="text-white">${stats.phy}</span></div>
+          
+          <!-- الوجه الثاني (الإحصائيات التفصيلية) -->
+          <div class="flip-card-back fifa-bg ${cardClass} p-3 flex flex-col justify-between">
+            <div class="text-center border-b border-slate-600 pb-2 mb-2">
+              <div class="font-black text-sm text-white">${p.name}</div>
+              <div class="text-[10px] text-slate-400">إحصائيات اللاعب</div>
+            </div>
+            
+            <div class="w-full grid grid-cols-2 gap-x-4 gap-y-2 text-xs font-bold text-slate-300 px-2">
+              <div class="flex justify-between"><span>SHO</span><span class="text-white">${stats.sho}</span></div>
+              <div class="flex justify-between"><span>PAS</span><span class="text-white">${stats.pas}</span></div>
+              <div class="flex justify-between"><span>SPD</span><span class="text-white">${stats.spd}</span></div>
+              <div class="flex justify-between"><span>DEF</span><span class="text-white">${stats.def}</span></div>
+              <div class="flex justify-between"><span>PHY</span><span class="text-white">${stats.phy}</span></div>
+              <div class="flex justify-between"><span>OVR</span><span class="${textClass}">${ovr}</span></div>
+            </div>
+            
+            <div class="text-center mt-2">
+              <span class="text-[9px] text-slate-500 bg-slate-800 px-2 py-1 rounded">اضغط للعودة</span>
+            </div>
+          </div>
+          
         </div>
       </div>
     `;
@@ -576,7 +641,7 @@ window.editPlayerStats = function(playerId) {
 
   p.stats = { sho: Number(sho), pas: Number(pas), spd: Number(spd), def: Number(def), phy: Number(phy) };
   save();
-  alert('تم حفظ إحصائيات اللاعب ✅');
+  // التحديث هيعمل ريندر أوتوماتيك وهتلاقي التقييم اتغير في الكروت
 };
 
 /* ================== الماتشات ================== */
@@ -613,17 +678,11 @@ function renderMatches() {
   const activeMatches = state.matches.filter(m => !m.archived).sort((a,b) => (b.date||'').localeCompare(a.date||''));
   const historyMatches = state.matches.filter(m => m.archived).sort((a,b) => (b.date||'').localeCompare(a.date||''));
 
-  // رندر الماتشات النشطة
   if (!activeMatches.length) { activeBox.innerHTML = '<div class="text-center py-10 opacity-50"><div class="text-5xl mb-2">📅</div><p class="text-sm font-bold text-slate-400">مفيش ماتشات حالية.</p></div>'; }
-  else {
-    activeBox.innerHTML = activeMatches.map(m => buildMatchCard(m, false)).join('');
-  }
+  else { activeBox.innerHTML = activeMatches.map(m => buildMatchCard(m, false)).join(''); }
 
-  // رندر سجل الماتشات
   if (!historyMatches.length) { historyBox.innerHTML = '<div class="text-center py-10 opacity-50"><div class="text-5xl mb-2">📂</div><p class="text-sm font-bold text-slate-400">مفيش ماتشات في السجل.</p></div>'; }
-  else {
-    historyBox.innerHTML = historyMatches.map(m => buildMatchCard(m, true)).join('');
-  }
+  else { historyBox.innerHTML = historyMatches.map(m => buildMatchCard(m, true)).join(''); }
 }
 
 function buildMatchCard(m, isArchived) {
@@ -650,7 +709,6 @@ function buildMatchCard(m, isArchived) {
         <span>حضور: ${present}/${state.players.length}</span>
       </div>
       
-      <!-- زر التفاصيل (Accordion) -->
       <details class="group">
         <summary class="cursor-pointer text-xs font-bold text-emerald-400 bg-emerald-900/20 hover:bg-emerald-900/40 p-2 rounded-lg flex justify-between items-center transition-all">
           <span>عرض التفاصيل والتقييمات</span>
@@ -678,7 +736,6 @@ function buildMatchCard(m, isArchived) {
                 </div>
               </div>
               
-              <!-- التقييم والنجوم (في حالة عدم الأرشفة) -->
               ${(!isArchived && (isAdmin||isCoach)) ? `
               <div class="flex items-center justify-between bg-slate-800/50 p-1.5 rounded-lg">
                 <div class="flex items-center gap-1">
@@ -709,26 +766,7 @@ function buildMatchCard(m, isArchived) {
 
 /* ================== الإحصائيات ================== */
 function renderStats() {
-  const totals = state.players.map(p => {
-    let goals=0, assists=0, present=0, motmCount=0, worstCount=0, totalRating=0, ratingCount=0;
-    
-    state.matches.forEach(m => {
-      goals += (m.goals||{})[p.id] || 0;
-      assists += (m.assists||{})[p.id] || 0;
-      if ((m.attendance||{})[p.id] === 'present') present++;
-      if (m.motm === p.id) motmCount++;
-      if (m.worst === p.id) worstCount++;
-      
-      if (m.ratings && m.ratings[p.id]) {
-        totalRating += m.ratings[p.id];
-        ratingCount++;
-      }
-    });
-    
-    const avgRating = ratingCount > 0 ? (totalRating / ratingCount).toFixed(1) : 0;
-    return { ...p, goals, assists, present, motmCount, worstCount, avgRating };
-  });
-  
+  const totals = state.players.map(p => getPlayerData(p));
   const topScorer = [...totals].sort((a,b)=>b.goals-a.goals)[0]; 
   const topAssist = [...totals].sort((a,b)=>b.assists-a.assists)[0];
   const topRated = [...totals].sort((a,b)=>b.avgRating-a.avgRating)[0];
@@ -836,7 +874,7 @@ window.uploadTeamLogo = function() {
         if (width > height) { if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } } else { if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; } }
         canvas.width = width; canvas.height = height;
         const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
-        const base64 = canvas.toDataURL('image/png', 1.0); // png for better quality logo
+        const base64 = canvas.toDataURL('image/png', 1.0);
         
         state.teamLogo = base64;
         await save();
