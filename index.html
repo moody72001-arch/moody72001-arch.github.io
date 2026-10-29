@@ -7,6 +7,13 @@
 <title>فريقنا - كرة خماسية</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script>
+  // دي عشان تظهرلك أي مشكلة في الكود
+  window.onerror = function(msg, url, line) {
+    alert("حدث خطأ برمجي:\n" + msg + "\nالسطر: " + line);
+    return false;
+  };
+</script>
 <style>
   body { font-family: 'Cairo', system-ui, sans-serif; background-color: #f8fafc; }
   .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
@@ -201,7 +208,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, on
 import { getFirestore, doc, setDoc, updateDoc, onSnapshot, collection }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// 🔴 تم تصحيح إعدادات مشروعك بناءً على الصورة
+// إعدادات مشروعك الصحيحة
 const firebaseConfig = {
   apiKey: "AIzaSyD4PqVEdU1NI7_5eZGntteEyRbZ519KYbg",
   authDomain: "fariqi-4d879.firebaseapp.com",
@@ -246,17 +253,23 @@ window.toggleAuthMode = function() {
 };
 
 window.handleAuth = async function() {
-  const rawPhone = $('#auth-phone').value.trim();
-  const password = $('#auth-password').value;
-  const dob = $('#auth-dob').value;
-  const errorEl = $('#auth-error');
-  
-  if(!rawPhone || !password) { errorEl.textContent = "املا البيانات المطلوبة"; errorEl.classList.remove('hidden'); return; }
-  if(!isLoginMode && !dob) { errorEl.textContent = "ادخل تاريخ الميلاد"; errorEl.classList.remove('hidden'); return; }
-
-  const email = formatPhone(rawPhone);
+  const btn = $('#auth-btn');
+  const originalText = btn.textContent;
   
   try {
+    const rawPhone = $('#auth-phone').value.trim();
+    const password = $('#auth-password').value;
+    const dob = $('#auth-dob').value;
+    const errorEl = $('#auth-error');
+    
+    if(!rawPhone || !password) { errorEl.textContent = "املا البيانات المطلوبة"; errorEl.classList.remove('hidden'); return; }
+    if(!isLoginMode && !dob) { errorEl.textContent = "ادخل تاريخ الميلاد"; errorEl.classList.remove('hidden'); return; }
+
+    btn.textContent = "جاري الاتصال...";
+    errorEl.classList.add('hidden');
+
+    const email = formatPhone(rawPhone);
+    
     if (isLoginMode) {
       await signInWithEmailAndPassword(auth, email, password);
     } else {
@@ -271,10 +284,13 @@ window.handleAuth = async function() {
       });
     }
   } catch (e) {
-    let msg = "حدث خطأ";
-    if(e.code === 'auth/invalid-credential') msg = "رقم التليفون أو الباسورد غلط";
-    if(e.code === 'auth/email-already-in-use') msg = "رقم التليفون ده مسجل بالفعل";
-    if(e.code === 'auth/weak-password') msg = "الباسورد ضعيف (6 أرقام/حروف على الأقل)";
+    btn.textContent = originalText;
+    console.error(e);
+    const errorEl = $('#auth-error');
+    let msg = "حدث خطأ: " + e.message;
+    if(e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') msg = "رقم التليفون أو الباسورد غلط ❌";
+    if(e.code === 'auth/email-already-in-use') msg = "رقم التليفون ده مسجل بالفعل ❌";
+    if(e.code === 'auth/weak-password') msg = "الباسورد ضعيف (6 أرقام/حروف على الأقل) ❌";
     errorEl.textContent = msg;
     errorEl.classList.remove('hidden');
   }
@@ -291,6 +307,7 @@ onAuthStateChanged(auth, (user) => {
     currentUserPhone = user.email.replace('@futsal.com', '');
     checkUserStatus(user.uid);
   } else {
+    $('#auth-btn').textContent = "دخول";
     $('#auth-screen').classList.remove('hidden');
     $('#pending-screen').classList.add('hidden');
     $('#app-screen').classList.add('hidden');
@@ -302,9 +319,10 @@ onAuthStateChanged(auth, (user) => {
 function checkUserStatus(uid) {
   const userRef = doc(db, "users", uid);
   onSnapshot(userRef, async (snap) => {
-    // عمل حساب الأدمن أوتوماتيك لو مش موجود
+    // لو المستخدم مش موجود في قاعدة البيانات
     if (!snap.exists()) {
       if (currentUserPhone.toLowerCase() === SUPER_ADMIN_PHONE) {
+        // لو هو الأدمن، نعمله على طول
         await setDoc(userRef, {
           phone: SUPER_ADMIN_PHONE,
           role: "admin",
@@ -337,6 +355,8 @@ function checkUserStatus(uid) {
       
       startAppSync();
     }
+  }, (error) => {
+    alert("مشكلة في الاتصال بقاعدة البيانات (تأكد من قواعد Firestore): " + error.message);
   });
 }
 
@@ -360,6 +380,8 @@ function startAppSync() {
 
     updateUI();
     render();
+  }, (error) => {
+    alert("مشكلة في قراءة بيانات الفريق: " + error.message);
   });
 
   if (isAdmin) {
