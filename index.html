@@ -21,8 +21,16 @@
   .flip-card { perspective: 1000px; width: 100%; height: 220px; cursor: pointer; }
   .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
   .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
-  .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 1.2rem; overflow: hidden; }
+  
+  /* الأوجه الأساسية */
+  .flip-card-front, .flip-card-back { 
+    position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 1.2rem; overflow: hidden; 
+    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  }
   .flip-card-back { transform: rotateY(180deg); }
+
+  /* المحتوى فوق الرسوم المتحركة */
+  .card-content { position: relative; z-index: 20; width: 100%; height: 100%; padding: 0.75rem; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
   
   /* ألوان الكروت */
   .fifa-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 2px solid #334155; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
@@ -35,21 +43,97 @@
   .card-green { border-color: #10b981; background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%); }
   .card-green .text-rating { color: #10b981; }
 
-  .card-glow-red { border-color: #ef4444; background: linear-gradient(135deg, #450a0a 0%, #0f172a 100%); box-shadow: 0 0 15px rgba(239, 68, 68, 0.6); }
+  .card-glow-red { border-color: #ef4444; background: linear-gradient(135deg, #450a0a 0%, #0f172a 100%); }
   .card-glow-red .text-rating { color: #ef4444; }
 
-  /* كارت النيران (أكبر من 95) */
-  @keyframes fireGlow {
-    0% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500, 0 0 30px #ff8c00; border-color: #ff0000; }
-    50% { box-shadow: 0 0 20px #ff4500, 0 0 30px #ff8c00, 0 0 40px #ff0000; border-color: #ff8c00; }
-    100% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500, 0 0 30px #ff8c00; border-color: #ff0000; }
-  }
   .card-fire { 
     background: linear-gradient(135deg, #7f1d1d 0%, #0f172a 100%); 
     border: 3px solid #ff0000; 
     animation: fireGlow 1.5s infinite alternate; 
   }
   .card-fire .text-rating { color: #fbbf24; text-shadow: 0 0 10px #ff4500; }
+
+  /* ====== التأثيرات الحركية داخل الكارت ====== */
+  
+  /* 1. لمعة متحركة (Shine) */
+  .card-shine::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+    transform: rotate(30deg) translateX(-100%);
+    animation: shineSweep 4s infinite ease-in-out;
+    z-index: 10;
+    pointer-events: none;
+  }
+  @keyframes shineSweep {
+    0% { transform: rotate(30deg) translateX(-100%); }
+    50%, 100% { transform: rotate(30deg) translateX(100%); }
+  }
+
+  /* 2. نبض في الخلفية (Pulse) */
+  .card-pulse {
+    animation: cardPulse 2s infinite alternate;
+  }
+  @keyframes cardPulse {
+    from { box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); }
+    to { box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), inset 0 0 15px rgba(255,255,255,0.1); }
+  }
+  .card-glow-red.card-pulse {
+    animation: redPulse 2s infinite alternate;
+  }
+  @keyframes redPulse {
+    from { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
+    to { box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); }
+  }
+
+  /* 3. شرارات / نجوم متحركة (Particles) */
+  .card-particles::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px),
+      radial-gradient(circle, rgba(255,200,100,0.6) 1.5px, transparent 1.5px);
+    background-size: 30px 30px, 50px 50px;
+    background-position: 0 0, 15px 15px;
+    animation: floatingParticles 6s linear infinite;
+    opacity: 0.3;
+    z-index: 5;
+    pointer-events: none;
+  }
+  @keyframes floatingParticles {
+    from { background-position: 0 0, 15px 15px; }
+    to { background-position: 30px 30px, 65px 65px; }
+  }
+
+  /* نار متحركة لأعلى من 95 */
+  .card-fire::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle, #ff4500 2px, transparent 2px),
+      radial-gradient(circle, #ff8c00 3px, transparent 3px);
+    background-size: 40px 40px, 60px 60px;
+    background-position: 0 0, 20px 20px;
+    animation: fireParticles 3s linear infinite;
+    opacity: 0.6;
+    z-index: 5;
+    pointer-events: none;
+  }
+  @keyframes fireParticles {
+    from { background-position: 0 0, 20px 20px; }
+    to { background-position: 40px 40px, 80px 80px; }
+  }
+
+  /* أنيميشن النار الخارجي */
+  @keyframes fireGlow {
+    0% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500, 0 0 30px #ff8c00; border-color: #ff0000; }
+    50% { box-shadow: 0 0 20px #ff4500, 0 0 30px #ff8c00, 0 0 40px #ff0000; border-color: #ff8c00; }
+    100% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500, 0 0 30px #ff8c00; border-color: #ff0000; }
+  }
 
   input, select, textarea { outline: none; transition: border-color 0.2s; color: #fff; }
   input:focus, select:focus, textarea:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
@@ -128,7 +212,6 @@
   </header>
 
   <main class="p-4 max-w-md mx-auto">
-    <!-- اللاعبين -->
     <section id="tab-players" class="tab-content active">
       <div id="add-player-form" class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 hidden">
         <h2 class="font-bold text-sm mb-3 text-emerald-400">إضافة لاعب جديد (يدوي)</h2>
@@ -147,12 +230,10 @@
       <div id="players-list" class="space-y-2"></div>
     </section>
 
-    <!-- كروت اللاعيبة -->
     <section id="tab-cards" class="tab-content">
       <div id="cards-list" class="grid grid-cols-2 gap-3"></div>
     </section>
 
-    <!-- الماتشات -->
     <section id="tab-matches" class="tab-content">
       <div class="flex bg-slate-800 p-1 rounded-xl mb-4 border border-slate-700">
         <button onclick="switchMatchTab('active')" id="btn-match-active" class="flex-1 py-2 text-sm font-bold rounded-lg bg-emerald-600 text-white transition-all">الماتشات الحالية</button>
@@ -182,17 +263,11 @@
         </div>
         <div id="matches-active-list" class="space-y-3"></div>
       </div>
-
-      <div id="matches-history-container" class="hidden space-y-3">
-      </div>
+      <div id="matches-history-container" class="hidden space-y-3"></div>
     </section>
 
-    <!-- الإحصائيات -->
-    <section id="tab-stats" class="tab-content">
-      <div id="stats-content"></div>
-    </section>
+    <section id="tab-stats" class="tab-content"><div id="stats-content"></div></section>
 
-    <!-- الفلوس -->
     <section id="tab-money" class="tab-content">
       <div id="add-payment-form" class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 hidden">
         <h2 class="font-bold text-sm mb-3 text-emerald-400">تسجيل دفعة مالية</h2>
@@ -209,7 +284,6 @@
       <div id="money-content"></div>
     </section>
 
-    <!-- القوانين -->
     <section id="tab-rules" class="tab-content">
       <div class="bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-700">
         <h2 class="font-bold text-lg mb-3 text-emerald-400 flex items-center gap-2">📜 قوانين الفريق</h2>
@@ -218,7 +292,6 @@
       </div>
     </section>
 
-    <!-- الإعلانات -->
     <section id="tab-announcements" class="tab-content">
       <div id="add-announcement-form" class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 hidden">
         <form onsubmit="addAnnouncement(event)">
@@ -229,7 +302,6 @@
       <div id="announcements-list" class="space-y-3"></div>
     </section>
 
-    <!-- الإدارة -->
     <section id="tab-admin" class="tab-content">
       <div class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 flex justify-between items-center">
         <div>
@@ -575,16 +647,16 @@ function renderCards() {
     let ratingTextColor = "text-white"; // Default
 
     if (ovr > 95) {
-        cardClass = "card-fire";
+        cardClass = "card-fire card-shine";
         ratingTextColor = "text-rating"; 
     } else if (ovr >= 91) {
-        cardClass = "card-glow-red";
+        cardClass = "card-glow-red card-pulse card-shine";
         ratingTextColor = "text-rating";
     } else if (ovr >= 86) {
-        cardClass = "card-green";
+        cardClass = "card-green card-pulse card-shine";
         ratingTextColor = "text-rating";
     } else if (ovr >= 80) {
-        cardClass = "card-orange";
+        cardClass = "card-orange card-shine";
         ratingTextColor = "text-rating";
     } else if (ovr >= 70) {
         cardClass = "card-silver";
@@ -599,48 +671,52 @@ function renderCards() {
         <div class="flip-card-inner">
           
           <!-- الوجه الأول (الأساسي) -->
-          <div class="flip-card-front ${cardClass} p-3 flex flex-col items-center justify-between">
-            <div class="w-full flex justify-between items-start">
-              <div class="text-right">
-                <div class="text-3xl font-black ${ratingTextColor}">${ovr}</div>
-                <div class="text-[10px] font-bold text-slate-300 uppercase">${p.position ? p.position.substring(0,3) : 'PLY'}</div>
+          <div class="flip-card-front ${cardClass}">
+            <div class="card-content">
+              <div class="w-full flex justify-between items-start">
+                <div class="text-right">
+                  <div class="text-3xl font-black ${ratingTextColor}">${ovr}</div>
+                  <div class="text-[10px] font-bold text-slate-300 uppercase">${p.position ? p.position.substring(0,3) : 'PLY'}</div>
+                </div>
+                <div class="text-2xl font-black text-slate-500">${p.number ? '#'+p.number : ''}</div>
               </div>
-              <div class="text-2xl font-black text-slate-500">${p.number ? '#'+p.number : ''}</div>
-            </div>
-            
-            <div class="relative -mt-2">
-              ${p.image ? `<img src="${p.image}" class="w-16 h-16 rounded-full object-cover border-2 border-slate-500">` : `<div class="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center font-black text-xl text-white border-2 border-slate-500">${p.name.charAt(0)}</div>`}
-            </div>
-            
-            <div class="w-full border-b border-slate-600 pb-1 text-center">
-              <div class="font-black text-xs text-white truncate px-1">${p.name}</div>
-            </div>
-            
-            <div class="w-full flex justify-around text-[10px] font-bold text-slate-300 mt-1">
-              <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">مباريات</span>${data.present}</div>
-              <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">أهداف</span>${data.goals}</div>
-              <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">أسيست</span>${data.assists}</div>
+              
+              <div class="relative -mt-2">
+                ${p.image ? `<img src="${p.image}" class="w-16 h-16 rounded-full object-cover border-2 border-slate-500 relative z-30">` : `<div class="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center font-black text-xl text-white border-2 border-slate-500 relative z-30">${p.name.charAt(0)}</div>`}
+              </div>
+              
+              <div class="w-full border-b border-slate-600 pb-1 text-center">
+                <div class="font-black text-xs text-white truncate px-1">${p.name}</div>
+              </div>
+              
+              <div class="w-full flex justify-around text-[10px] font-bold text-slate-300 mt-1">
+                <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">مباريات</span>${data.present}</div>
+                <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">أهداف</span>${data.goals}</div>
+                <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">أسيست</span>${data.assists}</div>
+              </div>
             </div>
           </div>
           
           <!-- الوجه الثاني (الإحصائيات التفصيلية) -->
-          <div class="flip-card-back ${cardClass} p-3 flex flex-col justify-between">
-            <div class="text-center border-b border-slate-600 pb-2 mb-2">
-              <div class="font-black text-sm text-white">${p.name}</div>
-              <div class="text-[10px] text-slate-400">إحصائيات اللاعب</div>
-            </div>
-            
-            <div class="w-full grid grid-cols-2 gap-x-4 gap-y-2 text-xs font-bold text-slate-300 px-2">
-              <div class="flex justify-between"><span>SHO</span><span class="text-white">${stats.sho}</span></div>
-              <div class="flex justify-between"><span>PAS</span><span class="text-white">${stats.pas}</span></div>
-              <div class="flex justify-between"><span>SPD</span><span class="text-white">${stats.spd}</span></div>
-              <div class="flex justify-between"><span>DEF</span><span class="text-white">${stats.def}</span></div>
-              <div class="flex justify-between"><span>PHY</span><span class="text-white">${stats.phy}</span></div>
-              <div class="flex justify-between"><span>OVR</span><span class="${ratingTextColor}">${ovr}</span></div>
-            </div>
-            
-            <div class="text-center mt-2">
-              <span class="text-[9px] text-slate-500 bg-slate-800/50 px-2 py-1 rounded">اضغط للعودة</span>
+          <div class="flip-card-back ${cardClass}">
+            <div class="card-content">
+              <div class="text-center border-b border-slate-600 pb-2 mb-2 w-full">
+                <div class="font-black text-sm text-white">${p.name}</div>
+                <div class="text-[10px] text-slate-400">إحصائيات اللاعب</div>
+              </div>
+              
+              <div class="w-full grid grid-cols-2 gap-x-4 gap-y-2 text-xs font-bold text-slate-300 px-2">
+                <div class="flex justify-between"><span>SHO</span><span class="text-white">${stats.sho}</span></div>
+                <div class="flex justify-between"><span>PAS</span><span class="text-white">${stats.pas}</span></div>
+                <div class="flex justify-between"><span>SPD</span><span class="text-white">${stats.spd}</span></div>
+                <div class="flex justify-between"><span>DEF</span><span class="text-white">${stats.def}</span></div>
+                <div class="flex justify-between"><span>PHY</span><span class="text-white">${stats.phy}</span></div>
+                <div class="flex justify-between"><span>OVR</span><span class="${ratingTextColor}">${ovr}</span></div>
+              </div>
+              
+              <div class="text-center mt-2">
+                <span class="text-[9px] text-slate-500 bg-slate-800/50 px-2 py-1 rounded">اضغط للعودة</span>
+              </div>
             </div>
           </div>
           
