@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#0f172a">
 <title>فريقنا - كرة خماسية</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Teko:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
   body { font-family: 'Cairo', system-ui, sans-serif; background-color: #0f172a; color: #f8fafc; }
   .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
@@ -17,57 +17,237 @@
   .nav-btn span { font-size: 1.3rem; margin-bottom: 0.1rem; }
   .nav-btn.active { color: #10b981; background-color: rgba(16, 185, 129, 0.1); }
   
-  /* تأثير قلب الكارت (Flip Card) */
-  .flip-card { perspective: 1000px; width: 100%; height: 220px; cursor: pointer; }
-  .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
-  .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
-  .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 1.2rem; overflow: hidden; }
-  .flip-card-back { transform: rotateY(180deg); }
-
-  /* تصميم كارت فيفا */
-  .fifa-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 2px solid #334155; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
-  .card-silver { border-color: #cbd5e1; background: linear-gradient(135deg, #334155 0%, #0f172a 100%); }
-  .card-orange { border-color: #f97316; background: linear-gradient(135deg, #431407 0%, #0f172a 100%); }
-  .card-orange .text-rating { color: #f97316; }
-  .card-green { border-color: #10b981; background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%); }
-  .card-green .text-rating { color: #10b981; }
-  .card-glow-red { border-color: #ef4444; background: linear-gradient(135deg, #450a0a 0%, #0f172a 100%); }
-  .card-glow-red .text-rating { color: #ef4444; }
-  .card-fire { background: linear-gradient(135deg, #7f1d1d 0%, #0f172a 100%); border: 3px solid #ff0000; animation: fireGlow 1.5s infinite alternate; }
-  .card-fire .text-rating { color: #fbbf24; text-shadow: 0 0 10px #ff4500; }
-
-  @keyframes fireGlow {
-    0% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500, 0 0 30px #ff8c00; border-color: #ff0000; }
-    50% { box-shadow: 0 0 20px #ff4500, 0 0 30px #ff8c00, 0 0 40px #ff0000; border-color: #ff8c00; }
-    100% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500, 0 0 30px #ff8c00; border-color: #ff0000; }
+  /* ====== تصميم كارت فيفا الاحترافي (الدرع) ====== */
+  .fifa-card-container {
+    width: 100%;
+    aspect-ratio: 3/4.2;
+    position: relative;
+    filter: drop-shadow(0 15px 25px rgba(0,0,0,0.8));
+    cursor: pointer;
+    transition: transform 0.3s ease;
+  }
+  .fifa-card-container:active {
+    transform: scale(1.05) rotate(2deg);
   }
 
-  /* ====== التأثيرات الحركية داخل الكارت ====== */
+  /* الشكل السداسي/الدرع */
+  .fifa-card-shape {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #facc15 0%, #b45309 50%, #facc15 100%); /* إطار ذهبي */
+    clip-path: polygon(15% 0, 85% 0, 100% 10%, 100% 85%, 50% 100%, 0 85%, 0 10%);
+    padding: 4px; /* سمك الإطار */
+  }
+
+  .fifa-card-inner {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    clip-path: polygon(15% 0, 85% 0, 100% 10%, 100% 85%, 50% 100%, 0 85%, 0 10%);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* خلفية الكارت (لمعة ذهبية وسودة) */
+  .fifa-bg {
+    position: absolute;
+    inset: 0;
+    background: 
+      radial-gradient(circle at top right, rgba(212, 175, 55, 0.2) 0%, transparent 50%),
+      radial-gradient(circle at bottom left, rgba(212, 175, 55, 0.15) 0%, transparent 50%),
+      linear-gradient(45deg, #111 25%, #1a1a1a 50%, #111 75%);
+    background-size: 100% 100%, 100% 100%, 200% 200%;
+    animation: goldShine 10s infinite alternate;
+    z-index: 1;
+  }
+  @keyframes goldShine {
+    0% { background-position: 0% 0%, 100% 100%, 0% 0%; }
+    100% { background-position: 100% 100%, 0% 0%, 100% 100%; }
+  }
+
+  /* نجوم/لمعات ذهبية */
+  .fifa-bg::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle, rgba(212, 175, 55, 0.8) 1px, transparent 1px),
+      radial-gradient(circle, rgba(255, 255, 255, 0.5) 1.5px, transparent 1.5px);
+    background-size: 40px 40px, 70px 70px;
+    background-position: 0 0, 20px 20px;
+    opacity: 0.3;
+    animation: starsMove 15s linear infinite;
+  }
+  @keyframes starsMove {
+    from { background-position: 0 0, 20px 20px; }
+    to { background-position: 100px 100px, 120px 120px; }
+  }
+
+  /* لمعة بتعدي على الكارت */
   .card-shine::before {
-    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
-    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
-    transform: rotate(30deg) translateX(-100%); animation: shineSweep 4s infinite ease-in-out; z-index: 10; pointer-events: none;
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,215,0,0.2) 50%, rgba(255,255,255,0) 100%);
+    transform: rotate(30deg) translateX(-100%);
+    animation: shineSweep 4s infinite ease-in-out;
+    z-index: 10;
+    pointer-events: none;
   }
-  @keyframes shineSweep { 0% { transform: rotate(30deg) translateX(-100%); } 50%, 100% { transform: rotate(30deg) translateX(100%); } }
-
-  .card-pulse { animation: cardPulse 2s infinite alternate; }
-  @keyframes cardPulse { from { box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); } to { box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), inset 0 0 15px rgba(255,255,255,0.1); } }
-  .card-glow-red.card-pulse { animation: redPulse 2s infinite alternate; }
-  @keyframes redPulse { from { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); } to { box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); } }
-
-  .card-particles::after {
-    content: ''; position: absolute; inset: 0;
-    background-image: radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px), radial-gradient(circle, rgba(255,200,100,0.6) 1.5px, transparent 1.5px);
-    background-size: 30px 30px, 50px 50px; animation: floatingParticles 6s linear infinite; opacity: 0.3; z-index: 5; pointer-events: none;
+  @keyframes shineSweep {
+    0% { transform: rotate(30deg) translateX(-100%); }
+    50%, 100% { transform: rotate(30deg) translateX(100%); }
   }
-  @keyframes floatingParticles { from { background-position: 0 0, 15px 15px; } to { background-position: 30px 30px, 65px 65px; } }
 
-  .card-fire::after {
-    content: ''; position: absolute; inset: 0;
+  /* محتوى الكارت */
+  .fifa-content {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 10px;
+  }
+
+  /* الجزء العلوي (التقييم والمركز) */
+  .fifa-top {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .fifa-rating {
+    font-family: 'Teko', sans-serif;
+    font-size: 55px;
+    font-weight: 700;
+    line-height: 1;
+    color: #facc15;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  }
+  .fifa-pos {
+    font-family: 'Teko', sans-serif;
+    font-size: 24px;
+    font-weight: 600;
+    color: #facc15;
+    line-height: 1;
+    margin-top: -5px;
+    margin-bottom: 5px;
+  }
+  .fifa-flag {
+    width: 30px;
+    height: 20px;
+    background: linear-gradient(to bottom, #ce1126 33%, #fff 33%, #fff 66%, #000 66%);
+    border-radius: 2px;
+    border: 1px solid #555;
+    margin-bottom: 5px;
+  }
+
+  /* صورة اللاعب */
+  .fifa-player-img {
+    position: absolute;
+    top: 15%;
+    right: 50%;
+    transform: translateX(50%);
+    width: 90%;
+    height: auto;
+    z-index: 5;
+    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    pointer-events: none;
+  }
+
+  /* الجزء السفلي (الاسم والإحصائيات) */
+  .fifa-bottom {
+    margin-top: auto;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(4px);
+    padding: 8px 5px;
+    border-top: 1px solid rgba(212, 175, 55, 0.5);
+    text-align: center;
+  }
+
+  .fifa-name {
+    font-size: 18px;
+    font-weight: 900;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding-bottom: 5px;
+  }
+
+  /* شبكة الإحصائيات 2x3 */
+  .fifa-stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px 10px;
+    text-align: left;
+    padding: 0 5px;
+  }
+
+  .fifa-stat-item {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 5px;
+  }
+
+  .fifa-stat-val {
+    font-family: 'Teko', sans-serif;
+    font-size: 20px;
+    font-weight: 600;
+    color: #facc15;
+    width: 25px;
+  }
+
+  .fifa-stat-name {
+    font-size: 11px;
+    font-weight: 700;
+    color: #d1d5db;
+    letter-spacing: 0.5px;
+  }
+
+  /* شعار الاتحاد في النص */
+  .fifa-crest {
+    position: absolute;
+    bottom: 70px;
+    right: 50%;
+    transform: translateX(50%);
+    z-index: 15;
+    opacity: 0.8;
+  }
+
+  /* ألوان بديلة للكروت (فضي، برونزي) */
+  .card-silver .fifa-card-shape { background: linear-gradient(135deg, #e2e8f0 0%, #94a3b8 50%, #e2e8f0 100%); }
+  .card-silver .fifa-rating, .card-silver .fifa-pos, .card-silver .fifa-stat-val { color: #e2e8f0; }
+  .card-silver .fifa-bg { background: radial-gradient(circle at top right, rgba(226,232,240,0.2) 0%, transparent 50%), linear-gradient(45deg, #111, #1a1a1a); }
+
+  .card-bronze .fifa-card-shape { background: linear-gradient(135deg, #d97706 0%, #78350f 50%, #d97706 100%); }
+  .card-bronze .fifa-rating, .card-bronze .fifa-pos, .card-bronze .fifa-stat-val { color: #d97706; }
+  .card-bronze .fifa-bg { background: radial-gradient(circle at top right, rgba(217,119,6,0.2) 0%, transparent 50%), linear-gradient(45deg, #111, #1a1a1a); }
+
+  /* كارت النار (أكبر من 95) */
+  .card-fire .fifa-card-shape {
+    background: linear-gradient(135deg, #ff0000 0%, #ff8c00 50%, #ff0000 100%);
+    animation: fireGlow 1.5s infinite alternate;
+  }
+  .card-fire .fifa-rating, .card-fire .fifa-pos, .card-fire .fifa-stat-val { color: #ff8c00; text-shadow: 0 0 10px #ff0000; }
+  .card-fire .fifa-bg { 
+    background: radial-gradient(circle at top right, rgba(255,69,0,0.3) 0%, transparent 50%), 
+                linear-gradient(45deg, #2a0000, #000); 
+  }
+  .card-fire .fifa-bg::after {
     background-image: radial-gradient(circle, #ff4500 2px, transparent 2px), radial-gradient(circle, #ff8c00 3px, transparent 3px);
-    background-size: 40px 40px, 60px 60px; animation: fireParticles 3s linear infinite; opacity: 0.6; z-index: 5; pointer-events: none;
+    opacity: 0.6; animation: fireParticles 3s linear infinite;
   }
   @keyframes fireParticles { from { background-position: 0 0, 20px 20px; } to { background-position: 40px 40px, 80px 80px; } }
+  @keyframes fireGlow {
+    0% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500; }
+    100% { box-shadow: 0 0 20px #ff4500, 0 0 30px #ff0000; }
+  }
 
   input, select, textarea { outline: none; transition: border-color 0.2s; color: #fff; }
   input:focus, select:focus, textarea:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
@@ -90,7 +270,6 @@
     <div class="space-y-3 relative z-10 text-right">
       <div id="name-container" class="hidden">
         <label class="text-xs text-slate-400 mb-1 block">الاسم بالكامل:</label>
-        <!-- منع المتصفح من الحفظ التلقائي -->
         <input id="auth-name" type="text" placeholder="اكتب اسمك هنا" autocomplete="off" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white">
       </div>
       
@@ -166,7 +345,7 @@
     </section>
 
     <section id="tab-cards" class="tab-content">
-      <div id="cards-list" class="grid grid-cols-2 gap-3"></div>
+      <div id="cards-list" class="grid grid-cols-2 gap-4 px-2"></div>
     </section>
 
     <section id="tab-matches" class="tab-content">
@@ -339,7 +518,6 @@ window.handleAdminAuth = async function() {
 
 window.handlePlayerAuth = async function() {
   const name = $('#auth-name').value.trim();
-  // إزالة المسافات من رقم التليفون
   const rawPhone = $('#auth-phone').value.trim().replace(/\s+/g, '');
   const password = $('#auth-password').value;
   const dob = $('#auth-dob').value;
@@ -361,18 +539,17 @@ window.handlePlayerAuth = async function() {
         name: name, phone: rawPhone, dob: dob, role: "pending", joinedAt: new Date().toISOString()
       });
       alert("تم إنشاء الحساب بنجاح! يرجى الانتظار حتى يوافق المدير.");
-      await signOut(auth); // تسجيل الخروج عشان يدخل لما يتم الموافقة
+      await signOut(auth);
       window.location.reload();
     }
   } catch (e) {
-    // إظهار الخطأ الحقيقي بوضوح
     let msg = "خطأ غير معروف";
     if(e.code === 'auth/invalid-credential') msg = "رقم التليفون أو الباسورد غلط ❌";
     else if(e.code === 'auth/email-already-in-use') msg = "رقم التليفون ده مسجل بالفعل، سجل دخولك ❌";
     else if(e.code === 'auth/weak-password') msg = "الباسورد ضعيف جداً (6 أرقام/حروف على الأقل) ❌";
     else msg = e.message;
 
-    alert("حدث خطأ: " + msg); // رسالة تنبيه قوية تمنع المتصفح من التعليق
+    alert("حدث خطأ: " + msg);
     errorEl.textContent = msg;
     errorEl.classList.remove('hidden');
   }
@@ -512,11 +689,6 @@ window.switchMatchTab = function(type) {
   }
 };
 
-window.flipCard = function(playerId) {
-  const card = document.getElementById('card-' + playerId);
-  if(card) card.classList.toggle('flipped');
-};
-
 function render() {
   renderPlayers(); renderCards(); renderMatches(); renderStats(); renderPayments(); renderRules(); renderAnnouncements();
   $('#team-summary').textContent = `${state.players.length} لاعب · ${state.matches.length} ماتش`;
@@ -566,9 +738,9 @@ function getPlayerData(p) {
 
 function calculateOVR(p) {
   const data = getPlayerData(p);
-  const stats = p.stats || { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 };
+  const stats = p.stats || { pac: 70, sho: 70, pas: 70, dri: 70, def: 70, phy: 70 };
   
-  const statsAvg = (stats.sho + stats.pas + stats.spd + stats.def + stats.phy) / 5;
+  const statsAvg = (stats.pac + stats.sho + stats.pas + stats.dri + stats.def + stats.phy) / 6;
   const goalsBonus = data.goals * 0.5; 
   const assistsBonus = data.assists * 0.3;
   const motmBonus = data.motmCount * 1.5;
@@ -585,83 +757,60 @@ function renderCards() {
   box.innerHTML = state.players.map(p => {
     const data = getPlayerData(p);
     const ovr = calculateOVR(p);
-    const stats = p.stats || { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 };
+    const stats = p.stats || { pac: 70, sho: 70, pas: 70, dri: 70, def: 70, phy: 70 };
     
-    let cardClass = "fifa-bg"; 
-    let ratingTextColor = "text-white"; 
-
+    let cardClass = "card-gold"; 
     if (ovr > 95) {
-        cardClass = "card-fire card-shine";
-        ratingTextColor = "text-rating"; 
-    } else if (ovr >= 91) {
-        cardClass = "card-glow-red card-pulse card-shine";
-        ratingTextColor = "text-rating";
-    } else if (ovr >= 86) {
-        cardClass = "card-green card-pulse card-shine";
-        ratingTextColor = "text-rating";
-    } else if (ovr >= 80) {
-        cardClass = "card-orange card-shine";
-        ratingTextColor = "text-rating";
-    } else if (ovr >= 70) {
+        cardClass = "card-fire";
+    } else if (ovr < 70) {
+        cardClass = "card-bronze";
+    } else if (ovr < 80) {
         cardClass = "card-silver";
-        ratingTextColor = "text-slate-300";
-    } else {
-        cardClass = "fifa-bg border-slate-600";
-        ratingTextColor = "text-slate-500";
     }
 
     return `
-      <div class="flip-card" id="card-${p.id}" onclick="flipCard('${p.id}')">
-        <div class="flip-card-inner">
-          
-          <div class="flip-card-front ${cardClass}">
-            <div class="card-content">
-              <div class="w-full flex justify-between items-start">
-                <div class="text-right">
-                  <div class="text-3xl font-black ${ratingTextColor}">${ovr}</div>
-                  <div class="text-[10px] font-bold text-slate-300 uppercase">${p.position ? p.position.substring(0,3) : 'PLY'}</div>
+      <div class="fifa-card-container ${cardClass}" onclick="this.classList.toggle('active')">
+        <div class="fifa-card-shape">
+          <div class="fifa-card-inner ${cardClass === 'card-fire' ? 'card-shine' : ''}">
+            <div class="fifa-bg"></div>
+            
+            <!-- اللوجو في النص -->
+            <div class="fifa-crest">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="#facc15" stroke-width="2"/>
+                <path d="M12 6L14.5 10.5L19.5 11.5L16 15L16.5 20L12 18L7.5 20L8 15L4.5 11.5L9.5 10.5L12 6Z" fill="#facc15"/>
+              </svg>
+            </div>
+
+            <div class="fifa-content">
+              <!-- التقييم والمركز -->
+              <div class="fifa-top">
+                <div class="fifa-rating">${ovr}</div>
+                <div class="fifa-pos">${p.position ? p.position.substring(0,2).toUpperCase() : 'PLY'}</div>
+                <div class="fifa-flag"></div>
+              </div>
+
+              <!-- صورة اللاعب -->
+              ${p.image ? `<img src="${p.image}" class="fifa-player-img" crossorigin="anonymous">` : `<div class="fifa-player-img flex items-center justify-center text-6xl font-black text-white/20">${p.name.charAt(0)}</div>`}
+
+              <!-- الاسم والإحصائيات -->
+              <div class="fifa-bottom">
+                <div class="fifa-name">${p.name}</div>
+                
+                <div class="fifa-stats-grid">
+                  <div class="fifa-stat-item"><span class="fifa-stat-val">${stats.pac}</span><span class="fifa-stat-name">PAC</span></div>
+                  <div class="fifa-stat-item"><span class="fifa-stat-val">${stats.sho}</span><span class="fifa-stat-name">SHO</span></div>
+                  
+                  <div class="fifa-stat-item"><span class="fifa-stat-val">${stats.pas}</span><span class="fifa-stat-name">PAS</span></div>
+                  <div class="fifa-stat-item"><span class="fifa-stat-val">${stats.dri}</span><span class="fifa-stat-name">DRI</span></div>
+                  
+                  <div class="fifa-stat-item"><span class="fifa-stat-val">${stats.def}</span><span class="fifa-stat-name">DEF</span></div>
+                  <div class="fifa-stat-item"><span class="fifa-stat-val">${stats.phy}</span><span class="fifa-stat-name">PHY</span></div>
                 </div>
-                <div class="text-2xl font-black text-slate-500">${p.number ? '#'+p.number : ''}</div>
-              </div>
-              
-              <div class="relative -mt-2">
-                ${p.image ? `<img src="${p.image}" class="w-16 h-16 rounded-full object-cover border-2 border-slate-500 relative z-30">` : `<div class="w-16 h-16 rounded-full bg-slate-700 flex items-center justify-center font-black text-xl text-white border-2 border-slate-500 relative z-30">${p.name.charAt(0)}</div>`}
-              </div>
-              
-              <div class="w-full border-b border-slate-600 pb-1 text-center">
-                <div class="font-black text-xs text-white truncate px-1">${p.name}</div>
-              </div>
-              
-              <div class="w-full flex justify-around text-[10px] font-bold text-slate-300 mt-1">
-                <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">مباريات</span>${data.present}</div>
-                <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">أهداف</span>${data.goals}</div>
-                <div class="flex flex-col items-center"><span class="text-[9px] text-slate-400">أسيست</span>${data.assists}</div>
               </div>
             </div>
+
           </div>
-          
-          <div class="flip-card-back ${cardClass}">
-            <div class="card-content">
-              <div class="text-center border-b border-slate-600 pb-2 mb-2 w-full">
-                <div class="font-black text-sm text-white">${p.name}</div>
-                <div class="text-[10px] text-slate-400">إحصائيات اللاعب</div>
-              </div>
-              
-              <div class="w-full grid grid-cols-2 gap-x-4 gap-y-2 text-xs font-bold text-slate-300 px-2">
-                <div class="flex justify-between"><span>SHO</span><span class="text-white">${stats.sho}</span></div>
-                <div class="flex justify-between"><span>PAS</span><span class="text-white">${stats.pas}</span></div>
-                <div class="flex justify-between"><span>SPD</span><span class="text-white">${stats.spd}</span></div>
-                <div class="flex justify-between"><span>DEF</span><span class="text-white">${stats.def}</span></div>
-                <div class="flex justify-between"><span>PHY</span><span class="text-white">${stats.phy}</span></div>
-                <div class="flex justify-between"><span>OVR</span><span class="${ratingTextColor}">${ovr}</span></div>
-              </div>
-              
-              <div class="text-center mt-2">
-                <span class="text-[9px] text-slate-500 bg-slate-800/50 px-2 py-1 rounded">اضغط للعودة</span>
-              </div>
-            </div>
-          </div>
-          
         </div>
       </div>
     `;
@@ -671,20 +820,26 @@ function renderCards() {
 window.editPlayerStats = function(playerId) {
   const p = state.players.find(x => x.id === playerId);
   if(!p) return;
-  p.stats = p.stats || { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 };
+  // تحديث الإحصائيات لتشمل 6 أرقام (PAC, SHO, PAS, DRI, DEF, PHY)
+  p.stats = p.stats || { pac: 70, sho: 70, pas: 70, dri: 70, def: 70, phy: 70 };
   
-  const sho = prompt("قوة التسديد (SHO) - من 1 لـ 99:", p.stats.sho);
+  const pac = prompt("السرعة (PAC) - من 1 لـ 99:", p.stats.pac || 70);
+  if(pac === null) return;
+  const sho = prompt("التسديد (SHO) - من 1 لـ 99:", p.stats.sho || 70);
   if(sho === null) return;
-  const pas = prompt("دقة التمرير (PAS) - من 1 لـ 99:", p.stats.pas);
+  const pas = prompt("التمرير (PAS) - من 1 لـ 99:", p.stats.pas || 70);
   if(pas === null) return;
-  const spd = prompt("السرعة (SPD) - من 1 لـ 99:", p.stats.spd);
-  if(spd === null) return;
-  const def = prompt("الدفاع (DEF) - من 1 لـ 99:", p.stats.def);
+  const dri = prompt("المراوغة (DRI) - من 1 لـ 99:", p.stats.dri || 70);
+  if(dri === null) return;
+  const def = prompt("الدفاع (DEF) - من 1 لـ 99:", p.stats.def || 70);
   if(def === null) return;
-  const phy = prompt("القوة البدنية (PHY) - من 1 لـ 99:", p.stats.phy);
+  const phy = prompt("القوة البدنية (PHY) - من 1 لـ 99:", p.stats.phy || 70);
   if(phy === null) return;
 
-  p.stats = { sho: Number(sho), pas: Number(pas), spd: Number(spd), def: Number(def), phy: Number(phy) };
+  p.stats = { 
+    pac: Number(pac), sho: Number(sho), pas: Number(pas), 
+    dri: Number(dri), def: Number(def), phy: Number(phy) 
+  };
   save();
 };
 
@@ -950,7 +1105,7 @@ window.approveUser = async function(uid) {
     if(!exists) {
       state.players.push({ 
         id: uid, name: data.name, phone: data.phone, position: 'لاعب', image: null,
-        stats: { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 } 
+        stats: { pac: 70, sho: 70, pas: 70, dri: 70, def: 70, phy: 70 } 
       });
       await save();
     }
@@ -1036,7 +1191,7 @@ window.uploadPlayerImage = function(playerId) {
         if (width > height) { if (width > MAX_SIZE) { height *= MAX_SIZE / width; width = MAX_SIZE; } } else { if (height > MAX_SIZE) { width *= MAX_SIZE / height; height = MAX_SIZE; } }
         canvas.width = width; canvas.height = height;
         const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, width, height);
-        const base64 = canvas.toDataURL('image/jpeg', 0.8);
+        const base64 = canvas.toDataURL('image/png', 0.8); // نستخدم png عشان الجودة
         const pIndex = state.players.findIndex(p => p.id === playerId);
         if(pIndex > -1) { state.players[pIndex].image = base64; await save(); alert('تم حفظ الصورة ✅'); }
       }; img.src = event.target.result;
@@ -1044,7 +1199,7 @@ window.uploadPlayerImage = function(playerId) {
   }; input.click();
 };
 
-window.addPlayer = function(e) { e.preventDefault(); if(!isAdmin) return; const f = e.target; state.players.push({ id: uid(), name: f.name.value.trim(), number: f.number.value.trim(), position: f.position.value, image: null, stats: { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 } }); f.reset(); save(); };
+window.addPlayer = function(e) { e.preventDefault(); if(!isAdmin) return; const f = e.target; state.players.push({ id: uid(), name: f.name.value.trim(), number: f.number.value.trim(), position: f.position.value, image: null, stats: { pac: 70, sho: 70, pas: 70, dri: 70, def: 70, phy: 70 } }); f.reset(); save(); };
 window.deletePlayer = function(id) { if(!isAdmin) return; if (!confirm('متأكد تحذف اللاعب؟')) return; state.players = state.players.filter(p => p.id !== id); save(); };
 
 </script>
