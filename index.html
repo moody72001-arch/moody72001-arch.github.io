@@ -201,11 +201,12 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, on
 import { getFirestore, doc, setDoc, updateDoc, onSnapshot, collection }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+// 🔴 تم تصحيح إعدادات مشروعك بناءً على الصورة
 const firebaseConfig = {
   apiKey: "AIzaSyD4PqVEdU1NI7_5eZGntteEyRbZ519KYbg",
-  authDomain: "my-team-4d879.firebaseapp.com",
-  projectId: "my-team-4d879",
-  storageBucket: "my-team-4d879.firebasestorage.app",
+  authDomain: "fariqi-4d879.firebaseapp.com",
+  projectId: "fariqi-4d879",
+  storageBucket: "fariqi-4d879.firebasestorage.app",
   messagingSenderId: "837918664225",
   appId: "1:837918664225:web:28a56f2a7065228faae560"
 };
@@ -301,6 +302,7 @@ onAuthStateChanged(auth, (user) => {
 function checkUserStatus(uid) {
   const userRef = doc(db, "users", uid);
   onSnapshot(userRef, async (snap) => {
+    // عمل حساب الأدمن أوتوماتيك لو مش موجود
     if (!snap.exists()) {
       if (currentUserPhone.toLowerCase() === SUPER_ADMIN_PHONE) {
         await setDoc(userRef, {
