@@ -132,7 +132,7 @@
       
       <div>
         <label class="text-xs text-slate-400 mb-1 block">رقم التليفون (للاعبين فقط):</label>
-        <input id="auth-phone" type="text" placeholder="01xxxxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white" dir="ltr" autocomplete="off">
+        <input id="auth-phone" type="tel" placeholder="01xxxxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white" dir="ltr" autocomplete="off">
       </div>
       
       <div id="password-container">
@@ -369,7 +369,7 @@ window.toggleAuthMode = function() {
   if(isLoginMode) {
     $('#name-container').classList.add('hidden');
     $('#dob-container').classList.add('hidden');
-    $('#password-container').classList.add('hidden'); // نخفي خانة الباسورد وقت الدخول عشان المتصفح
+    $('#password-container').classList.add('hidden');
   } else {
     $('#name-container').classList.remove('hidden');
     $('#dob-container').classList.remove('hidden');
@@ -387,10 +387,10 @@ window.handleAdminAuth = async function() {
   }
 };
 
-// 🔴 دالة تسجيل دخول اللاعبين (تم إصلاحها عشان تمنع مشكلة المتصفح)
 window.handlePlayerAuth = async function() {
   const name = $('#auth-name').value.trim();
-  const rawPhone = $('#auth-phone').value.trim();
+  // 🔴 الحل هنا: شيلنا المسافات من رقم التليفون
+  const rawPhone = $('#auth-phone').value.trim().replace(/\s+/g, ''); 
   let password = $('#auth-password').value;
   const dob = $('#auth-dob').value;
   const errorEl = $('#auth-error');
@@ -398,7 +398,6 @@ window.handlePlayerAuth = async function() {
   if(!rawPhone) { alert("اكتب رقم التليفون"); return; }
 
   if (isLoginMode) {
-    // نطلب الباسورد في نافذة منبثقة عشان نمنع المتصفح من التدخل
     const passPrompt = prompt("ادخل الباسورد:");
     if(!passPrompt) return;
     password = passPrompt;
@@ -428,6 +427,7 @@ window.handlePlayerAuth = async function() {
     if(e.code === 'auth/invalid-credential') msg = "رقم التليفون أو الباسورد غلط ❌";
     else if(e.code === 'auth/email-already-in-use') msg = "رقم التليفون ده مسجل بالفعل، سجل دخولك ❌";
     else if(e.code === 'auth/weak-password') msg = "الباسورد ضعيف جداً (6 أرقام/حروف على الأقل) ❌";
+    else if(e.code === 'auth/invalid-email') msg = "رقم التليفون فيه حروف أو مسافات غير مسموحة ❌";
     else msg = e.message;
 
     alert("حدث خطأ: " + msg);
@@ -624,7 +624,6 @@ function getPlayerData(p) {
 
 function calculateOVR(p) {
   const data = getPlayerData(p);
-  // تحديث الإحصائيات لتشمل 6 أرقام
   const stats = p.stats || { sho: 70, pas: 70, spd: 70, dri: 70, def: 70, phy: 70 };
   
   const statsAvg = (stats.sho + stats.pas + stats.spd + stats.dri + stats.def + stats.phy) / 6;
@@ -670,7 +669,6 @@ function renderCards() {
         <div class="flip-card" id="card-${p.id}" onclick="flipCard('${p.id}')">
           <div class="flip-card-inner">
             
-            <!-- الوجه الأول -->
             <div class="flip-card-front">
               <div class="card-wrapper ${wrapperClass}">
                 <div class="card-inner ${innerClass} p-4 flex flex-col justify-between">
@@ -703,7 +701,6 @@ function renderCards() {
               </div>
             </div>
             
-            <!-- الوجه الثاني -->
             <div class="flip-card-back">
               <div class="card-wrapper ${wrapperClass}">
                 <div class="card-inner ${innerClass} p-4 flex flex-col justify-between items-center">
@@ -715,7 +712,6 @@ function renderCards() {
                       <div class="text-[9px] text-slate-400">إحصائيات اللاعب</div>
                     </div>
                     
-                    <!-- 6 إحصائيات + OVR -->
                     <div class="w-full grid grid-cols-2 gap-x-2 gap-y-1 text-xs font-bold text-slate-300 px-1">
                       <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">SHO</span><span class="fifa-number text-lg text-white">${stats.sho}</span></div>
                       <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">PAS</span><span class="fifa-number text-lg text-white">${stats.pas}</span></div>
