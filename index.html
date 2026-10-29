@@ -17,7 +17,7 @@
   .nav-btn span { font-size: 1.3rem; margin-bottom: 0.1rem; }
   .nav-btn.active { color: #10b981; background-color: rgba(16, 185, 129, 0.1); }
   
-  /* ====== تصميم كارت فيفا (Flip Card) ====== */
+  /* ====== تصميم كارت فيفا ====== */
   .flip-card { perspective: 1000px; width: 100%; height: 240px; cursor: pointer; position: relative; }
   .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; z-index: 10; }
   .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
@@ -31,14 +31,12 @@
   .card-wrapper {
     position: absolute; inset: 0;
     clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px);
-    padding: 3px; 
-    box-sizing: border-box;
+    padding: 3px; box-sizing: border-box;
   }
   .card-inner {
     width: 100%; height: 100%;
     clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
-    position: relative; overflow: hidden;
-    display: flex; flex-direction: column;
+    position: relative; overflow: hidden; display: flex; flex-direction: column;
   }
 
   .card-bg-texture {
@@ -72,52 +70,35 @@
   .inner-fire { background: linear-gradient(135deg, #450a0a 0%, #000000 100%); }
   .inner-fire .text-rating { color: #fbbf24; text-shadow: 0 0 15px #ff4500; }
 
-  /* ====== كارت الأسطورة 99 (التنين والتاج) ====== */
-  .card-99-container {
-    position: relative;
-    width: 100%;
-    height: 100%;
-  }
+  /* ====== كارت الأسطورة 99 ====== */
+  .card-99-container { position: relative; width: 100%; height: 100%; }
 
-  /* التاج بينزل من فوق */
+  /* التاج */
   @keyframes dropCrown {
-    0% { transform: translate(-50%, -60px) scale(0.5); opacity: 0; }
-    60% { transform: translate(-50%, 10px) scale(1.1); opacity: 1; }
+    0% { transform: translate(-50%, -40px) scale(0.5); opacity: 0; }
+    60% { transform: translate(-50%, 5px) scale(1.1); opacity: 1; }
     100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
   }
   .crown-99 {
-    position: absolute; top: -25px; left: 50%;
+    position: absolute; top: -20px; left: 50%;
     transform: translateX(-50%);
-    font-size: 45px; z-index: 30;
+    font-size: 38px; z-index: 30;
     animation: dropCrown 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-    filter: drop-shadow(0 0 15px #fbbf24) drop-shadow(0 0 5px #fff);
+    filter: drop-shadow(0 0 15px #fbbf24) drop-shadow(0 0 5px #ff0000);
     pointer-events: none;
   }
 
-  /* الطاقة/التنين اللي بيلف حوالين الكارت */
-  @keyframes orbitEnergy {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  .dragon-energy {
-    position: absolute; inset: -15px;
-    background: conic-gradient(from 0deg, transparent, rgba(255, 69, 0, 0.8), rgba(251, 191, 36, 0.8), transparent 60%);
-    border-radius: 50%;
-    animation: orbitEnergy 3s linear infinite;
-    z-index: 5;
-    filter: blur(8px);
-    opacity: 0.8;
-  }
-
+  /* إطار النار الأسود */
   .wrapper-99 {
-    background: linear-gradient(135deg, #fbbf24, #ff0000, #fbbf24);
+    background: linear-gradient(135deg, #ff0000, #000000, #ff4500);
     padding: 4px;
     clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px);
     z-index: 10;
     position: relative;
+    animation: fireGlow 1.5s infinite alternate;
   }
   .inner-99 {
-    background: linear-gradient(135deg, #1a0000 0%, #000000 100%);
+    background: radial-gradient(circle at center, #2a0000 0%, #000000 100%);
     clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
     width: 100%; height: 100%; position: relative; overflow: hidden;
   }
@@ -154,7 +135,7 @@
         <input id="auth-phone" type="text" placeholder="01xxxxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white" dir="ltr" autocomplete="off">
       </div>
       
-      <div>
+      <div id="password-container">
         <label class="text-xs text-slate-400 mb-1 block">الباسورد:</label>
         <input id="auth-password" type="password" placeholder="••••••" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white" dir="ltr" autocomplete="new-password">
       </div>
@@ -223,7 +204,7 @@
 
     <!-- كروت اللاعيبة -->
     <section id="tab-cards" class="tab-content">
-      <div id="cards-list" class="grid grid-cols-2 gap-4 p-2"></div>
+      <div id="cards-list" class="grid grid-cols-2 gap-3 p-1"></div>
     </section>
 
     <!-- الماتشات -->
@@ -388,9 +369,11 @@ window.toggleAuthMode = function() {
   if(isLoginMode) {
     $('#name-container').classList.add('hidden');
     $('#dob-container').classList.add('hidden');
+    $('#password-container').classList.add('hidden'); // نخفي خانة الباسورد وقت الدخول عشان المتصفح
   } else {
     $('#name-container').classList.remove('hidden');
     $('#dob-container').classList.remove('hidden');
+    $('#password-container').classList.remove('hidden');
   }
 };
 
@@ -404,16 +387,26 @@ window.handleAdminAuth = async function() {
   }
 };
 
+// 🔴 دالة تسجيل دخول اللاعبين (تم إصلاحها عشان تمنع مشكلة المتصفح)
 window.handlePlayerAuth = async function() {
   const name = $('#auth-name').value.trim();
   const rawPhone = $('#auth-phone').value.trim();
-  const password = $('#auth-password').value;
+  let password = $('#auth-password').value;
   const dob = $('#auth-dob').value;
   const errorEl = $('#auth-error');
   
-  if(!isLoginMode && !name) { errorEl.textContent = "اكتب اسمك"; errorEl.classList.remove('hidden'); return; }
-  if(!rawPhone || !password) { errorEl.textContent = "املا رقم التليفون والباسورد"; errorEl.classList.remove('hidden'); return; }
-  if(!isLoginMode && !dob) { errorEl.textContent = "ادخل تاريخ الميلاد"; errorEl.classList.remove('hidden'); return; }
+  if(!rawPhone) { alert("اكتب رقم التليفون"); return; }
+
+  if (isLoginMode) {
+    // نطلب الباسورد في نافذة منبثقة عشان نمنع المتصفح من التدخل
+    const passPrompt = prompt("ادخل الباسورد:");
+    if(!passPrompt) return;
+    password = passPrompt;
+  } else {
+    if(!name) { alert("اكتب اسمك الأول"); return; }
+    if(!password) { alert("اكتب الباسورد"); return; }
+    if(!dob) { alert("ادخل تاريخ الميلاد"); return; }
+  }
 
   const email = formatPhone(rawPhone);
   errorEl.classList.add('hidden');
@@ -426,11 +419,18 @@ window.handlePlayerAuth = async function() {
       await setDoc(doc(db, "users", userCred.user.uid), {
         name: name, phone: rawPhone, dob: dob, role: "pending", joinedAt: new Date().toISOString()
       });
+      alert("تم إنشاء الحساب بنجاح! يرجى الانتظار حتى يوافق المدير.");
+      await signOut(auth);
+      window.location.reload();
     }
   } catch (e) {
-    let msg = "حدث خطأ";
+    let msg = "خطأ غير معروف";
     if(e.code === 'auth/invalid-credential') msg = "رقم التليفون أو الباسورد غلط ❌";
-    if(e.code === 'auth/email-already-in-use') msg = "رقم التليفون ده مسجل بالفعل ❌";
+    else if(e.code === 'auth/email-already-in-use') msg = "رقم التليفون ده مسجل بالفعل، سجل دخولك ❌";
+    else if(e.code === 'auth/weak-password') msg = "الباسورد ضعيف جداً (6 أرقام/حروف على الأقل) ❌";
+    else msg = e.message;
+
+    alert("حدث خطأ: " + msg);
     errorEl.textContent = msg;
     errorEl.classList.remove('hidden');
   }
@@ -624,9 +624,10 @@ function getPlayerData(p) {
 
 function calculateOVR(p) {
   const data = getPlayerData(p);
-  const stats = p.stats || { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 };
+  // تحديث الإحصائيات لتشمل 6 أرقام
+  const stats = p.stats || { sho: 70, pas: 70, spd: 70, dri: 70, def: 70, phy: 70 };
   
-  const statsAvg = (stats.sho + stats.pas + stats.spd + stats.def + stats.phy) / 5;
+  const statsAvg = (stats.sho + stats.pas + stats.spd + stats.dri + stats.def + stats.phy) / 6;
   const goalsBonus = data.goals * 0.5; 
   const assistsBonus = data.assists * 0.3;
   const motmBonus = data.motmCount * 1.5;
@@ -643,9 +644,8 @@ function renderCards() {
   box.innerHTML = state.players.map(p => {
     const data = getPlayerData(p);
     const ovr = calculateOVR(p);
-    const stats = p.stats || { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 };
+    const stats = p.stats || { sho: 70, pas: 70, spd: 70, dri: 70, def: 70, phy: 70 };
     
-    // تحديد الكلاسات بناء على التقييم
     let wrapperClass = "wrapper-silver"; 
     let innerClass = "inner-silver"; 
     let ratingTextColor = "text-slate-300"; 
@@ -665,15 +665,12 @@ function renderCards() {
 
     return `
       <div class="card-99-container">
-        <!-- تأثير التنين أو الطاقة اللي بيلف (بيظهر بس لو 99) -->
-        ${is99 ? `<div class="dragon-energy"></div>` : ''}
-        <!-- التاج اللي بينزل من فوق (بيظهر بس لو 99) -->
         ${is99 ? `<div class="crown-99">👑</div>` : ''}
 
         <div class="flip-card" id="card-${p.id}" onclick="flipCard('${p.id}')">
           <div class="flip-card-inner">
             
-            <!-- الوجه الأول (الأساسي) -->
+            <!-- الوجه الأول -->
             <div class="flip-card-front">
               <div class="card-wrapper ${wrapperClass}">
                 <div class="card-inner ${innerClass} p-4 flex flex-col justify-between">
@@ -706,29 +703,33 @@ function renderCards() {
               </div>
             </div>
             
-            <!-- الوجه الثاني (الإحصائيات التفصيلية) -->
+            <!-- الوجه الثاني -->
             <div class="flip-card-back">
               <div class="card-wrapper ${wrapperClass}">
                 <div class="card-inner ${innerClass} p-4 flex flex-col justify-between items-center">
                   <div class="card-bg-texture"></div>
                   <div class="relative z-10 w-full h-full flex flex-col justify-between items-center">
                     
-                    <div class="w-full text-center border-b border-white/20 pb-2 mb-2">
-                      <div class="font-black text-sm text-white">${p.name}</div>
-                      <div class="text-[10px] text-slate-400">إحصائيات اللاعب</div>
+                    <div class="w-full text-center border-b border-white/20 pb-1 mb-1">
+                      <div class="font-black text-xs text-white">${p.name}</div>
+                      <div class="text-[9px] text-slate-400">إحصائيات اللاعب</div>
                     </div>
                     
-                    <div class="w-full grid grid-cols-2 gap-x-4 gap-y-3 text-sm font-bold text-slate-300 px-2">
-                      <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">SHO</span><span class="fifa-number text-xl text-white">${stats.sho}</span></div>
-                      <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">PAS</span><span class="fifa-number text-xl text-white">${stats.pas}</span></div>
-                      <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">SPD</span><span class="fifa-number text-xl text-white">${stats.spd}</span></div>
-                      <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">DEF</span><span class="fifa-number text-xl text-white">${stats.def}</span></div>
-                      <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">PHY</span><span class="fifa-number text-xl text-white">${stats.phy}</span></div>
-                      <div class="flex justify-between items-center"><span class="text-slate-400 text-xs">OVR</span><span class="fifa-number text-xl ${ratingTextColor}">${ovr}</span></div>
+                    <!-- 6 إحصائيات + OVR -->
+                    <div class="w-full grid grid-cols-2 gap-x-2 gap-y-1 text-xs font-bold text-slate-300 px-1">
+                      <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">SHO</span><span class="fifa-number text-lg text-white">${stats.sho}</span></div>
+                      <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">PAS</span><span class="fifa-number text-lg text-white">${stats.pas}</span></div>
+                      <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">SPD</span><span class="fifa-number text-lg text-white">${stats.spd}</span></div>
+                      <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">DRI</span><span class="fifa-number text-lg text-white">${stats.dri || 70}</span></div>
+                      <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">DEF</span><span class="fifa-number text-lg text-white">${stats.def}</span></div>
+                      <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">PHY</span><span class="fifa-number text-lg text-white">${stats.phy}</span></div>
+                      <div class="col-span-2 flex justify-between items-center mt-1 border-t border-white/10 pt-1">
+                        <span class="text-slate-400 text-xs">OVR</span><span class="fifa-number text-xl ${ratingTextColor}">${ovr}</span>
+                      </div>
                     </div>
                     
-                    <div class="text-center mt-2">
-                      <span class="text-[9px] text-slate-400 bg-black/40 px-3 py-1 rounded-full border border-white/10">اضغط للعودة</span>
+                    <div class="text-center">
+                      <span class="text-[9px] text-slate-400 bg-black/40 px-2 py-0.5 rounded-full border border-white/10">اضغط للعودة</span>
                     </div>
                   </div>
                 </div>
@@ -745,20 +746,25 @@ function renderCards() {
 window.editPlayerStats = function(playerId) {
   const p = state.players.find(x => x.id === playerId);
   if(!p) return;
-  p.stats = p.stats || { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 };
+  p.stats = p.stats || { sho: 70, pas: 70, spd: 70, dri: 70, def: 70, phy: 70 };
   
-  const sho = prompt("قوة التسديد (SHO) - من 1 لـ 99:", p.stats.sho);
+  const sho = prompt("قوة التسديد (SHO) - من 1 لـ 99:", p.stats.sho || 70);
   if(sho === null) return;
-  const pas = prompt("دقة التمرير (PAS) - من 1 لـ 99:", p.stats.pas);
+  const pas = prompt("دقة التمرير (PAS) - من 1 لـ 99:", p.stats.pas || 70);
   if(pas === null) return;
-  const spd = prompt("السرعة (SPD) - من 1 لـ 99:", p.stats.spd);
+  const spd = prompt("السرعة (SPD) - من 1 لـ 99:", p.stats.spd || 70);
   if(spd === null) return;
-  const def = prompt("الدفاع (DEF) - من 1 لـ 99:", p.stats.def);
+  const dri = prompt("المراوغة (DRI) - من 1 لـ 99:", p.stats.dri || 70);
+  if(dri === null) return;
+  const def = prompt("الدفاع (DEF) - من 1 لـ 99:", p.stats.def || 70);
   if(def === null) return;
-  const phy = prompt("القوة البدنية (PHY) - من 1 لـ 99:", p.stats.phy);
+  const phy = prompt("القوة البدنية (PHY) - من 1 لـ 99:", p.stats.phy || 70);
   if(phy === null) return;
 
-  p.stats = { sho: Number(sho), pas: Number(pas), spd: Number(spd), def: Number(def), phy: Number(phy) };
+  p.stats = { 
+    sho: Number(sho), pas: Number(pas), spd: Number(spd), 
+    dri: Number(dri), def: Number(def), phy: Number(phy) 
+  };
   save();
 };
 
@@ -1024,7 +1030,7 @@ window.approveUser = async function(uid) {
     if(!exists) {
       state.players.push({ 
         id: uid, name: data.name, phone: data.phone, position: 'لاعب', image: null,
-        stats: { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 } 
+        stats: { sho: 70, pas: 70, spd: 70, dri: 70, def: 70, phy: 70 } 
       });
       await save();
     }
@@ -1118,7 +1124,7 @@ window.uploadPlayerImage = function(playerId) {
   }; input.click();
 };
 
-window.addPlayer = function(e) { e.preventDefault(); if(!isAdmin) return; const f = e.target; state.players.push({ id: uid(), name: f.name.value.trim(), number: f.number.value.trim(), position: f.position.value, image: null, stats: { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 } }); f.reset(); save(); };
+window.addPlayer = function(e) { e.preventDefault(); if(!isAdmin) return; const f = e.target; state.players.push({ id: uid(), name: f.name.value.trim(), number: f.number.value.trim(), position: f.position.value, image: null, stats: { sho: 70, pas: 70, spd: 70, dri: 70, def: 70, phy: 70 } }); f.reset(); save(); };
 window.deletePlayer = function(id) { if(!isAdmin) return; if (!confirm('متأكد تحذف اللاعب؟')) return; state.players = state.players.filter(p => p.id !== id); save(); };
 
 </script>
