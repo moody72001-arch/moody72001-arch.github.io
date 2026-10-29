@@ -21,119 +21,53 @@
   .flip-card { perspective: 1000px; width: 100%; height: 220px; cursor: pointer; }
   .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s; transform-style: preserve-3d; }
   .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
-  
-  /* الأوجه الأساسية */
-  .flip-card-front, .flip-card-back { 
-    position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 1.2rem; overflow: hidden; 
-    display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-  }
+  .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; border-radius: 1.2rem; overflow: hidden; }
   .flip-card-back { transform: rotateY(180deg); }
 
-  /* المحتوى فوق الرسوم المتحركة */
-  .card-content { position: relative; z-index: 20; width: 100%; height: 100%; padding: 0.75rem; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
-  
-  /* ألوان الكروت */
+  /* تصميم كارت فيفا */
   .fifa-bg { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 2px solid #334155; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5); }
-  
   .card-silver { border-color: #cbd5e1; background: linear-gradient(135deg, #334155 0%, #0f172a 100%); }
-  
   .card-orange { border-color: #f97316; background: linear-gradient(135deg, #431407 0%, #0f172a 100%); }
   .card-orange .text-rating { color: #f97316; }
-
   .card-green { border-color: #10b981; background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%); }
   .card-green .text-rating { color: #10b981; }
-
   .card-glow-red { border-color: #ef4444; background: linear-gradient(135deg, #450a0a 0%, #0f172a 100%); }
   .card-glow-red .text-rating { color: #ef4444; }
-
-  .card-fire { 
-    background: linear-gradient(135deg, #7f1d1d 0%, #0f172a 100%); 
-    border: 3px solid #ff0000; 
-    animation: fireGlow 1.5s infinite alternate; 
-  }
+  .card-fire { background: linear-gradient(135deg, #7f1d1d 0%, #0f172a 100%); border: 3px solid #ff0000; animation: fireGlow 1.5s infinite alternate; }
   .card-fire .text-rating { color: #fbbf24; text-shadow: 0 0 10px #ff4500; }
 
-  /* ====== التأثيرات الحركية داخل الكارت ====== */
-  
-  /* 1. لمعة متحركة (Shine) */
-  .card-shine::before {
-    content: '';
-    position: absolute;
-    top: -50%; left: -50%;
-    width: 200%; height: 200%;
-    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
-    transform: rotate(30deg) translateX(-100%);
-    animation: shineSweep 4s infinite ease-in-out;
-    z-index: 10;
-    pointer-events: none;
-  }
-  @keyframes shineSweep {
-    0% { transform: rotate(30deg) translateX(-100%); }
-    50%, 100% { transform: rotate(30deg) translateX(100%); }
-  }
-
-  /* 2. نبض في الخلفية (Pulse) */
-  .card-pulse {
-    animation: cardPulse 2s infinite alternate;
-  }
-  @keyframes cardPulse {
-    from { box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); }
-    to { box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), inset 0 0 15px rgba(255,255,255,0.1); }
-  }
-  .card-glow-red.card-pulse {
-    animation: redPulse 2s infinite alternate;
-  }
-  @keyframes redPulse {
-    from { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); }
-    to { box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); }
-  }
-
-  /* 3. شرارات / نجوم متحركة (Particles) */
-  .card-particles::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: 
-      radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px),
-      radial-gradient(circle, rgba(255,200,100,0.6) 1.5px, transparent 1.5px);
-    background-size: 30px 30px, 50px 50px;
-    background-position: 0 0, 15px 15px;
-    animation: floatingParticles 6s linear infinite;
-    opacity: 0.3;
-    z-index: 5;
-    pointer-events: none;
-  }
-  @keyframes floatingParticles {
-    from { background-position: 0 0, 15px 15px; }
-    to { background-position: 30px 30px, 65px 65px; }
-  }
-
-  /* نار متحركة لأعلى من 95 */
-  .card-fire::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: 
-      radial-gradient(circle, #ff4500 2px, transparent 2px),
-      radial-gradient(circle, #ff8c00 3px, transparent 3px);
-    background-size: 40px 40px, 60px 60px;
-    background-position: 0 0, 20px 20px;
-    animation: fireParticles 3s linear infinite;
-    opacity: 0.6;
-    z-index: 5;
-    pointer-events: none;
-  }
-  @keyframes fireParticles {
-    from { background-position: 0 0, 20px 20px; }
-    to { background-position: 40px 40px, 80px 80px; }
-  }
-
-  /* أنيميشن النار الخارجي */
   @keyframes fireGlow {
     0% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500, 0 0 30px #ff8c00; border-color: #ff0000; }
     50% { box-shadow: 0 0 20px #ff4500, 0 0 30px #ff8c00, 0 0 40px #ff0000; border-color: #ff8c00; }
     100% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500, 0 0 30px #ff8c00; border-color: #ff0000; }
   }
+
+  /* ====== التأثيرات الحركية داخل الكارت ====== */
+  .card-shine::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: linear-gradient(to right, rgba(255,255,255,0) 0%, rgba(255,255,255,0.15) 50%, rgba(255,255,255,0) 100%);
+    transform: rotate(30deg) translateX(-100%); animation: shineSweep 4s infinite ease-in-out; z-index: 10; pointer-events: none;
+  }
+  @keyframes shineSweep { 0% { transform: rotate(30deg) translateX(-100%); } 50%, 100% { transform: rotate(30deg) translateX(100%); } }
+
+  .card-pulse { animation: cardPulse 2s infinite alternate; }
+  @keyframes cardPulse { from { box-shadow: 0 0 5px rgba(255, 255, 255, 0.1); } to { box-shadow: 0 0 20px rgba(255, 255, 255, 0.4), inset 0 0 15px rgba(255,255,255,0.1); } }
+  .card-glow-red.card-pulse { animation: redPulse 2s infinite alternate; }
+  @keyframes redPulse { from { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); } to { box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); } }
+
+  .card-particles::after {
+    content: ''; position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.8) 1px, transparent 1px), radial-gradient(circle, rgba(255,200,100,0.6) 1.5px, transparent 1.5px);
+    background-size: 30px 30px, 50px 50px; animation: floatingParticles 6s linear infinite; opacity: 0.3; z-index: 5; pointer-events: none;
+  }
+  @keyframes floatingParticles { from { background-position: 0 0, 15px 15px; } to { background-position: 30px 30px, 65px 65px; } }
+
+  .card-fire::after {
+    content: ''; position: absolute; inset: 0;
+    background-image: radial-gradient(circle, #ff4500 2px, transparent 2px), radial-gradient(circle, #ff8c00 3px, transparent 3px);
+    background-size: 40px 40px, 60px 60px; animation: fireParticles 3s linear infinite; opacity: 0.6; z-index: 5; pointer-events: none;
+  }
+  @keyframes fireParticles { from { background-position: 0 0, 20px 20px; } to { background-position: 40px 40px, 80px 80px; } }
 
   input, select, textarea { outline: none; transition: border-color 0.2s; color: #fff; }
   input:focus, select:focus, textarea:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
@@ -156,17 +90,18 @@
     <div class="space-y-3 relative z-10 text-right">
       <div id="name-container" class="hidden">
         <label class="text-xs text-slate-400 mb-1 block">الاسم بالكامل:</label>
-        <input id="auth-name" type="text" placeholder="اكتب اسمك هنا" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white">
+        <!-- منع المتصفح من الحفظ التلقائي -->
+        <input id="auth-name" type="text" placeholder="اكتب اسمك هنا" autocomplete="off" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white">
       </div>
       
       <div>
         <label class="text-xs text-slate-400 mb-1 block">رقم التليفون (للاعبين فقط):</label>
-        <input id="auth-phone" type="text" placeholder="01xxxxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white" dir="ltr" autocomplete="off">
+        <input id="auth-phone" type="tel" placeholder="01xxxxxxxxx" autocomplete="off" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white" dir="ltr">
       </div>
       
       <div>
         <label class="text-xs text-slate-400 mb-1 block">الباسورد:</label>
-        <input id="auth-password" type="password" placeholder="••••••" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white" dir="ltr" autocomplete="new-password">
+        <input id="auth-password" type="password" placeholder="••••••" autocomplete="new-password" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white" dir="ltr">
       </div>
       
       <div id="dob-container" class="hidden">
@@ -404,14 +339,15 @@ window.handleAdminAuth = async function() {
 
 window.handlePlayerAuth = async function() {
   const name = $('#auth-name').value.trim();
-  const rawPhone = $('#auth-phone').value.trim();
+  // إزالة المسافات من رقم التليفون
+  const rawPhone = $('#auth-phone').value.trim().replace(/\s+/g, '');
   const password = $('#auth-password').value;
   const dob = $('#auth-dob').value;
   const errorEl = $('#auth-error');
   
-  if(!isLoginMode && !name) { errorEl.textContent = "اكتب اسمك"; errorEl.classList.remove('hidden'); return; }
-  if(!rawPhone || !password) { errorEl.textContent = "املا رقم التليفون والباسورد"; errorEl.classList.remove('hidden'); return; }
-  if(!isLoginMode && !dob) { errorEl.textContent = "ادخل تاريخ الميلاد"; errorEl.classList.remove('hidden'); return; }
+  if(!isLoginMode && !name) { alert("اكتب اسمك الأول"); return; }
+  if(!rawPhone || !password) { alert("املا رقم التليفون والباسورد"); return; }
+  if(!isLoginMode && !dob) { alert("ادخل تاريخ الميلاد"); return; }
 
   const email = formatPhone(rawPhone);
   errorEl.classList.add('hidden');
@@ -424,11 +360,19 @@ window.handlePlayerAuth = async function() {
       await setDoc(doc(db, "users", userCred.user.uid), {
         name: name, phone: rawPhone, dob: dob, role: "pending", joinedAt: new Date().toISOString()
       });
+      alert("تم إنشاء الحساب بنجاح! يرجى الانتظار حتى يوافق المدير.");
+      await signOut(auth); // تسجيل الخروج عشان يدخل لما يتم الموافقة
+      window.location.reload();
     }
   } catch (e) {
-    let msg = "حدث خطأ";
+    // إظهار الخطأ الحقيقي بوضوح
+    let msg = "خطأ غير معروف";
     if(e.code === 'auth/invalid-credential') msg = "رقم التليفون أو الباسورد غلط ❌";
-    if(e.code === 'auth/email-already-in-use') msg = "رقم التليفون ده مسجل بالفعل ❌";
+    else if(e.code === 'auth/email-already-in-use') msg = "رقم التليفون ده مسجل بالفعل، سجل دخولك ❌";
+    else if(e.code === 'auth/weak-password') msg = "الباسورد ضعيف جداً (6 أرقام/حروف على الأقل) ❌";
+    else msg = e.message;
+
+    alert("حدث خطأ: " + msg); // رسالة تنبيه قوية تمنع المتصفح من التعليق
     errorEl.textContent = msg;
     errorEl.classList.remove('hidden');
   }
@@ -643,8 +587,8 @@ function renderCards() {
     const ovr = calculateOVR(p);
     const stats = p.stats || { sho: 70, pas: 70, spd: 70, def: 70, phy: 70 };
     
-    let cardClass = "fifa-bg"; // Default
-    let ratingTextColor = "text-white"; // Default
+    let cardClass = "fifa-bg"; 
+    let ratingTextColor = "text-white"; 
 
     if (ovr > 95) {
         cardClass = "card-fire card-shine";
@@ -670,7 +614,6 @@ function renderCards() {
       <div class="flip-card" id="card-${p.id}" onclick="flipCard('${p.id}')">
         <div class="flip-card-inner">
           
-          <!-- الوجه الأول (الأساسي) -->
           <div class="flip-card-front ${cardClass}">
             <div class="card-content">
               <div class="w-full flex justify-between items-start">
@@ -697,7 +640,6 @@ function renderCards() {
             </div>
           </div>
           
-          <!-- الوجه الثاني (الإحصائيات التفصيلية) -->
           <div class="flip-card-back ${cardClass}">
             <div class="card-content">
               <div class="text-center border-b border-slate-600 pb-2 mb-2 w-full">
