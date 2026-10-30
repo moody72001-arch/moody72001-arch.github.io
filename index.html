@@ -29,12 +29,29 @@
   .nav-btn span { font-size: 1.3rem; margin-bottom: 0.1rem; }
   .nav-btn.active { color: #10b981; background-color: rgba(16, 185, 129, 0.1); }
   
-  /* ==== الكارت والمسافات ==== */
-  .cards-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem 1rem; padding-bottom: 2rem; }
-  .flip-card-container { perspective: 1000px; width: 100%; height: 260px; cursor: pointer; position: relative; }
-  .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; z-index: 10; }
+  /* ==== ضبط حجم الكروت عشان ميدخلوش في بعض ==== */
+  .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding-bottom: 2rem; align-items: start; }
   
-  .flip-card-container.flipped .flip-card-inner { transform: rotateY(180deg) !important; }
+  .flip-card-container { 
+    perspective: 1000px; 
+    width: 100%; 
+    aspect-ratio: 1 / 1.45; /* الحجم الثابت للكارت */
+    cursor: pointer; 
+    position: relative; 
+    transition: transform 0.1s ease-out; 
+  }
+  
+  .flip-card-inner { 
+    position: relative; 
+    width: 100%; 
+    height: 100%; 
+    transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); 
+    transform-style: preserve-3d; 
+    z-index: 10; 
+  }
+  
+  /* حركة القلب */
+  .flip-card-container.flipped .flip-card-inner { transform: rotateY(180deg); }
   
   .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
   .flip-card-back { transform: rotateY(180deg); }
@@ -42,7 +59,7 @@
   .card-wrapper { position: absolute; inset: 0; clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px); padding: 3px; box-sizing: border-box; }
   .card-inner { width: 100%; height: 100%; clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px); position: relative; overflow: hidden; display: flex; flex-direction: column; }
 
-  /* الألوان والتوهج الخارجي */
+  /* الألوان والتوهج */
   .wrapper-silver { background: #cbd5e1; }
   .inner-silver { background: linear-gradient(135deg, #334155 0%, #0f172a 100%); }
   .wrapper-orange { background: #f97316; }
@@ -52,7 +69,6 @@
   .wrapper-red { background: #ef4444; }
   .inner-red { background: linear-gradient(135deg, #7f1d1d 0%, #0f172a 100%); }
 
-  /* التوهج الخارجي */
   .glow-orange { filter: drop-shadow(0 0 8px rgba(249, 115, 22, 0.7)); }
   .glow-green { filter: drop-shadow(0 0 12px rgba(16, 185, 129, 0.8)); }
   .glow-red { filter: drop-shadow(0 0 18px rgba(239, 68, 68, 0.9)); }
@@ -64,7 +80,6 @@
   @keyframes fireParticles { from { background-position: 0 0; } to { background-position: 40px 40px; } }
   .glow-fire { animation: fireGlow 1.5s infinite alternate; }
 
-  /* كارت 99 */
   .card-99-container { position: relative; width: 100%; height: 100%; }
   @keyframes crownFloat { 0% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -15px); } 100% { transform: translate(-50%, 0); } }
   .crown-99 { position: absolute; top: -25px; left: 50%; font-size: 40px; z-index: 30; filter: drop-shadow(0 0 15px #fbbf24); animation: crownFloat 3s ease-in-out infinite; pointer-events: none; }
@@ -82,7 +97,6 @@
   input, select, textarea { outline: none; transition: border-color 0.2s; color: #fff; }
   input:focus, select:focus, textarea:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
 
-  /* المودال */
   #stats-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px); }
   #stats-modal.active { display: flex; }
 </style>
@@ -551,12 +565,12 @@ function getPlayerData(p) {
   
   recentRatings.sort((a,b) => (b.date||'').localeCompare(a.date||''));
   const last3 = recentRatings.slice(0, 3);
-  let form = '➖'; 
-  let formColor = "text-orange-400";
+  let form = ''; let formColor = "text-orange-400";
   if (last3.length > 0) {
     const formAvg = last3.reduce((sum, r) => sum + r.rate, 0) / last3.length;
     if (formAvg >= 7.5) { form = '⬆️'; formColor = "text-emerald-400"; }
-    else if (formAvg < 5.5) { form = '⬇️'; formColor = "text-red-500"; }
+    else if (formAvg >= 5.5) { form = '➖'; formColor = "text-orange-400"; }
+    else { form = '⬇️'; formColor = "text-red-500"; }
   }
   return { ...p, goals, assists, present, motmCount, avgRating, form, formColor };
 }
@@ -615,12 +629,11 @@ function renderCards() {
                   <div class="card-bg-shine"></div>
                   
                   <div class="relative z-10 w-full h-full flex flex-col items-center justify-between">
-                    <!-- التقييم والمركز فوق بعض -->
                     <div class="w-full flex justify-between items-start">
                       <div class="flex flex-col items-center text-right">
                         <div class="text-4xl fifa-number ${ratingTextColor} leading-none">${ovr}</div>
                         <div class="text-[11px] font-bold text-slate-300 mt-0.5 mb-1">${p.position || 'لاعب'}</div>
-                        <div class="text-xl fifa-number ${data.formColor}">${data.form}</div>
+                        ${data.form ? `<div class="text-xl fifa-number ${data.formColor}">${data.form}</div>` : ''}
                       </div>
                       <div class="flex flex-col items-end gap-1">
                         <div class="text-xl font-black text-white/40 fifa-number">${p.number ? '#'+p.number : ''}</div>
@@ -678,12 +691,9 @@ function renderCards() {
 }
 
 /* ==== دوال 3D والقلب والمشاركة ==== */
-let isDragging = false;
-
 window.tiltCard = function(e, playerId) {
   const card = document.getElementById(`card-container-${playerId}`);
-  const inner = document.getElementById(`card-inner-${playerId}`);
-  if(!card || !inner || card.classList.contains('flipped')) return;
+  if(!card || card.classList.contains('flipped')) return;
   
   let clientX, clientY;
   if(e.type === 'touchmove') { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; } 
@@ -695,23 +705,20 @@ window.tiltCard = function(e, playerId) {
   const rotateX = ((y - centerY) / centerY) * -15;
   const rotateY = ((x - centerX) / centerX) * 15;
   
-  inner.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
-  isDragging = true;
+  card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
 };
 
 window.resetTilt = function(playerId) {
-  const inner = document.getElementById(`card-inner-${playerId}`);
   const card = document.getElementById(`card-container-${playerId}`);
-  if(inner && card && !card.classList.contains('flipped')) inner.style.transform = '';
-  setTimeout(() => { isDragging = false; }, 100);
+  if(card) card.style.transform = ''; // مسح الميلان
 };
 
 window.toggleCardFlip = function(e, playerId) {
-  if(isDragging) return;
   const card = document.getElementById(`card-container-${playerId}`);
-  const inner = document.getElementById(`card-inner-${playerId}`);
-  if(inner) inner.style.transform = ''; // مسح حركة الـ 3D عشان ميعارضش القلب
-  if(card) card.classList.toggle('flipped');
+  if(card) {
+    card.classList.toggle('flipped');
+    card.style.transform = ''; // مسح الميلان عشان الكارت يقلب صح
+  }
 };
 
 window.shareCard = async function(e, playerId) {
