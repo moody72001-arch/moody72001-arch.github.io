@@ -29,13 +29,13 @@
   .nav-btn span { font-size: 1.3rem; margin-bottom: 0.1rem; }
   .nav-btn.active { color: #10b981; background-color: rgba(16, 185, 129, 0.1); }
   
-  /* ==== ضبط حجم الكروت عشان ميدخلوش في بعض ==== */
-  .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding-bottom: 2rem; align-items: start; }
+  /* ==== حل مشكلة الأحجام (طول ثابت) ==== */
+  .cards-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding-bottom: 2rem; align-items: start; }
   
   .flip-card-container { 
     perspective: 1000px; 
     width: 100%; 
-    aspect-ratio: 1 / 1.45; /* الحجم الثابت للكارت */
+    height: 260px; /* طول ثابت لكل الكروت */
     cursor: pointer; 
     position: relative; 
     transition: transform 0.1s ease-out; 
@@ -164,7 +164,6 @@
   </header>
 
   <main class="p-4 max-w-md mx-auto">
-    <!-- اللاعبين -->
     <section id="tab-players" class="tab-content active">
       <div id="add-player-form" class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 hidden">
         <h2 class="font-bold text-sm mb-3 text-emerald-400">إضافة لاعب جديد (يدوي)</h2>
@@ -183,12 +182,10 @@
       <div id="players-list" class="space-y-2"></div>
     </section>
 
-    <!-- كروت اللاعيبة -->
     <section id="tab-cards" class="tab-content">
       <div id="cards-list" class="cards-grid"></div>
     </section>
 
-    <!-- الماتشات -->
     <section id="tab-matches" class="tab-content">
       <div class="flex bg-slate-800 p-1 rounded-xl mb-4 border border-slate-700">
         <button onclick="switchMatchTab('active')" id="btn-match-active" class="flex-1 py-2 text-sm font-bold rounded-lg bg-emerald-600 text-white transition-all">الماتشات الحالية</button>
@@ -222,10 +219,8 @@
       <div id="matches-history-container" class="hidden space-y-3"></div>
     </section>
 
-    <!-- الإحصائيات -->
     <section id="tab-stats" class="tab-content"><div id="stats-content"></div></section>
 
-    <!-- الفلوس -->
     <section id="tab-money" class="tab-content">
       <div id="add-payment-form" class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 hidden">
         <h2 class="font-bold text-sm mb-3 text-emerald-400">تسجيل دفعة مالية</h2>
@@ -242,7 +237,6 @@
       <div id="money-content"></div>
     </section>
 
-    <!-- القوانين -->
     <section id="tab-rules" class="tab-content">
       <div class="bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-700">
         <h2 class="font-bold text-lg mb-3 text-emerald-400 flex items-center gap-2">📜 قوانين الفريق</h2>
@@ -251,7 +245,6 @@
       </div>
     </section>
 
-    <!-- الإعلانات -->
     <section id="tab-announcements" class="tab-content">
       <div id="add-announcement-form" class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 hidden">
         <form onsubmit="addAnnouncement(event)">
@@ -262,7 +255,6 @@
       <div id="announcements-list" class="space-y-3"></div>
     </section>
 
-    <!-- الإدارة -->
     <section id="tab-admin" class="tab-content">
       <div class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 flex justify-between items-center">
         <div>
@@ -710,14 +702,14 @@ window.tiltCard = function(e, playerId) {
 
 window.resetTilt = function(playerId) {
   const card = document.getElementById(`card-container-${playerId}`);
-  if(card) card.style.transform = ''; // مسح الميلان
+  if(card) card.style.transform = ''; 
 };
 
 window.toggleCardFlip = function(e, playerId) {
   const card = document.getElementById(`card-container-${playerId}`);
   if(card) {
     card.classList.toggle('flipped');
-    card.style.transform = ''; // مسح الميلان عشان الكارت يقلب صح
+    card.style.transform = ''; 
   }
 };
 
