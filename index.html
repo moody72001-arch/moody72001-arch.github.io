@@ -8,6 +8,7 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
@@ -28,71 +29,68 @@
   .nav-btn span { font-size: 1.3rem; margin-bottom: 0.1rem; }
   .nav-btn.active { color: #10b981; background-color: rgba(16, 185, 129, 0.1); }
   
-  .flip-card { perspective: 1000px; width: 100%; height: 240px; cursor: pointer; position: relative; }
+  /* ==== تصميم الكارت والـ 3D ==== */
+  .flip-card-container { perspective: 1000px; width: 100%; height: 260px; cursor: pointer; position: relative; }
   .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; z-index: 10; }
-  .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
+  
+  .flip-card-container.flipped .flip-card-inner { transform: rotateY(180deg); }
+  
   .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
   .flip-card-back { transform: rotateY(180deg); }
 
-  .card-wrapper { position: absolute; inset: 0; clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px); padding: 3px; box-sizing: border-box; }
+  .card-wrapper { position: absolute; inset: 0; clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px); padding: 3px; box-sizing: border-box; transition: box-shadow 0.3s; }
   .card-inner { width: 100%; height: 100%; clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px); position: relative; overflow: hidden; display: flex; flex-direction: column; }
 
-  .card-bg-texture { position: absolute; inset: 0; z-index: 0; opacity: 0.2; background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px); }
-
+  /* الألوان */
   .wrapper-silver { background: #cbd5e1; }
   .inner-silver { background: linear-gradient(135deg, #334155 0%, #0f172a 100%); }
-  .inner-silver .text-rating { color: #f1f5f9; }
-
   .wrapper-orange { background: #f97316; }
   .inner-orange { background: linear-gradient(135deg, #431407 0%, #0f172a 100%); }
-  .inner-orange .text-rating { color: #fdba74; }
-
   .wrapper-green { background: #10b981; }
   .inner-green { background: linear-gradient(135deg, #064e3b 0%, #0f172a 100%); }
-  .inner-green .text-rating { color: #6ee7b7; }
-
   .wrapper-red { background: #ef4444; }
   .inner-red { background: linear-gradient(135deg, #7f1d1d 0%, #0f172a 100%); }
-  .inner-red .text-rating { color: #fca5a5; }
 
-  @keyframes fireGlow {
-    0% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500; border-color: #ff0000; }
-    100% { box-shadow: 0 0 20px #ff4500, 0 0 30px #ff8c00; border-color: #ff8c00; }
-  }
+  /* تأثيرات الخلفيات */
+  @keyframes fireGlow { 0% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500; border-color: #ff0000; } 100% { box-shadow: 0 0 20px #ff4500, 0 0 30px #ff8c00; border-color: #ff8c00; } }
   .wrapper-fire { background: linear-gradient(135deg, #ff0000, #ff8c00, #ff0000); animation: fireGlow 1.5s infinite alternate; }
-  .inner-fire { background: linear-gradient(135deg, #450a0a 0%, #000000 100%); }
-  .inner-fire .text-rating { color: #fbbf24; text-shadow: 0 0 15px #ff4500; }
+  .inner-fire { background: linear-gradient(135deg, #450a0a 0%, #000000 100%); position: relative; }
+  .inner-fire::after { content: ''; position: absolute; inset: 0; background-image: radial-gradient(circle, #ff4500 1px, transparent 1px); background-size: 20px 20px; animation: fireParticles 2s linear infinite; opacity: 0.5; z-index: 0; pointer-events: none; }
+  @keyframes fireParticles { from { background-position: 0 0; } to { background-position: 40px 40px; } }
 
+  @keyframes pulseGreen { 0% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.2); } 50% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.8); } 100% { box-shadow: 0 0 5px rgba(16, 185, 129, 0.2); } }
+  .wrapper-green { animation: pulseGreen 3s infinite; }
+
+  @keyframes pulseRed { 0% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); } 50% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.8); } 100% { box-shadow: 0 0 5px rgba(239, 68, 68, 0.2); } }
+  .wrapper-red { animation: pulseRed 3s infinite; }
+
+  .card-bg-texture { position: absolute; inset: 0; z-index: 0; opacity: 0.15; background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px); }
+  .card-bg-shine { position: absolute; inset: 0; background: linear-gradient(120deg, transparent 30%, rgba(255,255,255,0.1) 50%, transparent 70%); background-size: 200% 100%; animation: shineSweep 4s infinite; z-index: 0; }
+  @keyframes shineSweep { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+  /* كارت 99 */
   .card-99-container { position: relative; width: 100%; height: 100%; }
-  @keyframes dropCrown {
-    0% { transform: translate(-50%, -40px) scale(0.5); opacity: 0; }
-    60% { transform: translate(-50%, 5px) scale(1.1); opacity: 1; }
-    100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
-  }
-  .crown-99 {
-    position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
-    font-size: 38px; z-index: 30;
-    animation: dropCrown 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
-    filter: drop-shadow(0 0 15px #fbbf24) drop-shadow(0 0 5px #ff0000);
-    pointer-events: none;
-  }
+  @keyframes crownFloat { 0% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -15px); } 100% { transform: translate(-50%, 0); } }
+  .crown-99 { position: absolute; top: -20px; left: 50%; font-size: 40px; z-index: 30; filter: drop-shadow(0 0 15px #fbbf24); animation: crownFloat 3s ease-in-out infinite; pointer-events: none; }
   .wrapper-99 { background: linear-gradient(135deg, #ff0000, #000000, #ff4500); padding: 4px; clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px); z-index: 10; position: relative; animation: fireGlow 1.5s infinite alternate; }
   .inner-99 { background: radial-gradient(circle at center, #2a0000 0%, #000000 100%); clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px); width: 100%; height: 100%; position: relative; overflow: hidden; }
-  .inner-99 .text-rating { color: #fbbf24; text-shadow: 0 0 20px #ff4500, 0 0 40px #ff0000; }
 
+  /* شارات */
+  .badge { display: inline-flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.6); border-radius: 50%; width: 22px; height: 22px; font-size: 12px; margin: 0 2px; border: 1px solid rgba(255,255,255,0.2); }
+  
   .fifa-number { font-family: 'Teko', sans-serif; font-weight: 600; line-height: 0.9; }
   
   input, select, textarea { outline: none; transition: border-color 0.2s; color: #fff; }
   input:focus, select:focus, textarea:focus { border-color: #10b981; box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
 
-  details > summary { list-style: none; }
-  details > summary::-webkit-details-marker { display: none; }
-  details[open] .arrow-icon { transform: rotate(180deg); }
-  .arrow-icon { transition: transform 0.3s; }
+  /* المودال */
+  #stats-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px); }
+  #stats-modal.active { display: flex; }
 </style>
 </head>
 <body class="pb-24">
 
+<!-- شاشة الدخول -->
 <div id="auth-screen" class="fixed inset-0 bg-slate-900 flex items-center justify-center p-4 z-50 overflow-y-auto">
   <div class="bg-slate-800 rounded-3xl p-8 w-full max-w-sm text-center shadow-2xl my-auto relative overflow-hidden border border-slate-700">
     <div class="text-6xl mb-2 relative z-10">⚽</div>
@@ -127,6 +125,7 @@
   </div>
 </div>
 
+<!-- شاشة الانتظار -->
 <div id="pending-screen" class="fixed inset-0 bg-slate-900 flex items-center justify-center p-4 z-50 hidden">
   <div class="bg-slate-800 rounded-3xl p-8 w-full max-w-sm text-center shadow-2xl border border-slate-700">
     <div class="text-6xl mb-4 animate-pulse">⏳</div>
@@ -136,6 +135,7 @@
   </div>
 </div>
 
+<!-- شاشة التطبيق -->
 <div id="app-screen" class="hidden">
   <header class="bg-slate-800 p-5 pb-6 rounded-b-3xl shadow-lg border-b border-slate-700 relative overflow-hidden">
     <div class="flex justify-between items-start relative z-10">
@@ -151,6 +151,7 @@
   </header>
 
   <main class="p-4 max-w-md mx-auto">
+    <!-- اللاعبين -->
     <section id="tab-players" class="tab-content active">
       <div id="add-player-form" class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 hidden">
         <h2 class="font-bold text-sm mb-3 text-emerald-400">إضافة لاعب جديد (يدوي)</h2>
@@ -169,10 +170,12 @@
       <div id="players-list" class="space-y-2"></div>
     </section>
 
+    <!-- كروت اللاعيبة -->
     <section id="tab-cards" class="tab-content">
       <div id="cards-list" class="grid grid-cols-2 gap-3 p-1"></div>
     </section>
 
+    <!-- الماتشات -->
     <section id="tab-matches" class="tab-content">
       <div class="flex bg-slate-800 p-1 rounded-xl mb-4 border border-slate-700">
         <button onclick="switchMatchTab('active')" id="btn-match-active" class="flex-1 py-2 text-sm font-bold rounded-lg bg-emerald-600 text-white transition-all">الماتشات الحالية</button>
@@ -206,8 +209,10 @@
       <div id="matches-history-container" class="hidden space-y-3"></div>
     </section>
 
+    <!-- الإحصائيات -->
     <section id="tab-stats" class="tab-content"><div id="stats-content"></div></section>
 
+    <!-- الفلوس -->
     <section id="tab-money" class="tab-content">
       <div id="add-payment-form" class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 hidden">
         <h2 class="font-bold text-sm mb-3 text-emerald-400">تسجيل دفعة مالية</h2>
@@ -224,6 +229,7 @@
       <div id="money-content"></div>
     </section>
 
+    <!-- القوانين -->
     <section id="tab-rules" class="tab-content">
       <div class="bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-700">
         <h2 class="font-bold text-lg mb-3 text-emerald-400 flex items-center gap-2">📜 قوانين الفريق</h2>
@@ -232,6 +238,7 @@
       </div>
     </section>
 
+    <!-- الإعلانات -->
     <section id="tab-announcements" class="tab-content">
       <div id="add-announcement-form" class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 hidden">
         <form onsubmit="addAnnouncement(event)">
@@ -242,8 +249,8 @@
       <div id="announcements-list" class="space-y-3"></div>
     </section>
 
+    <!-- الإدارة -->
     <section id="tab-admin" class="tab-content">
-      <!-- 🔴 الزرار اللي إنت عايزه هنا 🔴 -->
       <div class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 flex justify-between items-center">
         <div>
            <h2 class="font-bold text-sm text-emerald-400">إشعارات الفريق</h2>
@@ -287,6 +294,23 @@
   </nav>
 </div>
 
+<!-- نافذة تعديل الإحصائيات (المودال) -->
+<div id="stats-modal">
+  <div class="bg-slate-800 rounded-2xl p-6 w-full max-w-sm border border-slate-600 shadow-2xl relative">
+    <button onclick="closeStatsModal()" class="absolute top-3 left-3 text-slate-400 hover:text-white text-xl">×</button>
+    <h2 class="font-bold text-lg text-emerald-400 mb-4 text-center">تعديل إحصائيات اللاعب</h2>
+    <div class="space-y-3">
+      <div class="flex justify-between items-center"><span class="text-sm font-bold">التسديد (SHO)</span><input type="number" id="edit-sho" class="w-20 bg-slate-900 border border-slate-700 rounded p-2 text-center"></div>
+      <div class="flex justify-between items-center"><span class="text-sm font-bold">التمرير (PAS)</span><input type="number" id="edit-pas" class="w-20 bg-slate-900 border border-slate-700 rounded p-2 text-center"></div>
+      <div class="flex justify-between items-center"><span class="text-sm font-bold">السرعة (SPD)</span><input type="number" id="edit-spd" class="w-20 bg-slate-900 border border-slate-700 rounded p-2 text-center"></div>
+      <div class="flex justify-between items-center"><span class="text-sm font-bold">المراوغة (DRI)</span><input type="number" id="edit-dri" class="w-20 bg-slate-900 border border-slate-700 rounded p-2 text-center"></div>
+      <div class="flex justify-between items-center"><span class="text-sm font-bold">الدفاع (DEF)</span><input type="number" id="edit-def" class="w-20 bg-slate-900 border border-slate-700 rounded p-2 text-center"></div>
+      <div class="flex justify-between items-center"><span class="text-sm font-bold">البدنية (PHY)</span><input type="number" id="edit-phy" class="w-20 bg-slate-900 border border-slate-700 rounded p-2 text-center"></div>
+    </div>
+    <button onclick="savePlayerStats()" class="w-full bg-emerald-600 text-white rounded-xl p-3 font-bold mt-5">حفظ التعديلات</button>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut }
@@ -303,10 +327,6 @@ const firebaseConfig = {
   appId: "1:837918664225:web:28a56f2a7065228faae560"
 };
 
-// 🔴 ضع لينك السيرفر بتاعك هنا
-const WORKER_URL = "https://broken-band-b260futsal-v2.moody72001.workers.dev"; 
-const ONESIGNAL_APP_ID = "a05829ee-dd76-44d5-929a-793ea08664c7";
-
 const TEAM_ID = "my-team";
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -322,6 +342,8 @@ let isAdmin = false;
 let isCoach = false;
 let currentUserPhone = "";
 let isLoginMode = true;
+let editingPlayerId = null; 
+let openMatches = {}; // لحفظ حالة فتح وقفل الماتشات
 
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
@@ -329,31 +351,14 @@ const fmt = n => Number(n||0).toLocaleString('ar-EG');
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 function formatPhone(p) { return p.includes('@') ? p : p + "@futsal.com"; }
 
-// 🔔 دالة إرسال الإشعارات
+/* ==== دوال القفل والفتح للماتشات ==== */
+window.handleMatchToggle = function(id, isOpen) {
+  openMatches[id] = isOpen;
+};
+
 window.sendNotificationPrompt = async function() {
   if(!isAdmin) return;
-  const title = prompt("اكتب عنوان الإشعار (مثلاً: ماتش بكرة):");
-  if(!title) return;
-  const message = prompt("اكتب نص الرسالة (مثلاً: الساعة 8 في ملعب النور):");
-  if(!message) return;
-
-  try {
-    const response = await fetch(WORKER_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        app_id: ONESIGNAL_APP_ID,
-        included_segments: ["Subscribed Users"],
-        headings: { en: title, ar: title },
-        contents: { en: message, ar: message }
-      })
-    });
-    const result = await response.json();
-    if (result.id) alert("تم إرسال الإشعار بنجاح! ✅");
-    else alert("فشل الإرسال: " + JSON.stringify(result.errors));
-  } catch(e) {
-    alert("حدث خطأ في الاتصال بالسيرفر: " + e.message);
-  }
+  alert("السيرفر مش متفعل حالياً. الإشعارات هتشتغل قريب!");
 };
 
 window.toggleAuthMode = function() {
@@ -566,16 +571,12 @@ window.switchMatchTab = function(type) {
   }
 };
 
-window.flipCard = function(playerId) {
-  const card = document.getElementById('card-' + playerId);
-  if(card) card.classList.toggle('flipped');
-};
-
 function render() {
   renderPlayers(); renderCards(); renderMatches(); renderStats(); renderPayments(); renderRules(); renderAnnouncements();
   $('#team-summary').textContent = `${state.players.length} لاعب · ${state.matches.length} ماتش`;
 }
 
+/* ==== دوال اللاعبين والكروت ==== */
 function renderPlayers() {
   const box = $('#players-list');
   if (!state.players.length) { box.innerHTML = '<div class="text-center py-10 opacity-50"><div class="text-5xl mb-2">⚽</div><p class="text-sm font-bold text-slate-400">مفيش لاعبين لسه.</p></div>'; return; }
@@ -584,36 +585,48 @@ function renderPlayers() {
       <div class="flex items-center gap-3">
         ${p.image ? `<img src="${p.image}" class="w-12 h-12 rounded-full object-cover border-2 border-emerald-500">` : `<div class="w-12 h-12 rounded-full bg-slate-700 text-emerald-400 flex items-center justify-center font-black text-lg border border-slate-600">${p.number || p.name.charAt(0)}</div>`}
         <div>
-          <div class="font-bold text-white flex items-center gap-1">
-            ${p.name}
-          </div>
+          <div class="font-bold text-white flex items-center gap-1">${p.name}</div>
           <div class="text-[11px] text-slate-400 font-semibold">${p.position || 'لاعب'} ${p.number ? '· #'+p.number : ''}</div>
         </div>
       </div>
       <div class="flex gap-1">
-        ${(isAdmin||isCoach) ? `<button onclick="editPlayerStats('${p.id}')" class="text-yellow-400 hover:text-yellow-300 p-2 bg-yellow-900/30 rounded-lg text-xs font-bold" title="تعديل الإحصائيات">📊</button>` : ''}
+        ${(isAdmin||isCoach) ? `<button onclick="openStatsModal('${p.id}')" class="text-yellow-400 hover:text-yellow-300 p-2 bg-yellow-900/30 rounded-lg text-xs font-bold">📊</button>` : ''}
         ${(isAdmin||isCoach) ? `<button onclick="uploadPlayerImage('${p.id}')" class="text-blue-400 hover:text-blue-300 p-2 bg-blue-900/30 rounded-lg text-xs font-bold">📷</button>` : ''}
         ${isAdmin ? `<button onclick="deletePlayer('${p.id}')" class="text-red-400 hover:text-red-300 p-2 bg-red-900/30 rounded-lg text-xs font-bold">حذف</button>` : ''}
       </div>
     </div>`).join('');
 }
 
+/* ==== دوال الكروت والمودال ==== */
 function getPlayerData(p) {
-  let goals=0, assists=0, present=0, motmCount=0, totalRating=0, ratingCount=0;
+  let goals=0, assists=0, present=0, motmCount=0, totalRating=0, ratingCount=0, recentRatings=[];
   
   state.matches.forEach(m => {
     goals += (m.goals||{})[p.id] || 0;
     assists += (m.assists||{})[p.id] || 0;
     if ((m.attendance||{})[p.id] === 'present') present++;
     if (m.motm === p.id) motmCount++;
+    
     if (m.ratings && m.ratings[p.id]) {
       totalRating += m.ratings[p.id];
       ratingCount++;
+      recentRatings.push({ date: m.date, rate: m.ratings[p.id] });
     }
   });
   
   const avgRating = ratingCount > 0 ? (totalRating / ratingCount) : 0;
-  return { ...p, goals, assists, present, motmCount, avgRating };
+  
+  // حساب الفورمة (آخر 3 ماتشات)
+  recentRatings.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  const last3 = recentRatings.slice(0, 3);
+  let form = '➖';
+  if (last3.length > 0) {
+    const formAvg = last3.reduce((sum, r) => sum + r.rate, 0) / last3.length;
+    if (formAvg >= 7.5) form = '⬆️';
+    else if (formAvg < 5.5) form = '⬇️';
+  }
+  
+  return { ...p, goals, assists, present, motmCount, avgRating, form };
 }
 
 function calculateOVR(p) {
@@ -630,6 +643,15 @@ function calculateOVR(p) {
   return Math.min(99, Math.max(40, Math.round(ovr)));
 }
 
+function getStars(ovr) {
+  let stars = 1;
+  if(ovr >= 90) stars = 5;
+  else if(ovr >= 80) stars = 4;
+  else if(ovr >= 70) stars = 3;
+  else if(ovr >= 60) stars = 2;
+  return '⭐'.repeat(stars);
+}
+
 function renderCards() {
   const box = $('#cards-list');
   if (!state.players.length) { box.innerHTML = '<div class="col-span-2 text-center py-10 opacity-50 text-slate-400 font-bold">مفيش لاعبين لعرض الكروت.</div>'; return; }
@@ -639,50 +661,56 @@ function renderCards() {
     const ovr = calculateOVR(p);
     const stats = p.stats || { sho: 70, pas: 70, spd: 70, dri: 70, def: 70, phy: 70 };
     
+    // حساب الشارات
+    const badges = [];
+    if(stats.pac > 90) badges.push('🚀');
+    if(stats.sho > 90) badges.push('🎯');
+    if(stats.pas > 90) badges.push('🧠');
+    if(stats.def > 90) badges.push('🛡️');
+    
     let wrapperClass = "wrapper-silver"; 
     let innerClass = "inner-silver"; 
     let ratingTextColor = "text-slate-300"; 
     let is99 = (ovr === 99);
 
-    if (is99) { 
-      wrapperClass = "wrapper-99"; innerClass = "inner-99"; ratingTextColor = "text-rating"; 
-    } else if (ovr > 95) { 
-      wrapperClass = "wrapper-fire"; innerClass = "inner-fire"; ratingTextColor = "text-rating"; 
-    } else if (ovr >= 91) { 
-      wrapperClass = "wrapper-red"; innerClass = "inner-red"; ratingTextColor = "text-rating"; 
-    } else if (ovr >= 86) { 
-      wrapperClass = "wrapper-green"; innerClass = "inner-green"; ratingTextColor = "text-rating"; 
-    } else if (ovr >= 80) { 
-      wrapperClass = "wrapper-orange"; innerClass = "inner-orange"; ratingTextColor = "text-rating"; 
-    }
+    if (is99) { wrapperClass = "wrapper-99"; innerClass = "inner-99"; ratingTextColor = "text-yellow-400"; }
+    else if (ovr > 95) { wrapperClass = "wrapper-fire"; innerClass = "inner-fire"; ratingTextColor = "text-yellow-400"; }
+    else if (ovr >= 91) { wrapperClass = "wrapper-red"; innerClass = "inner-red"; ratingTextColor = "text-red-400"; }
+    else if (ovr >= 86) { wrapperClass = "wrapper-green"; innerClass = "inner-green"; ratingTextColor = "text-emerald-400"; }
+    else if (ovr >= 80) { wrapperClass = "wrapper-orange"; innerClass = "inner-orange"; ratingTextColor = "text-orange-400"; }
 
     return `
       <div class="card-99-container">
         ${is99 ? `<div class="crown-99">👑</div>` : ''}
 
-        <div class="flip-card" id="card-${p.id}" onclick="flipCard('${p.id}')">
-          <div class="flip-card-inner">
+        <div class="flip-card-container" id="card-container-${p.id}" onclick="toggleCardFlip(event, '${p.id}')" onmousemove="tiltCard(event, '${p.id}')" onmouseleave="resetTilt('${p.id}')" ontouchmove="tiltCard(event, '${p.id}')" ontouchend="resetTilt('${p.id}')">
+          <div class="flip-card-inner" id="card-inner-${p.id}">
             
-            <div class="flip-card-front">
+            <div class="flip-card-front" id="front-${p.id}">
               <div class="card-wrapper ${wrapperClass}">
-                <div class="card-inner ${innerClass} p-4 flex flex-col justify-between">
+                <div class="card-inner ${innerClass} p-3 flex flex-col justify-between">
                   <div class="card-bg-texture"></div>
+                  <div class="card-bg-shine"></div>
                   
                   <div class="relative z-10 w-full h-full flex flex-col items-center justify-between">
                     <div class="w-full flex justify-between items-start">
                       <div class="text-right flex flex-col items-center">
-                        <div class="text-4xl fifa-number ${ratingTextColor}">${ovr}</div>
-                        <div class="text-[10px] font-bold text-slate-300 uppercase tracking-widest mt-1">${p.position ? p.position.substring(0,3) : 'PLY'}</div>
+                        <div class="text-4xl fifa-number ${ratingTextColor}">${ovr} <span class="text-lg">${data.form}</span></div>
+                        <div class="text-[11px] font-bold text-slate-300 mt-1">${p.position || 'لاعب'}</div>
                       </div>
-                      <div class="text-2xl font-black text-white/30 fifa-number">${p.number ? '#'+p.number : ''}</div>
+                      <div class="flex flex-col items-end gap-1">
+                        <div class="text-xl font-black text-white/40 fifa-number">${p.number ? '#'+p.number : ''}</div>
+                        <div class="flex">${badges.map(b => `<span class="badge">${b}</span>`).join('')}</div>
+                      </div>
                     </div>
                     
-                    <div class="relative -mt-4">
+                    <div class="relative -mt-2">
                       ${p.image ? `<img src="${p.image}" class="w-20 h-20 rounded-full object-cover border-2 border-white/20 shadow-[0_0_20px_rgba(255,255,255,0.2)]">` : `<div class="w-20 h-20 rounded-full bg-slate-800/80 flex items-center justify-center font-black text-3xl text-white/50 border-2 border-white/10">${p.name.charAt(0)}</div>`}
                     </div>
                     
                     <div class="w-full border-b border-white/20 pb-1 text-center mt-1">
                       <div class="font-black text-sm text-white truncate px-1 drop-shadow-md">${p.name}</div>
+                      <div class="text-[10px] tracking-widest text-yellow-400 mt-0.5">${getStars(ovr)}</div>
                     </div>
                     
                     <div class="w-full flex justify-around text-[10px] font-bold text-slate-300 mt-1 bg-black/30 rounded-lg py-1 border border-white/5">
@@ -710,7 +738,7 @@ function renderCards() {
                       <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">SHO</span><span class="fifa-number text-lg text-white">${stats.sho}</span></div>
                       <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">PAS</span><span class="fifa-number text-lg text-white">${stats.pas}</span></div>
                       <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">SPD</span><span class="fifa-number text-lg text-white">${stats.spd}</span></div>
-                      <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">DRI</span><span class="fifa-number text-lg text-white">${stats.dri || 70}</span></div>
+                      <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">DRI</span><span class="fifa-number text-lg text-white">${stats.dri}</span></div>
                       <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">DEF</span><span class="fifa-number text-lg text-white">${stats.def}</span></div>
                       <div class="flex justify-between items-center"><span class="text-slate-400 text-[10px]">PHY</span><span class="fifa-number text-lg text-white">${stats.phy}</span></div>
                       <div class="col-span-2 flex justify-between items-center mt-1 border-t border-white/10 pt-1">
@@ -718,8 +746,8 @@ function renderCards() {
                       </div>
                     </div>
                     
-                    <div class="text-center">
-                      <span class="text-[9px] text-slate-400 bg-black/40 px-2 py-0.5 rounded-full border border-white/10">اضغط للعودة</span>
+                    <div class="flex gap-2 mt-2 w-full">
+                      <button onclick="shareCard(event, '${p.id}')" class="flex-1 bg-emerald-600 text-white text-xs font-bold py-1.5 rounded-lg hover:bg-emerald-500 transition-all">📤 مشاركة</button>
                     </div>
                   </div>
                 </div>
@@ -733,31 +761,132 @@ function renderCards() {
   }).join('');
 }
 
-window.editPlayerStats = function(playerId) {
-  const p = state.players.find(x => x.id === playerId);
-  if(!p) return;
-  p.stats = p.stats || { sho: 70, pas: 70, spd: 70, dri: 70, def: 70, phy: 70 };
-  
-  const sho = prompt("قوة التسديد (SHO) - من 1 لـ 99:", p.stats.sho || 70);
-  if(sho === null) return;
-  const pas = prompt("دقة التمرير (PAS) - من 1 لـ 99:", p.stats.pas || 70);
-  if(pas === null) return;
-  const spd = prompt("السرعة (SPD) - من 1 لـ 99:", p.stats.spd || 70);
-  if(spd === null) return;
-  const dri = prompt("المراوغة (DRI) - من 1 لـ 99:", p.stats.dri || 70);
-  if(dri === null) return;
-  const def = prompt("الدفاع (DEF) - من 1 لـ 99:", p.stats.def || 70);
-  if(def === null) return;
-  const phy = prompt("القوة البدنية (PHY) - من 1 لـ 99:", p.stats.phy || 70);
-  if(phy === null) return;
+/* ==== دوال 3D والمشاركة ==== */
+let tiltTimeout = null;
+let isDragging = false;
+let startX, startY;
 
-  p.stats = { 
-    sho: Number(sho), pas: Number(pas), spd: Number(spd), 
-    dri: Number(dri), def: Number(def), phy: Number(phy) 
-  };
-  save();
+window.tiltCard = function(e, playerId) {
+  const card = document.getElementById(`card-container-${playerId}`);
+  const inner = document.getElementById(`card-inner-${playerId}`);
+  if(!card || !inner || card.classList.contains('flipped')) return;
+  
+  let clientX, clientY;
+  if(e.type === 'touchmove') {
+    clientX = e.touches[0].clientX;
+    clientY = e.touches[0].clientY;
+  } else {
+    clientX = e.clientX;
+    clientY = e.clientY;
+  }
+  
+  const rect = card.getBoundingClientRect();
+  const x = clientX - rect.left;
+  const y = clientY - rect.top;
+  
+  const centerX = rect.width / 2;
+  const centerY = rect.height / 2;
+  
+  const rotateX = ((y - centerY) / centerY) * -15;
+  const rotateY = ((x - centerX) / centerX) * 15;
+  
+  inner.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+  isDragging = true;
 };
 
+window.resetTilt = function(playerId) {
+  const inner = document.getElementById(`card-inner-${playerId}`);
+  if(inner) inner.style.transform = '';
+  setTimeout(() => { isDragging = false; }, 100);
+};
+
+window.toggleCardFlip = function(e, playerId) {
+  if(isDragging) return;
+  const card = document.getElementById(`card-container-${playerId}`);
+  if(card) card.classList.toggle('flipped');
+};
+
+window.shareCard = async function(e, playerId) {
+  e.stopPropagation();
+  const card = document.getElementById(`front-${playerId}`);
+  if(!card) return;
+  
+  // نظهر الكارت الأمامي عشان نصوره
+  document.getElementById(`card-container-${playerId}`).classList.remove('flipped');
+  
+  setTimeout(() => {
+    html2canvas(card, { scale: 2, useCORS: true }).then(canvas => {
+      canvas.toBlob(async (blob) => {
+        const file = new File([blob], 'card.png', { type: 'image/png' });
+        if (navigator.share && navigator.canShare({ files: [file] })) {
+          try {
+            await navigator.share({
+              files: [file],
+              title: 'كارت اللاعب',
+              text: 'شوف كارت اللاعب بتاعي!'
+            });
+          } catch (err) {
+            console.log('Share failed', err);
+            downloadImage(canvas);
+          }
+        } else {
+          downloadImage(canvas);
+        }
+        document.getElementById(`card-container-${playerId}`).classList.add('flipped');
+      });
+    });
+  }, 300);
+};
+
+function downloadImage(canvas) {
+  const link = document.createElement('a');
+  link.download = 'my-card.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+}
+
+/* ==== مودال الإحصائيات ==== */
+window.openStatsModal = function(playerId) {
+  const p = state.players.find(x => x.id === playerId);
+  if(!p) return;
+  editingPlayerId = playerId;
+  const stats = p.stats || { sho: 70, pas: 70, spd: 70, dri: 70, def: 70, phy: 70 };
+  
+  $('#edit-sho').value = stats.sho;
+  $('#edit-pas').value = stats.pas;
+  $('#edit-spd').value = stats.spd;
+  $('#edit-dri').value = stats.dri;
+  $('#edit-def').value = stats.def;
+  $('#edit-phy').value = stats.phy;
+  
+  $('#stats-modal').classList.add('active');
+};
+
+window.closeStatsModal = function() {
+  $('#stats-modal').classList.remove('active');
+  editingPlayerId = null;
+};
+
+window.savePlayerStats = async function() {
+  if(!editingPlayerId) return;
+  const p = state.players.find(x => x.id === editingPlayerId);
+  if(!p) return;
+  
+  p.stats = {
+    sho: Number($('#edit-sho').value),
+    pas: Number($('#edit-pas').value),
+    spd: Number($('#edit-spd').value),
+    dri: Number($('#edit-dri').value),
+    def: Number($('#edit-def').value),
+    phy: Number($('#edit-phy').value),
+  };
+  
+  closeStatsModal();
+  await save();
+  alert('تم حفظ الإحصائيات ✅');
+};
+
+/* ==== الماتشات ==== */
 window.addMatch = function(e) { 
   e.preventDefault(); if(!(isAdmin || isCoach)) return; 
   const f = e.target; 
@@ -801,6 +930,7 @@ function renderMatches() {
 function buildMatchCard(m, isArchived) {
     const present = Object.values(m.attendance||{}).filter(v => v === 'present').length;
     const hasScore = (m.ourScore !== null && m.theirScore !== null && m.ourScore !== "" && m.theirScore !== "");
+    const isOpen = openMatches[m.id] ? 'open' : '';
     
     let resultBadge = "";
     if (hasScore) {
@@ -834,7 +964,7 @@ function buildMatchCard(m, isArchived) {
         <span>حضور: ${present}/${state.players.length}</span>
       </div>
       
-      <details class="group">
+      <details class="group" ontoggle="handleMatchToggle('${m.id}', this.open)" ${isOpen}>
         <summary class="cursor-pointer text-xs font-bold text-emerald-400 bg-emerald-900/20 hover:bg-emerald-900/40 p-2 rounded-lg flex justify-between items-center transition-all">
           <span>عرض التفاصيل والتقييمات</span>
           <svg class="arrow-icon w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -889,6 +1019,7 @@ function buildMatchCard(m, isArchived) {
     </div>`;
 }
 
+/* ==== الإحصائيات ==== */
 function renderStats() {
   const totals = state.players.map(p => getPlayerData(p));
   const topScorer = [...totals].sort((a,b)=>b.goals-a.goals)[0]; 
@@ -923,8 +1054,9 @@ function renderStats() {
               ${p.name} ${p.motmCount>0?`<span class="text-[10px] text-yellow-500">⭐${p.motmCount}</span>`:''}
             </span>
             <div class="flex gap-2 text-xs font-bold">
-              <span class="text-yellow-400 bg-yellow-900/20 px-2 py-1 rounded-md">${p.avgRating}</span>
+              <span class="text-amber-400 bg-amber-900/20 px-2 py-1 rounded-md">✅ ${p.present}</span>
               <span class="text-emerald-400 bg-emerald-900/20 px-2 py-1 rounded-md">⚽ ${p.goals}</span>
+              <span class="text-yellow-400 bg-yellow-900/20 px-2 py-1 rounded-md">🌟 ${p.avgRating}</span>
             </div>
           </div>
         `).join('') : '<p class="text-center text-xs text-slate-500">مفيش بيانات.</p>'}
@@ -932,6 +1064,7 @@ function renderStats() {
     </div>`;
 }
 
+/* ==== باقي الدوال ==== */
 window.addPayment = function(e) { e.preventDefault(); if(!isAdmin) return; const f = e.target; state.payments.push({ id: uid(), playerId: f.playerId.value, amount: Number(f.amount.value), note: f.note.value.trim(), date: new Date().toISOString().slice(0,10) }); f.reset(); save(); };
 
 function renderPayments() {
