@@ -7,6 +7,19 @@
 <title>فريقنا - كرة خماسية</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- كود OneSignal لاستقبال الإشعارات -->
+<script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "a05829ee-dd76-44d5-929a-793ea08664c7", // الـ App ID بتاعك
+      notifyButton: { enable: false },
+    });
+    // طلب الإذن من اللاعب أول ما يفتح التطبيق
+    OneSignal.Slidedown.promptPush();
+  });
+</script>
 <style>
   body { font-family: 'Cairo', system-ui, sans-serif; background-color: #0f172a; color: #f8fafc; }
   .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
@@ -17,34 +30,18 @@
   .nav-btn span { font-size: 1.3rem; margin-bottom: 0.1rem; }
   .nav-btn.active { color: #10b981; background-color: rgba(16, 185, 129, 0.1); }
   
-  /* ====== تصميم كارت فيفا ====== */
+  /* كروت فيفا */
   .flip-card { perspective: 1000px; width: 100%; height: 240px; cursor: pointer; position: relative; }
   .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; z-index: 10; }
   .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
-  
-  .flip-card-front, .flip-card-back { 
-    position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; 
-  }
+  .flip-card-front, .flip-card-back { position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden; }
   .flip-card-back { transform: rotateY(180deg); }
 
-  /* قوقعة الكارت (الشكل المشطوف) */
-  .card-wrapper {
-    position: absolute; inset: 0;
-    clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px);
-    padding: 3px; box-sizing: border-box;
-  }
-  .card-inner {
-    width: 100%; height: 100%;
-    clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px);
-    position: relative; overflow: hidden; display: flex; flex-direction: column;
-  }
+  .card-wrapper { position: absolute; inset: 0; clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px); padding: 3px; box-sizing: border-box; }
+  .card-inner { width: 100%; height: 100%; clip-path: polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px); position: relative; overflow: hidden; display: flex; flex-direction: column; }
 
-  .card-bg-texture {
-    position: absolute; inset: 0; z-index: 0; opacity: 0.2;
-    background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px);
-  }
+  .card-bg-texture { position: absolute; inset: 0; z-index: 0; opacity: 0.2; background-image: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px); }
 
-  /* ألوان الكروت العادية */
   .wrapper-silver { background: #cbd5e1; }
   .inner-silver { background: linear-gradient(135deg, #334155 0%, #0f172a 100%); }
   .inner-silver .text-rating { color: #f1f5f9; }
@@ -61,7 +58,6 @@
   .inner-red { background: linear-gradient(135deg, #7f1d1d 0%, #0f172a 100%); }
   .inner-red .text-rating { color: #fca5a5; }
 
-  /* كارت النار (96 - 98) */
   @keyframes fireGlow {
     0% { box-shadow: 0 0 10px #ff0000, 0 0 20px #ff4500; border-color: #ff0000; }
     100% { box-shadow: 0 0 20px #ff4500, 0 0 30px #ff8c00; border-color: #ff8c00; }
@@ -70,38 +66,21 @@
   .inner-fire { background: linear-gradient(135deg, #450a0a 0%, #000000 100%); }
   .inner-fire .text-rating { color: #fbbf24; text-shadow: 0 0 15px #ff4500; }
 
-  /* ====== كارت الأسطورة 99 ====== */
   .card-99-container { position: relative; width: 100%; height: 100%; }
-
-  /* التاج */
   @keyframes dropCrown {
     0% { transform: translate(-50%, -40px) scale(0.5); opacity: 0; }
     60% { transform: translate(-50%, 5px) scale(1.1); opacity: 1; }
     100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
   }
   .crown-99 {
-    position: absolute; top: -20px; left: 50%;
-    transform: translateX(-50%);
+    position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
     font-size: 38px; z-index: 30;
     animation: dropCrown 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
     filter: drop-shadow(0 0 15px #fbbf24) drop-shadow(0 0 5px #ff0000);
     pointer-events: none;
   }
-
-  /* إطار النار الأسود */
-  .wrapper-99 {
-    background: linear-gradient(135deg, #ff0000, #000000, #ff4500);
-    padding: 4px;
-    clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px);
-    z-index: 10;
-    position: relative;
-    animation: fireGlow 1.5s infinite alternate;
-  }
-  .inner-99 {
-    background: radial-gradient(circle at center, #2a0000 0%, #000000 100%);
-    clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px);
-    width: 100%; height: 100%; position: relative; overflow: hidden;
-  }
+  .wrapper-99 { background: linear-gradient(135deg, #ff0000, #000000, #ff4500); padding: 4px; clip-path: polygon(22px 0, 100% 0, 100% calc(100% - 22px), calc(100% - 22px) 100%, 0 100%, 0 22px); z-index: 10; position: relative; animation: fireGlow 1.5s infinite alternate; }
+  .inner-99 { background: radial-gradient(circle at center, #2a0000 0%, #000000 100%); clip-path: polygon(18px 0, 100% 0, 100% calc(100% - 18px), calc(100% - 18px) 100%, 0 100%, 0 18px); width: 100%; height: 100%; position: relative; overflow: hidden; }
   .inner-99 .text-rating { color: #fbbf24; text-shadow: 0 0 20px #ff4500, 0 0 40px #ff0000; }
 
   .fifa-number { font-family: 'Teko', sans-serif; font-weight: 600; line-height: 0.9; }
@@ -238,14 +217,11 @@
         <div id="matches-active-list" class="space-y-3"></div>
       </div>
 
-      <div id="matches-history-container" class="hidden space-y-3">
-      </div>
+      <div id="matches-history-container" class="hidden space-y-3"></div>
     </section>
 
     <!-- الإحصائيات -->
-    <section id="tab-stats" class="tab-content">
-      <div id="stats-content"></div>
-    </section>
+    <section id="tab-stats" class="tab-content"><div id="stats-content"></div></section>
 
     <!-- الفلوس -->
     <section id="tab-money" class="tab-content">
@@ -286,6 +262,15 @@
 
     <!-- الإدارة -->
     <section id="tab-admin" class="tab-content">
+      <!-- زرار الإشعارات الجديد -->
+      <div class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 flex justify-between items-center">
+        <div>
+           <h2 class="font-bold text-sm text-emerald-400">إشعارات الفريق</h2>
+           <p class="text-[10px] text-slate-500">ابعت رسالة تظهر على موبايلات اللاعيبة</p>
+        </div>
+        <button onclick="sendNotificationPrompt()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all">📢 إرسال إشعار</button>
+      </div>
+
       <div class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 flex justify-between items-center">
         <div>
            <h2 class="font-bold text-sm text-emerald-400">شعار الفريق</h2>
@@ -337,6 +322,10 @@ const firebaseConfig = {
   appId: "1:837918664225:web:28a56f2a7065228faae560"
 };
 
+// 🔴 اللينك بتاع السيرفر بتاعك
+const WORKER_URL = "https://futsal-server.moody72001.workers.dev"; 
+const ONESIGNAL_APP_ID = "a05829ee-dd76-44d5-929a-793ea08664c7";
+
 const TEAM_ID = "my-team";
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -358,6 +347,33 @@ const $$ = s => document.querySelectorAll(s);
 const fmt = n => Number(n||0).toLocaleString('ar-EG');
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 function formatPhone(p) { return p.includes('@') ? p : p + "@futsal.com"; }
+
+// 🔔 دالة إرسال الإشعارات
+window.sendNotificationPrompt = async function() {
+  if(!isAdmin) return;
+  const title = prompt("اكتب عنوان الإشعار (مثلاً: ماتش بكرة):");
+  if(!title) return;
+  const message = prompt("اكتب نص الرسالة (مثلاً: الساعة 8 في ملعب النور):");
+  if(!message) return;
+
+  try {
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        app_id: ONESIGNAL_APP_ID,
+        included_segments: ["Subscribed Users"],
+        headings: { en: title, ar: title },
+        contents: { en: message, ar: message }
+      })
+    });
+    const result = await response.json();
+    if (result.id) alert("تم إرسال الإشعار بنجاح! ✅");
+    else alert("فشل الإرسال: " + JSON.stringify(result.errors));
+  } catch(e) {
+    alert("حدث خطأ في الاتصال بالسيرفر: " + e.message);
+  }
+};
 
 window.toggleAuthMode = function() {
   isLoginMode = !isLoginMode;
@@ -389,7 +405,6 @@ window.handleAdminAuth = async function() {
 
 window.handlePlayerAuth = async function() {
   const name = $('#auth-name').value.trim();
-  // 🔴 الحل هنا: شيلنا المسافات من رقم التليفون
   const rawPhone = $('#auth-phone').value.trim().replace(/\s+/g, ''); 
   let password = $('#auth-password').value;
   const dob = $('#auth-dob').value;
@@ -580,7 +595,6 @@ function render() {
   $('#team-summary').textContent = `${state.players.length} لاعب · ${state.matches.length} ماتش`;
 }
 
-/* ================== اللاعبين ================== */
 function renderPlayers() {
   const box = $('#players-list');
   if (!state.players.length) { box.innerHTML = '<div class="text-center py-10 opacity-50"><div class="text-5xl mb-2">⚽</div><p class="text-sm font-bold text-slate-400">مفيش لاعبين لسه.</p></div>'; return; }
@@ -603,7 +617,6 @@ function renderPlayers() {
     </div>`).join('');
 }
 
-/* ================== كروت فيفا ================== */
 function getPlayerData(p) {
   let goals=0, assists=0, present=0, motmCount=0, totalRating=0, ratingCount=0;
   
@@ -764,7 +777,6 @@ window.editPlayerStats = function(playerId) {
   save();
 };
 
-/* ================== الماتشات ================== */
 window.addMatch = function(e) { 
   e.preventDefault(); if(!(isAdmin || isCoach)) return; 
   const f = e.target; 
@@ -896,7 +908,6 @@ function buildMatchCard(m, isArchived) {
     </div>`;
 }
 
-/* ================== الإحصائيات ================== */
 function renderStats() {
   const totals = state.players.map(p => getPlayerData(p));
   const topScorer = [...totals].sort((a,b)=>b.goals-a.goals)[0]; 
@@ -940,7 +951,6 @@ function renderStats() {
     </div>`;
 }
 
-/* ================== الفلوس ================== */
 window.addPayment = function(e) { e.preventDefault(); if(!isAdmin) return; const f = e.target; state.payments.push({ id: uid(), playerId: f.playerId.value, amount: Number(f.amount.value), note: f.note.value.trim(), date: new Date().toISOString().slice(0,10) }); f.reset(); save(); };
 
 function renderPayments() {
@@ -971,7 +981,6 @@ function renderPayments() {
     </div>`;
 }
 
-/* ================== القوانين والإعلانات ================== */
 window.saveRules = function() { if(!(isAdmin||isCoach)) return; state.rules = $('#rules-text').value.trim(); save(); alert('تم حفظ القوانين ✅'); };
 function renderRules() { const txt = $('#rules-text'); if (document.activeElement !== txt) txt.value = state.rules || "مفيش قوانين مكتوبة."; }
 
@@ -991,7 +1000,6 @@ function renderAnnouncements() {
     </div>`).join('');
 }
 
-/* ================== لوحة الإدارة ================== */
 window.uploadTeamLogo = function() {
   if(!isAdmin) return;
   const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
