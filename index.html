@@ -7,16 +7,14 @@
 <title>فريقنا - كرة خماسية</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
-<!-- كود OneSignal لاستقبال الإشعارات -->
 <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
 <script>
   window.OneSignalDeferred = window.OneSignalDeferred || [];
   OneSignalDeferred.push(async function(OneSignal) {
     await OneSignal.init({
-      appId: "a05829ee-dd76-44d5-929a-793ea08664c7", // الـ App ID بتاعك
+      appId: "a05829ee-dd76-44d5-929a-793ea08664c7",
       notifyButton: { enable: false },
     });
-    // طلب الإذن من اللاعب أول ما يفتح التطبيق
     OneSignal.Slidedown.promptPush();
   });
 </script>
@@ -30,7 +28,6 @@
   .nav-btn span { font-size: 1.3rem; margin-bottom: 0.1rem; }
   .nav-btn.active { color: #10b981; background-color: rgba(16, 185, 129, 0.1); }
   
-  /* كروت فيفا */
   .flip-card { perspective: 1000px; width: 100%; height: 240px; cursor: pointer; position: relative; }
   .flip-card-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; z-index: 10; }
   .flip-card.flipped .flip-card-inner { transform: rotateY(180deg); }
@@ -96,7 +93,6 @@
 </head>
 <body class="pb-24">
 
-<!-- شاشة الدخول -->
 <div id="auth-screen" class="fixed inset-0 bg-slate-900 flex items-center justify-center p-4 z-50 overflow-y-auto">
   <div class="bg-slate-800 rounded-3xl p-8 w-full max-w-sm text-center shadow-2xl my-auto relative overflow-hidden border border-slate-700">
     <div class="text-6xl mb-2 relative z-10">⚽</div>
@@ -108,22 +104,18 @@
         <label class="text-xs text-slate-400 mb-1 block">الاسم بالكامل:</label>
         <input id="auth-name" type="text" placeholder="اكتب اسمك هنا" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white">
       </div>
-      
       <div>
         <label class="text-xs text-slate-400 mb-1 block">رقم التليفون (للاعبين فقط):</label>
         <input id="auth-phone" type="tel" placeholder="01xxxxxxxxx" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white" dir="ltr" autocomplete="off">
       </div>
-      
       <div id="password-container">
         <label class="text-xs text-slate-400 mb-1 block">الباسورد:</label>
         <input id="auth-password" type="password" placeholder="••••••" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white" dir="ltr" autocomplete="new-password">
       </div>
-      
       <div id="dob-container" class="hidden">
         <label class="text-xs text-slate-400 mb-1 block">تاريخ الميلاد:</label>
         <input id="auth-dob" type="date" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm font-bold text-white">
       </div>
-
       <button id="auth-btn-player" onclick="handlePlayerAuth()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl p-3 font-bold text-lg shadow-lg transition-all mt-2">دخول كـ لاعب</button>
       <button id="auth-btn-admin" onclick="handleAdminAuth()" class="w-full bg-slate-700 hover:bg-slate-600 text-white rounded-xl p-3 font-bold text-sm shadow-md transition-all">👑 دخول كـ إدارة</button>
     </div>
@@ -131,12 +123,10 @@
     <button onclick="toggleAuthMode()" class="mt-6 text-sm text-emerald-400 hover:text-emerald-300 font-bold underline relative z-10">
       <span id="auth-toggle-text">معندكش حساب؟ اعمل حساب جديد</span>
     </button>
-    
     <p id="auth-error" class="text-red-400 text-sm mt-3 font-bold hidden relative z-10 bg-red-900/30 p-2 rounded-lg"></p>
   </div>
 </div>
 
-<!-- شاشة الانتظار -->
 <div id="pending-screen" class="fixed inset-0 bg-slate-900 flex items-center justify-center p-4 z-50 hidden">
   <div class="bg-slate-800 rounded-3xl p-8 w-full max-w-sm text-center shadow-2xl border border-slate-700">
     <div class="text-6xl mb-4 animate-pulse">⏳</div>
@@ -146,7 +136,6 @@
   </div>
 </div>
 
-<!-- شاشة التطبيق -->
 <div id="app-screen" class="hidden">
   <header class="bg-slate-800 p-5 pb-6 rounded-b-3xl shadow-lg border-b border-slate-700 relative overflow-hidden">
     <div class="flex justify-between items-start relative z-10">
@@ -162,7 +151,6 @@
   </header>
 
   <main class="p-4 max-w-md mx-auto">
-    <!-- اللاعبين -->
     <section id="tab-players" class="tab-content active">
       <div id="add-player-form" class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 hidden">
         <h2 class="font-bold text-sm mb-3 text-emerald-400">إضافة لاعب جديد (يدوي)</h2>
@@ -181,12 +169,10 @@
       <div id="players-list" class="space-y-2"></div>
     </section>
 
-    <!-- كروت اللاعيبة -->
     <section id="tab-cards" class="tab-content">
       <div id="cards-list" class="grid grid-cols-2 gap-3 p-1"></div>
     </section>
 
-    <!-- الماتشات -->
     <section id="tab-matches" class="tab-content">
       <div class="flex bg-slate-800 p-1 rounded-xl mb-4 border border-slate-700">
         <button onclick="switchMatchTab('active')" id="btn-match-active" class="flex-1 py-2 text-sm font-bold rounded-lg bg-emerald-600 text-white transition-all">الماتشات الحالية</button>
@@ -220,10 +206,8 @@
       <div id="matches-history-container" class="hidden space-y-3"></div>
     </section>
 
-    <!-- الإحصائيات -->
     <section id="tab-stats" class="tab-content"><div id="stats-content"></div></section>
 
-    <!-- الفلوس -->
     <section id="tab-money" class="tab-content">
       <div id="add-payment-form" class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 hidden">
         <h2 class="font-bold text-sm mb-3 text-emerald-400">تسجيل دفعة مالية</h2>
@@ -240,7 +224,6 @@
       <div id="money-content"></div>
     </section>
 
-    <!-- القوانين -->
     <section id="tab-rules" class="tab-content">
       <div class="bg-slate-800 rounded-2xl p-5 shadow-sm border border-slate-700">
         <h2 class="font-bold text-lg mb-3 text-emerald-400 flex items-center gap-2">📜 قوانين الفريق</h2>
@@ -249,7 +232,6 @@
       </div>
     </section>
 
-    <!-- الإعلانات -->
     <section id="tab-announcements" class="tab-content">
       <div id="add-announcement-form" class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 hidden">
         <form onsubmit="addAnnouncement(event)">
@@ -260,9 +242,8 @@
       <div id="announcements-list" class="space-y-3"></div>
     </section>
 
-    <!-- الإدارة -->
     <section id="tab-admin" class="tab-content">
-      <!-- زرار الإشعارات الجديد -->
+      <!-- 🔴 الزرار اللي إنت عايزه هنا 🔴 -->
       <div class="bg-slate-800 rounded-2xl p-4 shadow-sm border border-slate-700 mb-4 flex justify-between items-center">
         <div>
            <h2 class="font-bold text-sm text-emerald-400">إشعارات الفريق</h2>
@@ -322,8 +303,8 @@ const firebaseConfig = {
   appId: "1:837918664225:web:28a56f2a7065228faae560"
 };
 
-// 🔴 اللينك بتاع السيرفر بتاعك
-const WORKER_URL = "https://futsal-server.moody72001.workers.dev"; 
+// 🔴 ضع لينك السيرفر بتاعك هنا
+const WORKER_URL = "https://broken-band-b260futsal-v2.moody72001.workers.dev"; 
 const ONESIGNAL_APP_ID = "a05829ee-dd76-44d5-929a-793ea08664c7";
 
 const TEAM_ID = "my-team";
