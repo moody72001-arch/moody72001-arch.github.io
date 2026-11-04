@@ -7,12 +7,12 @@
   "theme_color": "#050a15",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/192/53/53283.png",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Soccerball.svg/192px-Soccerball.svg.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
+      "src": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Soccerball.svg/512px-Soccerball.svg.png",
       "sizes": "512x512",
       "type": "image/png"
     }
