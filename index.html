@@ -217,14 +217,12 @@ input,select,button,textarea{font-family:inherit}
 @keyframes legendFloat{0%,100%{transform:translateY(-4px)}50%{transform:translateY(4px)}}
 .legendary-indicator{text-align:center;color:var(--gold-lt);font-size:12px;font-weight:700;margin-top:10px;letter-spacing:2px}
 
-/* HALL OF FAME (Star Throne) - ANIMATIONS */
+/* HALL OF FAME (Star Throne) */
 .hall-bg{background:radial-gradient(circle at top, #1a1508 0%, #050a15 100%);min-height:100%;padding:10px;position:relative;overflow:hidden;}
-/* Starry Background */
 .hall-bg::before{content:'';position:absolute;inset:0;background-image:radial-gradient(1px 1px at 20px 30px, #fff, transparent),radial-gradient(1.5px 1.5px at 40px 70px, rgba(212,175,55,0.8), transparent),radial-gradient(1px 1px at 90px 40px, #fff, transparent),radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.8), transparent);background-repeat:repeat;background-size:200px 200px;opacity:0.3;animation:starDrift 60s linear infinite;z-index:0;pointer-events:none;}
 @keyframes starDrift{from{background-position:0 0}to{background-position:-200px -200px}}
-/* Marquee */
 .marquee-container{position:relative;z-index:1;overflow:hidden;white-space:nowrap;width:100%;background:rgba(212,175,55,0.1);border-radius:10px;padding:10px 0;margin-bottom:25px;border:1px solid rgba(212,175,55,0.3);box-shadow:0 0 15px rgba(212,175,55,0.2);}
-.marquee-text{display:inline-block;padding-left:100%;animation:marquee 15s linear infinite;color:var(--gold);font-weight:900;font-size:14px;text-shadow:0 0 10px rgba(212,175,55,0.5);}
+.marquee-text{display:inline-block;padding-left:100%;animation:marquee 35s linear infinite;color:var(--gold);font-weight:900;font-size:14px;text-shadow:0 0 10px rgba(212,175,55,0.5);}
 @keyframes marquee{0%{transform:translate(0,0)}100%{transform:translate(-100%,0)}}
 .hall-title{position:relative;z-index:1;text-align:center;font-size:24px;font-weight:900;color:var(--gold);text-shadow:0 0 15px rgba(212,175,55,0.5);margin-bottom:20px;letter-spacing:2px;}
 .star-month-banner{position:relative;z-index:1;background:linear-gradient(135deg, rgba(212,175,55,0.2), rgba(0,0,0,0.8));border:1px solid var(--gold);border-radius:20px;padding:20px;text-align:center;margin-bottom:30px;overflow:hidden;}
@@ -236,7 +234,6 @@ input,select,button,textarea{font-family:inherit}
 .month-star-name{font-size:20px;font-weight:900;color:#fff;}
 .month-star-count{display:inline-block;background:var(--gold);color:#000;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:900;margin-top:5px;}
 
-/* Podium Rise */
 .podium-container{position:relative;z-index:1;display:flex;justify-content:center;align-items:flex-end;gap:10px;margin-bottom:30px;}
 .podium{display:flex;flex-direction:column;align-items:center;background:linear-gradient(180deg, rgba(255,255,255,0.1), rgba(0,0,0,0.5));border-radius:15px 15px 0 0;padding:10px;border:1px solid rgba(255,255,255,0.1);position:relative;opacity:0;transform:translateY(50px);}
 .podium.p1{height:170px;width:100px;border-color:var(--gold);background:linear-gradient(180deg, rgba(212,175,55,0.3), rgba(0,0,0,0.8));z-index:3;box-shadow:0 0 30px rgba(212,175,55,0.4);animation:riseUp 0.8s cubic-bezier(0.2, 0.9, 0.3, 1) forwards 0.5s;}
@@ -391,25 +388,51 @@ input,select,button,textarea{font-family:inherit}
 .preview-close{position:absolute;top:-50px;right:0;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;width:40px;height:40px;border-radius:50%;font-size:22px;cursor:pointer;backdrop-filter:blur(6px)}
 .preview-content .fifa-card-wrap{width:100%;cursor:pointer}
 
+/* DELUXE PROFILE */
 .profile-view{position:fixed;inset:0;z-index:60;overflow-y:auto;background:#050a15;display:none}
 .profile-view.show{display:block}
-.profile-bg-img{position:fixed;inset:0;background-size:cover;background-position:center;filter:blur(40px) brightness(.25);transform:scale(1.2);z-index:0}
-.profile-overlay{position:fixed;inset:0;background:linear-gradient(180deg,rgba(5,10,21,.3),rgba(5,10,21,.7) 50%,rgba(5,10,21,.95));z-index:1}
+.profile-bg-img{position:fixed;inset:0;background-size:cover;background-position:center;filter:blur(20px) brightness(.3);transform:scale(1.2);z-index:0;animation:kenBurns 20s ease-in-out infinite alternate;}
+@keyframes kenBurns{0%{transform:scale(1.1) translate(0,0)}100%{transform:scale(1.3) translate(-20px,-20px)}}
+.profile-overlay{position:fixed;inset:0;background:linear-gradient(180deg,rgba(5,10,21,.2),rgba(5,10,21,.8) 60%,rgba(5,10,21,.98));z-index:1}
 .profile-content{position:relative;z-index:2;min-height:100%;padding:60px 20px 40px;display:flex;flex-direction:column;align-items:center}
 .profile-back{position:fixed;top:16px;right:16px;background:rgba(0,0,0,.6);border:1px solid var(--blue);color:var(--blue-lt);padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;z-index:3}
-.profile-avatar{width:140px;height:140px;border-radius:50%;border:4px solid var(--blue-mid);background:#1a2a44;display:flex;align-items:center;justify-content:center;font-size:60px;overflow:hidden;margin-bottom:20px;position:relative;}
+.profile-avatar{width:140px;height:140px;border-radius:50%;border:4px solid var(--blue-mid);background:#1a2a44;display:flex;align-items:center;justify-content:center;font-size:60px;overflow:hidden;margin-bottom:20px;position:relative;box-shadow:0 0 40px rgba(0,0,0,0.8)}
 .profile-avatar img{width:100%;height:100%;object-fit:cover}
-.profile-name{font-size:26px;font-weight:900;color:var(--blue-lt);text-align:center;margin-bottom:6px}
-.profile-pos{display:inline-block;background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff;padding:4px 16px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:24px}
+.profile-name{font-size:26px;font-weight:900;color:var(--blue-lt);text-align:center;margin-bottom:6px;text-shadow:0 2px 10px rgba(0,0,0,0.8)}
+.profile-pos{display:inline-block;background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff;padding:4px 16px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:24px;box-shadow:0 4px 10px rgba(0,0,0,0.5)}
 .profile-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:400px;margin-bottom:20px}
-.stat-box{background:rgba(12,20,37,.75);border:1px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center}
+.stat-box{background:rgba(12,20,37,.75);border:1px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center;backdrop-filter:blur(10px)}
 .stat-box b{display:block;font-size:22px;font-weight:900;color:var(--blue-lt);margin-bottom:2px}
 .stat-box span{font-size:11px;color:var(--dim);font-weight:600}
-.profile-details{width:100%;max-width:400px;background:rgba(12,20,37,.75);border:1px solid var(--border);border-radius:14px;padding:16px;font-size:14px;line-height:2;color:#ddd;text-align:center;margin-bottom:24px}
-.profile-delete-btn{width:100%;max-width:400px;padding:14px;background:rgba(231,76,60,.1);border:1px solid var(--red);color:var(--red);font-size:14px;font-weight:800;border-radius:14px;cursor:pointer;margin-top:8px}
+
+/* Profile Stats Bars */
+.profile-stats-bars{width:100%;max-width:400px;background:rgba(12,20,37,.75);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:20px;backdrop-filter:blur(10px);}
+.p-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.p-bar-row:last-child{margin-bottom:0;}
+.p-bar-label{width:50px;font-size:12px;font-weight:800;color:var(--dim);}
+.p-bar-track{flex:1;height:8px;background:rgba(255,255,255,0.1);border-radius:4px;overflow:hidden;}
+.p-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),#60a5fa);border-radius:4px;width:0;transition:width 1s cubic-bezier(0.2, 0.8, 0.2, 1);}
+.p-bar-val{width:25px;text-align:left;font-size:13px;font-weight:900;color:#fff;}
+
+/* Form Guide */
+.form-guide{width:100%;max-width:400px;margin-bottom:20px;}
+.form-title{font-size:14px;font-weight:800;color:var(--blue-lt);margin-bottom:10px;}
+.form-row{display:flex;gap:8px;margin-bottom:8px;background:rgba(0,0,0,0.4);padding:8px 12px;border-radius:10px;align-items:center;}
+.form-opp{flex:1;font-size:12px;font-weight:700;color:#eee;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.form-rating{width:35px;height:35px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;}
+.form-rating.good{background:#27ae60;color:#fff;box-shadow:0 0 10px rgba(39,174,96,0.5);}
+.form-rating.avg{background:#f39c12;color:#fff;box-shadow:0 0 10px rgba(243,156,18,0.5);}
+.form-rating.bad{background:#e74c3c;color:#fff;box-shadow:0 0 10px rgba(231,76,60,0.5);}
+
+/* Badges */
+.badges-container{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;width:100%;max-width:400px;}
+.achievement-badge{background:linear-gradient(135deg,rgba(212,175,55,0.2),rgba(0,0,0,0.5));border:1px solid var(--gold);padding:6px 10px;border-radius:10px;font-size:11px;font-weight:800;color:var(--gold-lt);display:flex;align-items:center;gap:4px;box-shadow:0 0 10px rgba(212,175,55,0.2);}
+
+.profile-details{width:100%;max-width:400px;background:rgba(12,20,37,.75);border:1px solid var(--border);border-radius:14px;padding:16px;font-size:14px;line-height:2;color:#ddd;text-align:center;margin-bottom:24px;backdrop-filter:blur(10px)}
+.profile-delete-btn{width:100%;max-width:400px;padding:14px;background:rgba(231,76,60,.1);border:1px solid var(--red);color:var(--red);font-size:14px;font-weight:800;border-radius:14px;cursor:pointer;margin-top:8px;margin-bottom:20px;}
 
 /* Trophy Room */
-.trophy-room{width:100%;max-width:400px;background:linear-gradient(135deg,rgba(212,175,55,0.1),rgba(12,20,37,0.8));border:1px solid rgba(212,175,55,0.3);border-radius:14px;padding:16px;margin-bottom:24px;}
+.trophy-room{width:100%;max-width:400px;background:linear-gradient(135deg,rgba(212,175,55,0.1),rgba(12,20,37,0.8));border:1px solid rgba(212,175,55,0.3);border-radius:14px;padding:16px;margin-bottom:24px;backdrop-filter:blur(10px)}
 .trophy-title{font-size:14px;font-weight:900;color:var(--gold);text-align:center;margin-bottom:12px;border-bottom:1px solid rgba(212,175,55,0.2);padding-bottom:8px;}
 .trophy-item{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#ddd;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.1);}
 .trophy-item:last-child{border:none;}
@@ -424,6 +447,9 @@ input,select,button,textarea{font-family:inherit}
 .comment-input-row{display:flex;gap:6px;}
 .comment-input-row input{flex:1;margin:0;padding:8px;}
 .comment-input-row button{width:auto;padding:8px 12px;margin:0;}
+
+/* Hide scrollbar for tabs */
+.tabs-nav::-webkit-scrollbar { display: none; }
 </style>
 </head>
 <body>
@@ -500,18 +526,26 @@ input,select,button,textarea{font-family:inherit}
   </div>
 </div>
 
-<!-- شاشة البروفايل -->
+<!-- شاشة البروفايل الديلوكس -->
 <div id="profileView" class="profile-view">
   <div class="profile-bg-img" id="profileBgImg"></div>
   <div class="profile-overlay"></div>
-  <div class="profile-content">
+  <div class="profile-content" id="profileContentCapture">
     <button class="profile-back" onclick="closeProfile()">← رجوع</button>
     <div class="profile-avatar" id="profileAvatar"></div>
     <h1 class="profile-name" id="profileName"></h1>
     <div class="profile-pos" id="profilePos"></div>
+    
     <div class="profile-stats-grid" id="profileStats"></div>
+    <div class="badges-container" id="profileBadges"></div>
+    
+    <div class="profile-stats-bars" id="profileStatsBars"></div>
+    <div class="form-guide" id="profileFormGuide"></div>
+    
     <div class="trophy-room" id="profileTrophies" style="display:none;"></div>
     <div class="profile-details" id="profileDetails"></div>
+    
+    <button class="btn-purple" onclick="shareProfile('${currentProfileId}')" style="max-width:400px; margin-bottom:10px;">📤 مشاركة البروفايل</button>
     <button class="profile-delete-btn" id="profileDeleteBtn" onclick="deleteFromProfile()" style="display:none">🗑 حذف اللاعب</button>
   </div>
 </div>
@@ -710,7 +744,7 @@ $$('.tab-btn').forEach(btn => {
     $$('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === currentTab));
     $$('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === currentTab));
     if(currentTab !== 1) legendaryPaused = true;
-    if(currentTab !== 4) hallAnimated = false; // Reset animation flag when leaving hall of fame
+    if(currentTab !== 4) hallAnimated = false; // Reset animation flag
   };
 });
 
@@ -729,11 +763,16 @@ function renderAll() {
 function getPlayerData(p) {
   let goals=0, assists=0, matches=0, motm=0, worst=0, bad=0, ratingSum=0, ratingCount=0;
   let trophies = [];
+  let recentMatches = [];
+  
   state.matches.forEach(m => {
     if(m.archived) {
       if((m.lineup||[]).includes(p.id)) {
         matches++; goals += (m.goals||{})[p.id] || 0; assists += (m.assists||{})[p.id] || 0;
-        if (m.ratings && m.ratings[p.id]) { ratingSum += m.ratings[p.id]; ratingCount++; }
+        if (m.ratings && m.ratings[p.id]) { 
+            ratingSum += m.ratings[p.id]; ratingCount++; 
+            recentMatches.push({ opponent: m.opponentTeam, rating: m.ratings[p.id], date: m.date });
+        }
       }
       if (m.motm === p.id) { motm++; trophies.push(m); }
       if (m.worst === p.id) worst++;
@@ -741,7 +780,11 @@ function getPlayerData(p) {
     }
   });
   const avgRating = ratingCount > 0 ? (ratingSum / ratingCount) : 0;
-  return { ...p, goals, assists, matches, motm, worst, bad, avgRating, trophies };
+  
+  // Sort recent matches by date descending
+  recentMatches.sort((a,b) => new Date(b.date) - new Date(a.date));
+  
+  return { ...p, goals, assists, matches, motm, worst, bad, avgRating, trophies, recentMatches };
 }
 
 function calculateOVR(p) {
@@ -781,7 +824,7 @@ function renderPlayers() {
         <div class="player-info" onclick="openProfile('${p.id}')"><div class="player-name">${esc(p.name)}</div><div class="player-pos">${esc(p.position||'لاعب')}</div></div>
         <div class="player-actions">
           ${isAdmin ? `<button class="icon-action" onclick="uploadPhoto('${p.id}')">📷</button>` : ''}
-          <button class="icon-action" onclick="editPlayerStats('${p.id}')">📊</button>
+          ${(isAdmin || isCoach) ? `<button class="icon-action" onclick="editPlayerStats('${p.id}')">📊</button>` : ''}
           <button class="icon-action" onclick="openProfile('${p.id}')">👁️</button>
           ${isAdmin ? `<button class="icon-action danger" onclick="deletePlayerComplete('${p.id}')">🗑</button>` : ''}
         </div>
@@ -793,6 +836,7 @@ function renderPlayers() {
 }
 
 window.showAddPlayer = function() {
+  if(!isAdmin) return;
   openModal(`<h3>➕ لاعب جديد</h3>
     <label class="form-label">الاسم *</label><input id="np_name" placeholder="اسم اللاعب">
     <label class="form-label">المركز</label><select id="np_pos"><option>حارس</option><option>مدافع</option><option>وسط</option><option>مهاجم</option></select>
@@ -800,12 +844,14 @@ window.showAddPlayer = function() {
 };
 
 window.addPlayer = async function() {
+  if(!isAdmin) return;
   const name = $('#np_name').value.trim(); if(!name) return alert("اكتب الاسم");
-  state.players.push({ id: uid(), name: name, position: $('#np_pos').value, photo: '', stats: { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 } });
+  state.players.push({ id: uid(), name: name, position: $('#np_pos').value, photo: '', profileBg: '', stats: { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 } });
   await save(); closeModal();
 };
 
 window.editPlayerStats = function(id) {
+  if(!isAdmin && !isCoach) return; // Security restriction
   const p = state.players.find(x => x.id === id); if(!p) return;
   const s = p.stats || { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 };
   openModal(`<h3>📊 إحصائيات ${esc(p.name)}</h3>
@@ -817,16 +863,19 @@ window.editPlayerStats = function(id) {
       <div><label class="form-label">دفاع</label><input id="ep_def" type="number" value="${s.defending}"></div>
       <div><label class="form-label">بدنية</label><input id="ep_phy" type="number" value="${s.physical}"></div>
     </div>
-    <button class="btn-purple" onclick="savePlayerStats('${id}')" style="margin-top:18px">حفظ</button>`);
+    ${isAdmin ? `<button class="btn-purple btn-ghost" onclick="uploadProfileBg('${id}')" style="margin-top:10px">🖼️ صورة خلفية البروفايل</button>` : ''}
+    <button class="btn-purple" onclick="savePlayerStats('${id}')" style="margin-top:18px">حفظ الإحصائيات</button>`);
 };
 
 window.savePlayerStats = async function(id) {
+  if(!isAdmin && !isCoach) return;
   const p = state.players.find(x => x.id === id); if(!p) return;
   p.stats = { pace: +$('#ep_pace').value, shooting: +$('#ep_sho').value, passing: +$('#ep_pas').value, dribbling: +$('#ep_dri').value, defending: +$('#ep_def').value, physical: +$('#ep_phy').value };
   await save(); closeModal();
 };
 
 window.deletePlayerComplete = async function(id) {
+  if(!isAdmin) return;
   const p = state.players.find(x => x.id === id); if(!p) return;
   const linkedUser = approvedUsers.find(u => u.uid === p.id || (u.name === p.name && u.phone === p.phone));
   if(linkedUser && linkedUser.phone === 'admin') return alert("❌ لا يمكن حذف الأدمن الرئيسي");
@@ -859,10 +908,40 @@ window.uploadPhoto = function(id) {
   input.click();
 };
 
+window.uploadProfileBg = function(id) {
+  if(!isAdmin) return;
+  const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas'); const MAX = 800; let w = img.width, h = img.height;
+        if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } }
+        canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const p = state.players.find(x => x.id === id);
+        if(p) { p.profileBg = canvas.toDataURL('image/jpeg', 0.6); await save(); alert('تم حفظ الخلفية!'); }
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+};
+
 window.openProfile = function(id) {
   const p = getPlayerData(state.players.find(x => x.id === id)); if(!p) return;
   currentProfileId = id;
-  $('#profileBgImg').style.backgroundImage = p.photo ? `url(${p.photo})` : 'none';
+  
+  // Background Image Logic (Custom or Photo)
+  const bgUrl = p.profileBg || p.photo || '';
+  if(bgUrl) {
+      $('#profileBgImg').style.backgroundImage = `url(${bgUrl})`;
+  } else {
+      $('#profileBgImg').style.backgroundImage = 'none';
+  }
+  
   $('#profileAvatar').innerHTML = p.photo ? `<img src="${p.photo}">` : '👤';
   if(p.motm > 0) $('#profileAvatar').innerHTML += '<div class="star-badge" style="font-size:26px; top:-10px; right:-10px;">👑</div>';
   if(p.motm >= 3) $('#profileAvatar').classList.add('star-aura');
@@ -870,6 +949,8 @@ window.openProfile = function(id) {
   
   $('#profileName').textContent = p.name;
   $('#profilePos').textContent = `${p.position} • التقييم ${calculateOVR(p)}`;
+  
+  // Basic Stats Grid
   $('#profileStats').innerHTML = `
     <div class="stat-box"><b>${p.matches}</b><span>ماتشات</span></div>
     <div class="stat-box"><b>${p.goals}</b><span>أهداف</span></div>
@@ -877,7 +958,41 @@ window.openProfile = function(id) {
     <div class="stat-box"><b>${p.motm}</b><span>⭐ نجم</span></div>
     <div class="stat-box"><b>${p.avgRating.toFixed(1)}</b><span>تقييم</span></div>
     <div class="stat-box"><b>${p.bad}</b><span>👎 وحش</span></div>`;
-    
+
+  // 6 Stats Bars
+  const s = p.stats || { pace: 70, shooting: 70, passing: 70, dribbling: 70, defending: 70, physical: 70 };
+  $('#profileStatsBars').innerHTML = `
+    <div class="p-bar-row"><div class="p-bar-label">سرعة</div><div class="p-bar-track"><div class="p-bar-fill" data-val="${s.pace}"></div></div><div class="p-bar-val">${s.pace}</div></div>
+    <div class="p-bar-row"><div class="p-bar-label">تسديد</div><div class="p-bar-track"><div class="p-bar-fill" data-val="${s.shooting}"></div></div><div class="p-bar-val">${s.shooting}</div></div>
+    <div class="p-bar-row"><div class="p-bar-label">تمرير</div><div class="p-bar-track"><div class="p-bar-fill" data-val="${s.passing}"></div></div><div class="p-bar-val">${s.passing}</div></div>
+    <div class="p-bar-row"><div class="p-bar-label">مراوغة</div><div class="p-bar-track"><div class="p-bar-fill" data-val="${s.dribbling}"></div></div><div class="p-bar-val">${s.dribbling}</div></div>
+    <div class="p-bar-row"><div class="p-bar-label">دفاع</div><div class="p-bar-track"><div class="p-bar-fill" data-val="${s.defending}"></div></div><div class="p-bar-val">${s.defending}</div></div>
+    <div class="p-bar-row"><div class="p-bar-label">بدنية</div><div class="p-bar-track"><div class="p-bar-fill" data-val="${s.physical}"></div></div><div class="p-bar-val">${s.physical}</div></div>`;
+
+  // Achievements/Badges
+  let badgesHTML = '';
+  if(p.recentMatches.some(m => (m.goals || 0) >= 3)) badgesHTML += `<div class="achievement-badge">🎯 هاتريك</div>`;
+  if(p.goals >= 10) badgesHTML += `<div class="achievement-badge">🔥 هداف</div>`;
+  if(s.defending >= 85) badgesHTML += `<div class="achievement-badge">🧱 السد العالي</div>`;
+  if(p.motm >= 5) badgesHTML += `<div class="achievement-badge">👑 أسطورة</div>`;
+  if(badgesHTML === '') badgesHTML = `<div style="color:var(--dim);font-size:12px;">لسه مفيش إنجازات</div>`;
+  $('#profileBadges').innerHTML = badgesHTML;
+
+  // Form Guide (Last 3 matches)
+  let formHTML = '';
+  if(p.recentMatches.length > 0) {
+      p.recentMatches.slice(0, 3).forEach(m => {
+          let r = m.rating;
+          let cls = r >= 8 ? 'good' : (r >= 5 ? 'avg' : 'bad');
+          formHTML += `<div class="form-row"><div class="form-opp">ضد ${esc(m.opponent)}</div><div class="form-rating ${cls}">${r}</div></div>`;
+      });
+      $('#profileFormGuide').innerHTML = `<div class="form-title">📈 آخر الماتشات</div>` + formHTML;
+      $('#profileFormGuide').style.display = 'block';
+  } else {
+      $('#profileFormGuide').style.display = 'none';
+  }
+
+  // Trophies
   const trophiesDiv = $('#profileTrophies');
   if(p.trophies.length > 0) {
       trophiesDiv.style.display = 'block';
@@ -890,9 +1005,32 @@ window.openProfile = function(id) {
   $('#profileDetails').innerHTML = `📱 ${p.phone || '—'}`;
   $('#profileDeleteBtn').style.display = (isAdmin && p.phone !== 'admin') ? 'block' : 'none';
   $('#profileView').classList.add('show');
+
+  // Trigger Stat Bar Animations
+  setTimeout(() => {
+    $('#profileStatsBars').querySelectorAll('.p-bar-fill').forEach(bar => {
+        bar.style.width = bar.getAttribute('data-val') + '%';
+    });
+  }, 100);
 };
 window.closeProfile = function() { $('#profileView').classList.remove('show'); };
 window.deleteFromProfile = function() { if(currentProfileId) deletePlayerComplete(currentProfileId); };
+
+window.shareProfile = async function(id) {
+    const captureArea = document.getElementById('profileContentCapture');
+    if(!captureArea) return;
+    try {
+        // Use html2canvas to capture the content
+        const canvas = await html2canvas(captureArea, { scale: 2, backgroundColor: '#050a15', useCORS: true });
+        const link = document.createElement('a');
+        link.download = `Profile_${id}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        // alert("تم حفظ صورة البروفايل في المعرض");
+    } catch(e) {
+        alert("حدث خطأ أثناء محاولة المشاركة: " + e.message);
+    }
+}
 
 // 2. الكروت
 function buildCardHTML(p, ovr, tier, isLegend, forPreview) {
@@ -952,9 +1090,8 @@ function renderCards() {
       contentHtml += '</div>';
     }
   } else {
-    // Auto-generate Legendary cards for players with 10+ stars
     let autoLegends = state.players.filter(p => getPlayerData(p).motm >= 10).map(p => {
-        return { ...p, id: 'leg_auto_' + p.id, isAuto: true }; // Temp ID to avoid conflict
+        return { ...p, id: 'leg_auto_' + p.id, isAuto: true };
     });
     let allLegends = [...state.legendary, ...autoLegends];
 
@@ -1060,7 +1197,7 @@ window.saveNewLegend = async function() {
 };
 
 window.editLegend = function(id) {
-  if(id.startsWith('leg_auto_')) return; // Prevent editing auto cards directly
+  if(id.startsWith('leg_auto_')) return;
   const p = state.legendary.find(x => x.id === id); if(!p) return;
   const s = p.stats || { pace:90, shooting:90, passing:90, dribbling:90, defending:90, physical:90 };
   openModal(`<h3>✏️ تعديل أسطورة</h3>
@@ -1110,7 +1247,6 @@ window.shareCard = async function(id) {
     link.download = `Card_${id}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
-    // Optional: alert("تم حفظ الصورة في معرض الصور");
   } catch(e) {
     alert("حدث خطأ أثناء تحميل الصورة: " + e.message);
   }
@@ -1157,6 +1293,7 @@ function renderMatches() {
 }
 
 window.addMatch = async function() {
+  if(!isAdmin) return;
   const d = $('#m_date').value, place = $('#m_place').value;
   const t1 = $('#m_t1').value, t2 = $('#m_t2').value;
   if(!d || !t2) return alert("اكمل البيانات");
@@ -1252,7 +1389,7 @@ window.addMatchComment = async function(mid) {
   if(!m.comments) m.comments = [];
   m.comments.push({ author: currentUserPhone !== 'admin' ? currentUserPhone : 'المدير', text: inp.value.trim() });
   await save();
-  openMatchDetail(mid); // Refresh modal
+  openMatchDetail(mid);
 };
 
 window.toggleMatchLineup = function() { 
@@ -1326,7 +1463,7 @@ function renderStats() {
   el.innerHTML = html;
 }
 
-// 4.5 عرش النجوم (Hall of Fame) - ANIMATIONS INCLUDED
+// 4.5 عرش النجوم (Hall of Fame)
 function renderHallOfFame() {
   const el = $('#panel-4');
   const data = state.players.map(p => getPlayerData(p)).filter(p => p.motm > 0).sort((a,b) => b.motm - a.motm);
@@ -1339,14 +1476,54 @@ function renderHallOfFame() {
     <div class="marquee-container"><div class="marquee-text">🌟 عرش النجوم - هنا يتواجد أساطير فريق بني برزه 🌟 عرش النجوم - هنا يتواجد أساطير فريق بني برزه 🌟</div></div>
     <div class="hall-title">👑 عرش النجوم 👑</div>`;
     
-  // Month Star (Just top player for now as MVP)
-  const topStar = data[0];
+  // Month Star (Calculated for current month: Stars + Avg Rating)
+  const currentMonthStr = new Date().toISOString().slice(0, 7); // YYYY-MM
+  const monthNames = ["يناير", "فبراير", "مارس", "أبريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر"];
+  const currentMonthName = monthNames[new Date().getMonth()];
+
+  let monthStats = {};
+  state.players.forEach(p => monthStats[p.id] = { id: p.id, name: p.name, photo: p.photo, stars: 0, ratingSum: 0, ratingCount: 0 });
+
+  state.matches.forEach(m => {
+      if(m.archived && m.date && m.date.startsWith(currentMonthStr)) {
+          if (m.motm && monthStats[m.motm]) monthStats[m.motm].stars++;
+          if (m.ratings) {
+              for (let pid in m.ratings) {
+                  if (monthStats[pid] && m.ratings[pid] > 0) {
+                      monthStats[pid].ratingSum += Number(m.ratings[pid]);
+                      monthStats[pid].ratingCount++;
+                  }
+              }
+          }
+      }
+  });
+
+  let monthlyArray = Object.values(monthStats).map(p => {
+      p.avgRating = p.ratingCount > 0 ? (p.ratingSum / p.ratingCount) : 0;
+      p.score = (p.stars * 10) + p.avgRating;
+      return p;
+  }).filter(p => p.stars > 0 || p.ratingCount > 0);
+
+  monthlyArray.sort((a,b) => b.score - a.score);
+  let monthlyTop = monthlyArray[0];
+
   html += `<div class="star-month-banner" onclick="triggerSparkles(event)">
-      <div class="month-title">🌟 نجم الفريق 🌟</div>
-      <img src="${topStar.photo || 'https://via.placeholder.com/100/050a15/3b82f6?text=👤'}" class="month-star-img">
-      <div class="month-star-name">${esc(topStar.name)}</div>
-      <div class="month-star-count count-up" data-target="${topStar.motm}">⭐ 0 نجمة</div>
-  </div>`;
+      <div class="month-title">🌟 نجم شهر ${currentMonthName} 🌟</div>`;
+  
+  if(monthlyTop && monthlyTop.score > 0) {
+      let ratingDisplay = monthlyTop.avgRating > 0 ? monthlyTop.avgRating.toFixed(1) : '0';
+      html += `<img src="${monthlyTop.photo || 'https://via.placeholder.com/100/050a15/3b82f6?text=👤'}" class="month-star-img">
+          <div class="month-star-name">${esc(monthlyTop.name)}</div>
+          <div style="margin-top:5px; display:flex; justify-content:center; gap:5px;">
+              <div class="month-star-count count-up" data-target="${monthlyTop.stars}">⭐ 0 نجمة</div>
+              <div class="month-star-count" style="background:var(--blue); color:#fff;">📈 ${ratingDisplay}/10</div>
+          </div>`;
+  } else {
+      html += `<div style="font-size:40px;margin:10px 0;opacity:0.5;">🌙</div>
+          <div class="month-star-name" style="font-size:16px;color:var(--dim);">لسه مفيش نجم للشهر ده</div>
+          <div class="month-star-count" style="background:var(--dim);color:#000;">اختار أفضل لاعب وأرشف الماتش!</div>`;
+  }
+  html += `</div>`;
 
   // Podium
   html += `<div class="podium-container">`;
@@ -1379,7 +1556,7 @@ function renderHallOfFame() {
       document.querySelectorAll('.count-up').forEach(el => {
         let target = parseInt(el.getAttribute('data-target'));
         let current = 0;
-        let prefix = el.innerText.replace(/[0-9]/g, '').trim(); // get the emoji/star
+        let prefix = el.innerText.replace(/[0-9]/g, '').trim();
         let step = target / 30;
         let timer = setInterval(() => {
           current += step;
@@ -1389,7 +1566,6 @@ function renderHallOfFame() {
       });
     }, 500);
   } else {
-      // just set the final values without animation if already animated
       document.querySelectorAll('.count-up').forEach(el => {
         let target = parseInt(el.getAttribute('data-target'));
         let prefix = el.innerText.replace(/[0-9]/g, '').trim();
@@ -1574,7 +1750,7 @@ window.approveUser = async function(uid) {
     const data = snap.data();
     const exists = state.players.find(p => p.name === data.name && p.phone === data.phone);
     if(!exists) {
-      state.players.push({ id: uid, name: data.name, phone: data.phone, position: 'لاعب', photo: '', stats: { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 } });
+      state.players.push({ id: uid, name: data.name, phone: data.phone, position: 'لاعب', photo: '', profileBg: '', stats: { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 } });
       await save();
     }
   }
@@ -1587,6 +1763,22 @@ window.changeRole = async function(uid, role) { await updateDoc(doc(db, "users",
 // المودال
 window.openModal = function(html) { $('#modalContent').innerHTML = html; $('#modalBg').classList.add('show'); };
 window.closeModal = function() { $('#modalBg').classList.remove('show'); };
+
+// ============ منع الريفريش عند السحب لأسفل ============
+let startY = 0;
+document.addEventListener('touchstart', function(e) {
+    startY = e.touches[0].clientY;
+}, {passive: true});
+
+document.addEventListener('touchmove', function(e) {
+    let currentY = e.touches[0].clientY;
+    let container = e.target.closest('.tabs-container');
+    let isAtTop = container ? container.scrollTop <= 0 : true;
+    
+    if (isAtTop && currentY > startY) {
+        if (e.cancelable) e.preventDefault();
+    }
+}, {passive: false});
 
 // التهيئة الأولى
 window.showView('login');
