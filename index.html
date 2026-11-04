@@ -10,7 +10,7 @@
 <style>
 :root{--gold:#d4af37;--gold-lt:#f5d76e;--gold-dk:#8a6d1f;--blue:#3b82f6;--blue-lt:#93c5fd;--blue-dk:#1e40af;--blue-mid:#2563eb;--bg:#050a15;--card:#0c1425;--card-2:#131d33;--text:#fff;--dim:#7a8499;--red:#e74c3c;--green:#27ae60;--border:rgba(59,130,246,.25)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
-html,body{height:100vh;overflow:hidden;font-family:'Cairo', sans-serif;background:var(--bg);color:var(--text)}
+html,body{height:100vh;overflow:hidden;overscroll-behavior-y: contain;font-family:'Cairo', sans-serif;background:var(--bg);color:var(--text)}
 input,select,button,textarea{font-family:inherit}
 
 /* AUTH (Gold & Glass) */
@@ -53,14 +53,12 @@ input,select,button,textarea{font-family:inherit}
 .icon-btn{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.35);color:var(--blue-lt);width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .badge{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:800;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg)}
 
-/* TABS Gradient */
+/* TABS (New Style) */
 .tabs-nav{flex-shrink:0;background:#0a1424;border-bottom:1px solid rgba(59,130,246,.18);overflow-x:auto;scrollbar-width:none}
 .tabs-nav::-webkit-scrollbar{display:none}
 .tabs-scroll{display:flex;gap:8px;padding:12px;min-width:max-content}
-.tab-btn{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);color:var(--dim);padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;font-weight:700;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
-.tab-btn.active{background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff;border-color:transparent;box-shadow:0 4px 15px rgba(59,130,246,.4);text-shadow:0 2px 4px rgba(0,0,0,.3)}
-.tab-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(to top, rgba(255,255,255,.2), transparent);opacity:0;transition:opacity .3s}
-.tab-btn.active::before{opacity:1}
+.tab-btn{background:transparent;border:1px solid var(--border);color:var(--dim);padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;font-weight:700;transition:all .3s}
+.tab-btn.active{background:#3b82f6;color:#fff;border-color:#3b82f6;box-shadow:0 0 15px rgba(59,130,246,.5);text-shadow:0 1px 2px rgba(0,0,0,.5)}
 
 .tabs-container{flex:1;overflow-y:auto;overflow-x:hidden}
 .tab-panel{display:none;width:100%;height:100%;overflow-y:auto;padding:16px;padding-bottom:60px}
@@ -241,7 +239,7 @@ input,select,button,textarea{font-family:inherit}
 .lineup-body.open{display:block}
 .lineup-player{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;margin-bottom:6px;background:rgba(0,0,0,.3);cursor:pointer}
 .lineup-player.selected{border:1px solid var(--blue);background:rgba(59,130,246,.15)}
-.lineup-checkbox{width:18px;height:18px;accent-color:#3b82f6;flex-shrink:0}
+.lineup-checkbox{width:18px;height:18px;accent-color:#3b82f6;flex-shrink:0;pointer-events:none;}
 .lineup-avatar{width:32px;height:32px;border-radius:50%;background:#1a2a44;border:1.5px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;flex-shrink:0}
 .lineup-avatar img{width:100%;height:100%;object-fit:cover}
 .lineup-name{font-size:13px;font-weight:700;flex:1}
@@ -620,8 +618,8 @@ function startAppSync() {
     updateUI();
     applyLoginBackground();
     
-    // Fix: Don't re-render if user is typing to prevent keyboard closing
-    const isTyping = document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
+    const activeEl = document.activeElement;
+    const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
     if(!isTyping) renderAll();
   });
 
@@ -634,7 +632,9 @@ function startAppSync() {
         else if (u.phone !== 'admin') approvedUsers.push({uid: d.id, ...u});
       });
       updateUI();
-      renderAdmin();
+      const activeEl = document.activeElement;
+      const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
+      if(!isTyping) renderAdmin();
     });
   }
 }
@@ -725,8 +725,6 @@ function getCardTier(ovr) {
   return 'bronze';
 }
 
-// ================= التابات =================
-
 // 1. اللاعبين
 function renderPlayers() {
   const el = $('#panel-0');
@@ -790,7 +788,7 @@ window.savePlayerStats = async function(id) {
 
 window.deletePlayerComplete = async function(id) {
   const p = state.players.find(x => x.id === id); if(!p) return;
-  const linkedUser = approvedUsers.find(u => u.name === p.name && u.phone === p.phone);
+  const linkedUser = approvedUsers.find(u => u.uid === p.id || (u.name === p.name && u.phone === p.phone));
   if(linkedUser && linkedUser.phone === 'admin') return alert("❌ لا يمكن حذف الأدمن الرئيسي");
   if(!confirm("حذف اللاعب نهائياً وحذف أكونته (لو موجود)؟")) return;
   
@@ -798,11 +796,7 @@ window.deletePlayerComplete = async function(id) {
   await save();
   
   if(linkedUser) {
-     try {
-       await deleteDoc(doc(db, "users", linkedUser.uid));
-     } catch(e) {
-       console.error("Error deleting user: ", e);
-     }
+     try { await deleteDoc(doc(db, "users", linkedUser.uid)); } catch(e) { console.error("Error deleting user: ", e); }
   }
   closeModal();
 };
@@ -829,7 +823,6 @@ window.uploadPhoto = function(id) {
   input.click();
 };
 
-// البروفايل
 window.openProfile = function(id) {
   const p = getPlayerData(state.players.find(x => x.id === id)); if(!p) return;
   currentProfileId = id;
@@ -892,32 +885,36 @@ function buildCardHTML(p, ovr, tier, isLegend, forPreview) {
 
 function renderCards() {
   const el = $('#panel-1');
-  el.innerHTML = `<div class="cards-subtabs">
+  let tabsHtml = `<div class="cards-subtabs">
     <button class="subtabs-btn ${cardsTab==='normal'?'active':''}" onclick="switchCardsTab('normal')">⚡ عادية</button>
     <button class="subtabs-btn ${cardsTab==='legendary'?'active':''}" onclick="switchCardsTab('legendary')">👑 أسطورية</button>
-  </div><div id="cardsView"></div>`;
-  const view = $('#cardsView');
+  </div>`;
   
+  let contentHtml = '';
   if(cardsTab === 'normal') {
-    if(!state.players.length) return view.innerHTML = '<div class="empty-state">مفيش لاعبين</div>';
-    let html = `<div class="cards-toolbar"><button id="motionBtn" onclick="toggleMotion()">🎮 الحركة</button></div><div class="cards-grid-2" id="cardsGrid">`;
-    state.players.forEach(p => html += buildCardHTML(p, calculateOVR(p), getCardTier(calculateOVR(p)), false, false));
-    html += '</div>';
-    view.innerHTML = html;
+    if(!state.players.length) contentHtml = '<div class="empty-state">مفيش لاعبين</div>';
+    else {
+      contentHtml = `<div class="cards-toolbar"><button id="motionBtn" onclick="toggleMotion()">🎮 الحركة</button></div><div class="cards-grid-2" id="cardsGrid">`;
+      state.players.forEach(p => contentHtml += buildCardHTML(p, calculateOVR(p), getCardTier(calculateOVR(p)), false, false));
+      contentHtml += '</div>';
+    }
   } else {
-    if(!state.legendary.length) return view.innerHTML = '<div class="empty-state">مفيش كروت أسطورية</div>';
-    if(legendaryIndex >= state.legendary.length) legendaryIndex = 0;
-    let html = isAdmin ? `<div class="legendary-toolbar"><button onclick="showAddLegend()">➕ إضافة كارت أسطوري</button></div>` : '';
-    html += `<div class="legendary-carousel"><div class="legendary-stage" id="legendaryStage">`;
-    state.legendary.forEach((p, i) => {
-      html += `<div class="legendary-card" data-index="${i}" onclick="onLegendaryClick(event, ${i})">
-        ${buildCardHTML(p, calculateOVR(p), 'legendary', true, false)}
-      </div>`;
-    });
-    html += `</div></div><div class="legendary-indicator" id="legendaryIndicator">${legendaryIndex+1} / ${state.legendary.length}</div>`;
-    view.innerHTML = html;
-    setTimeout(updateLegendaryPositions, 50);
+    if(isAdmin) contentHtml += `<div class="legendary-toolbar" style="margin-bottom:15px;"><button onclick="showAddLegend()">➕ إضافة كارت أسطوري جديد</button></div>`;
+    if(!state.legendary.length) contentHtml += '<div class="empty-state">مفيش كروت أسطورية</div>';
+    else {
+      if(legendaryIndex >= state.legendary.length) legendaryIndex = 0;
+      contentHtml += `<div class="legendary-carousel"><div class="legendary-stage" id="legendaryStage">`;
+      state.legendary.forEach((p, i) => {
+        contentHtml += `<div class="legendary-card" data-index="${i}" onclick="onLegendaryClick(event, ${i})">
+          ${buildCardHTML(p, calculateOVR(p), 'legendary', true, false)}
+        </div>`;
+      });
+      contentHtml += `</div></div><div class="legendary-indicator" id="legendaryIndicator">${legendaryIndex+1} / ${state.legendary.length}</div>`;
+    }
   }
+  
+  el.innerHTML = tabsHtml + `<div id="cardsView">${contentHtml}</div>`;
+  if(cardsTab === 'legendary' && state.legendary.length) setTimeout(updateLegendaryPositions, 50);
 }
 
 window.switchCardsTab = function(t) { cardsTab = t; renderCards(); };
@@ -959,7 +956,6 @@ window.onLegendaryClick = function(e, i) {
   }
 };
 
-// إضافة وتعديل الكروت الأسطورية
 window.showAddLegend = function() {
   openModal(`<h3>👑 كارت أسطوري جديد</h3>
     <label class="form-label">الاسم *</label><input id="lg_name" placeholder="اسم اللاعب">
@@ -1015,7 +1011,6 @@ window.deleteLegend = async function(id) {
   await save(); closeModal();
 };
 
-// العرض والمشاركة
 window.previewCard = function(id, isLegend) {
   const p = isLegend ? state.legendary.find(x => x.id === id) : state.players.find(x => x.id === id);
   if(!p) return;
@@ -1100,10 +1095,13 @@ window.openMatchDetail = function(id) {
   else {
     state.players.forEach(p => {
       const sel = m.lineup.includes(p.id);
-      html += `<div class="lineup-player ${sel?'selected':''}" onclick="toggleLineup('${m.id}', '${p.id}', ${canEdit})">
-        ${canEdit ? `<input type="checkbox" class="lineup-checkbox" ${sel?'checked':''}>` : ''}
-        <div class="lineup-avatar">${p.photo?`<img src="${p.photo}">`:'👤'}</div>
-        <div class="lineup-name">${esc(p.name)}</div>
+      html += `<div class="lineup-player ${sel?'selected':''}" onclick="toggleLineup('${m.id}', '${p.id}', ${canEdit})" style="display:flex; justify-content:space-between;">
+        <div style="display:flex; align-items:center; gap:10px;">
+            ${canEdit ? `<input type="checkbox" class="lineup-checkbox" ${sel?'checked':''} style="pointer-events:none;">` : ''}
+            <div class="lineup-avatar">${p.photo?`<img src="${p.photo}">`:'👤'}</div>
+            <div style="font-weight:700; font-size:14px; color:#fff;">${esc(p.name)}</div>
+        </div>
+        <div style="font-size:10px; color:var(--dim);">${esc(p.position||'لاعب')}</div>
       </div>`;
     });
     if(canEdit) html += `<div class="lineup-actions"><button onclick="selectAllLineup('${m.id}')">الكل</button><button onclick="clearLineup('${m.id}')">إلغاء الكل</button></div>`;
@@ -1139,9 +1137,17 @@ window.openMatchDetail = function(id) {
 window.toggleMatchLineup = function() { 
   const body = document.getElementById('lineupBody');
   const icon = document.getElementById('lineupToggleIcon');
-  if(body) {
-    body.classList.toggle('open');
-    icon.textContent = body.classList.contains('open') ? '▴' : '▾';
+  if(body && icon) {
+    const isOpen = body.style.display === 'block' || body.classList.contains('open');
+    if(isOpen) {
+      body.classList.remove('open');
+      body.style.display = 'none';
+      icon.textContent = '▾';
+    } else {
+      body.classList.add('open');
+      body.style.display = 'block';
+      icon.textContent = '▴';
+    }
   }
 };
 window.toggleLineup = async function(mid, pid, canEdit) {
