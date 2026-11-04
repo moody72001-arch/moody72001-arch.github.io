@@ -6,6 +6,7 @@
 <meta name="theme-color" content="#050a15">
 <title>فريق بني برزه</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--gold:#d4af37;--gold-lt:#f5d76e;--gold-dk:#8a6d1f;--blue:#3b82f6;--blue-lt:#93c5fd;--blue-dk:#1e40af;--blue-mid:#2563eb;--bg:#050a15;--card:#0c1425;--card-2:#131d33;--text:#fff;--dim:#7a8499;--red:#e74c3c;--green:#27ae60;--border:rgba(59,130,246,.25)}
@@ -53,7 +54,7 @@ input,select,button,textarea{font-family:inherit}
 .icon-btn{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.35);color:var(--blue-lt);width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .badge{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:800;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg)}
 
-/* TABS (New Style) */
+/* TABS */
 .tabs-nav{flex-shrink:0;background:#0a1424;border-bottom:1px solid rgba(59,130,246,.18);overflow-x:auto;scrollbar-width:none}
 .tabs-nav::-webkit-scrollbar{display:none}
 .tabs-scroll{display:flex;gap:8px;padding:12px;min-width:max-content}
@@ -75,11 +76,10 @@ input,select,button,textarea{font-family:inherit}
 .btn-ghost{background:rgba(59,130,246,.15);color:var(--blue-lt);border:1px solid rgba(59,130,246,.35);box-shadow:none}
 .btn-danger{background:rgba(231,76,60,.1);color:var(--red);border:1px solid var(--red);box-shadow:none}
 
-/* Matches Form (Fixed Layout) */
+/* Matches Form */
 .match-form{background:linear-gradient(135deg,var(--card),var(--card-2));border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px}
 .match-form label{display:block;font-size:12px;color:var(--blue-lt);font-weight:700;margin:10px 0 4px}
 .match-form input{width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:14px;margin-bottom:8px}
-.match-form input:focus{outline:none;border-color:var(--blue)}
 .match-form .row{display:flex;gap:8px;align-items:center}
 .match-form .row input{flex:1}
 .match-form .vs{color:var(--dim);font-weight:900;font-size:14px;padding:0 4px}
@@ -87,7 +87,7 @@ input,select,button,textarea{font-family:inherit}
 /* Players List */
 .player-list{display:flex;flex-direction:column;gap:10px}
 .player-card{display:flex;align-items:center;gap:8px;padding:12px;background:linear-gradient(135deg,var(--card),var(--card-2));border:1px solid rgba(59,130,246,.2);border-radius:16px}
-.player-avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#1a2a44,#050a15);border:2px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden}
+.player-avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#1a2a44,#050a15);border:2px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden;position:relative}
 .player-avatar img{width:100%;height:100%;object-fit:cover}
 .player-info{flex:1;min-width:0;cursor:pointer}
 .player-name{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -95,6 +95,10 @@ input,select,button,textarea{font-family:inherit}
 .player-actions{display:flex;gap:3px;flex-shrink:0}
 .icon-action{width:32px;height:32px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.28);border-radius:9px;color:var(--blue-lt);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .icon-action.danger{color:var(--red);border-color:rgba(231,76,60,.4);background:rgba(231,76,60,.08)}
+
+/* Star Aura on Player Cards/Profiles */
+.star-badge{position:absolute; top:-8px; right:-8px; font-size:16px; filter:drop-shadow(0 0 5px rgba(212,175,55,0.8)); z-index:5;}
+.star-aura{border-color: #d4af37 !important; box-shadow: 0 0 20px rgba(212,175,55,0.6) !important;}
 
 /* Cards */
 .cards-subtabs{display:flex;gap:6px;margin-bottom:14px;background:rgba(59,130,246,.06);padding:4px;border-radius:14px;border:1px solid rgba(59,130,246,.2)}
@@ -144,7 +148,7 @@ input,select,button,textarea{font-family:inherit}
 [data-tier="icon"] .fifa-rating-block{background:linear-gradient(135deg,#f5d76e,#d4af37,#8a6d1f);color:#1a1208;border:1px solid #f5d76e;box-shadow:0 0 20px rgba(245,215,110,.6)}
 [data-tier="legendary"] .fifa-rating-block{background:linear-gradient(135deg,#f5d76e,#d4af37,#8a6d1f);color:#1a1208;border:1px solid #f5d76e;box-shadow:0 0 25px rgba(245,215,110,.8)}
 
-.fifa-photo-wrap{flex:1;display:flex;justify-content:center;align-items:flex-start;padding-top:2px}
+.fifa-photo-wrap{flex:1;display:flex;justify-content:center;align-items:flex-start;padding-top:2px;position:relative;}
 .fifa-photo-circle{width:72px;height:72px;border-radius:50%;overflow:hidden;border:2.5px solid;box-shadow:0 4px 10px rgba(0,0,0,.4);background:rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;font-size:26px}
 [data-tier="gold"] .fifa-photo-circle{border-color:#1a1208}
 [data-tier="silver"] .fifa-photo-circle{border-color:#1a1a1a}
@@ -213,7 +217,39 @@ input,select,button,textarea{font-family:inherit}
 @keyframes legendFloat{0%,100%{transform:translateY(-4px)}50%{transform:translateY(4px)}}
 .legendary-indicator{text-align:center;color:var(--gold-lt);font-size:12px;font-weight:700;margin-top:10px;letter-spacing:2px}
 
-/* Modals */
+/* HALL OF FAME (Star Throne) */
+.hall-bg{background:radial-gradient(circle at top, #1a1508 0%, #050a15 100%);min-height:100%;padding:10px;}
+.hall-title{text-align:center;font-size:24px;font-weight:900;color:var(--gold);text-shadow:0 0 15px rgba(212,175,55,0.5);margin-bottom:20px;letter-spacing:2px;}
+.star-month-banner{background:linear-gradient(135deg, rgba(212,175,55,0.2), rgba(0,0,0,0.8));border:1px solid var(--gold);border-radius:20px;padding:20px;text-align:center;margin-bottom:30px;position:relative;overflow:hidden;}
+.star-month-banner::before{content:'✨';position:absolute;top:10px;left:10px;font-size:20px;opacity:0.5;animation:pulse 2s infinite;}
+.star-month-banner::after{content:'✨';position:absolute;bottom:10px;right:10px;font-size:20px;opacity:0.5;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.3);opacity:1}}
+.month-title{font-size:12px;color:var(--gold-lt);font-weight:800;letter-spacing:2px;margin-bottom:10px;}
+.month-star-img{width:100px;height:100px;border-radius:50%;border:3px solid var(--gold);box-shadow:0 0 30px rgba(212,175,55,0.8);margin:0 auto 10px;object-fit:cover;}
+.month-star-name{font-size:20px;font-weight:900;color:#fff;}
+.month-star-count{display:inline-block;background:var(--gold);color:#000;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:900;margin-top:5px;}
+
+.podium-container{display:flex;justify-content:center;align-items:flex-end;gap:10px;margin-bottom:30px;}
+.podium{display:flex;flex-direction:column;align-items:center;background:linear-gradient(180deg, rgba(255,255,255,0.1), rgba(0,0,0,0.5));border-radius:15px 15px 0 0;padding:10px;border:1px solid rgba(255,255,255,0.1);position:relative;}
+.podium.p1{height:170px;width:100px;border-color:var(--gold);background:linear-gradient(180deg, rgba(212,175,55,0.3), rgba(0,0,0,0.8));z-index:3;box-shadow:0 0 30px rgba(212,175,55,0.4);}
+.podium.p2{height:130px;width:90px;z-index:2;border-color:#c0c0c0;}
+.podium.p3{height:110px;width:90px;z-index:1;border-color:#cd7f32;}
+.podium-avatar{width:60px;height:60px;border-radius:50%;border:2px solid #fff;position:absolute;top:-30px;left:50%;transform:translateX(-50%);object-fit:cover;background:#000;}
+.p1 .podium-avatar{width:80px;height:80px;top:-40px;border-color:var(--gold);box-shadow:0 0 20px var(--gold);}
+.podium-name{font-size:12px;font-weight:800;color:#fff;text-align:center;margin-top:35px;line-height:1.2;}
+.p1 .podium-name{font-size:14px;margin-top:45px;}
+.podium-stars{font-size:11px;color:var(--gold);font-weight:900;margin-top:5px;background:rgba(0,0,0,0.5);padding:2px 6px;border-radius:10px;}
+.crown-p1{position:absolute;top:-55px;left:50%;transform:translateX(-50%);font-size:30px;filter:drop-shadow(0 0 10px gold);}
+
+.hall-list{background:rgba(0,0,0,0.4);border-radius:15px;border:1px solid rgba(255,255,255,0.1);overflow:hidden;}
+.hall-row{display:flex;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid rgba(255,255,255,0.05);}
+.hall-row:last-child{border:none;}
+.hall-rank{font-size:14px;font-weight:900;color:var(--dim);width:25px;}
+.hall-avatar{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);object-fit:cover;}
+.hall-name{flex:1;font-size:14px;font-weight:800;color:#fff;}
+.hall-count{font-size:14px;font-weight:900;color:var(--gold);}
+
+/* Modals, Board, Comments */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
 .modal-bg.show{display:flex}
 .modal{background:linear-gradient(135deg,#0d1728,#141e30);border:1px solid rgba(59,130,246,.4);border-radius:20px;padding:22px;width:100%;max-width:460px;max-height:85vh;overflow-y:auto}
@@ -222,6 +258,7 @@ input,select,button,textarea{font-family:inherit}
 .modal input:focus,.modal select:focus,.modal textarea:focus{outline:none;border-color:var(--blue)}
 .form-label{display:block;color:var(--blue-lt);font-size:12px;font-weight:700;margin:12px 0 4px}
 .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
 
 /* Others */
 .match-item{background:linear-gradient(135deg,var(--card),var(--card-2));border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer}
@@ -345,7 +382,7 @@ input,select,button,textarea{font-family:inherit}
 .profile-overlay{position:fixed;inset:0;background:linear-gradient(180deg,rgba(5,10,21,.3),rgba(5,10,21,.7) 50%,rgba(5,10,21,.95));z-index:1}
 .profile-content{position:relative;z-index:2;min-height:100%;padding:60px 20px 40px;display:flex;flex-direction:column;align-items:center}
 .profile-back{position:fixed;top:16px;right:16px;background:rgba(0,0,0,.6);border:1px solid var(--blue);color:var(--blue-lt);padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;z-index:3}
-.profile-avatar{width:140px;height:140px;border-radius:50%;border:4px solid var(--blue-mid);background:#1a2a44;display:flex;align-items:center;justify-content:center;font-size:60px;overflow:hidden;margin-bottom:20px}
+.profile-avatar{width:140px;height:140px;border-radius:50%;border:4px solid var(--blue-mid);background:#1a2a44;display:flex;align-items:center;justify-content:center;font-size:60px;overflow:hidden;margin-bottom:20px;position:relative;}
 .profile-avatar img{width:100%;height:100%;object-fit:cover}
 .profile-name{font-size:26px;font-weight:900;color:var(--blue-lt);text-align:center;margin-bottom:6px}
 .profile-pos{display:inline-block;background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff;padding:4px 16px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:24px}
@@ -355,6 +392,23 @@ input,select,button,textarea{font-family:inherit}
 .stat-box span{font-size:11px;color:var(--dim);font-weight:600}
 .profile-details{width:100%;max-width:400px;background:rgba(12,20,37,.75);border:1px solid var(--border);border-radius:14px;padding:16px;font-size:14px;line-height:2;color:#ddd;text-align:center;margin-bottom:24px}
 .profile-delete-btn{width:100%;max-width:400px;padding:14px;background:rgba(231,76,60,.1);border:1px solid var(--red);color:var(--red);font-size:14px;font-weight:800;border-radius:14px;cursor:pointer;margin-top:8px}
+
+/* Trophy Room */
+.trophy-room{width:100%;max-width:400px;background:linear-gradient(135deg,rgba(212,175,55,0.1),rgba(12,20,37,0.8));border:1px solid rgba(212,175,55,0.3);border-radius:14px;padding:16px;margin-bottom:24px;}
+.trophy-title{font-size:14px;font-weight:900;color:var(--gold);text-align:center;margin-bottom:12px;border-bottom:1px solid rgba(212,175,55,0.2);padding-bottom:8px;}
+.trophy-item{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#ddd;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.1);}
+.trophy-item:last-child{border:none;}
+.trophy-item span{color:var(--dim);font-size:10px;}
+
+/* Comments & Board */
+.comment-section{margin-top:15px;background:rgba(0,0,0,0.2);border-radius:12px;padding:12px;border:1px solid var(--border);}
+.comment-list{max-height:150px;overflow-y:auto;margin-bottom:10px;}
+.comment-item{background:rgba(255,255,255,0.05);padding:8px;border-radius:8px;margin-bottom:6px;}
+.comment-author{font-size:10px;color:var(--blue-lt);font-weight:800;margin-bottom:2px;}
+.comment-text{font-size:12px;color:#ddd;}
+.comment-input-row{display:flex;gap:6px;}
+.comment-input-row input{flex:1;margin:0;padding:8px;}
+.comment-input-row button{width:auto;padding:8px 12px;margin:0;}
 </style>
 </head>
 <body>
@@ -372,7 +426,6 @@ input,select,button,textarea{font-family:inherit}
     <div class="auth-brand">فريق بني برزه</div>
     <div class="auth-sub">إدارة فريقك باحترافية</div>
     
-    <!-- شاشة تسجيل الدخول -->
     <div id="loginView">
       <div class="field"><span class="field-icon">📱</span><input type="tel" id="loginPhone" placeholder="رقم الموبايل"></div>
       <div class="field"><span class="field-icon">🔒</span><input type="password" id="loginPassword" placeholder="الباسورد"></div>
@@ -381,7 +434,6 @@ input,select,button,textarea{font-family:inherit}
       <div class="auth-switch" style="margin-top:10px;font-size:11px;">مدير النظام؟ <a onclick="handleAdminLogin()" style="color:#888;">دخول الإدارة 👑</a></div>
     </div>
 
-    <!-- شاشة إنشاء حساب -->
     <div id="signupView" style="display:none">
       <div class="field"><span class="field-icon">👤</span><input type="text" id="suName" placeholder="اسمك"></div>
       <div class="field"><span class="field-icon">📱</span><input type="tel" id="suPhone" placeholder="رقم الموبايل"></div>
@@ -392,7 +444,6 @@ input,select,button,textarea{font-family:inherit}
       <div class="auth-switch">عندك حساب؟ <a onclick="showView('login')">سجل دخول</a></div>
     </div>
 
-    <!-- شاشة الانتظار -->
     <div id="pendingView" style="display:none">
       <div class="pending-icon">⏳</div>
       <div class="pending-title">طلبك قيد المراجعة</div>
@@ -416,9 +467,10 @@ input,select,button,textarea{font-family:inherit}
       <button class="tab-btn" data-tab="1">🎴 الكروت</button>
       <button class="tab-btn" data-tab="2">⚽ الماتشات</button>
       <button class="tab-btn" data-tab="3">📊 الإحصائيات</button>
-      <button class="tab-btn" data-tab="4">📋 القوانين</button>
-      <button class="tab-btn" data-tab="5">📢 الإعلانات</button>
-      <button class="tab-btn" data-tab="6" id="adminTabBtn" style="display:none">⚙️ الإدارة</button>
+      <button class="tab-btn" data-tab="4">🏆 عرش النجوم</button>
+      <button class="tab-btn" data-tab="5">📋 القوانين</button>
+      <button class="tab-btn" data-tab="6">📢 الإعلانات</button>
+      <button class="tab-btn" data-tab="7" id="adminTabBtn" style="display:none">⚙️ الإدارة</button>
     </div>
   </nav>
   <div class="tabs-container" id="tabsContainer">
@@ -429,6 +481,7 @@ input,select,button,textarea{font-family:inherit}
     <section class="tab-panel" id="panel-4"></section>
     <section class="tab-panel" id="panel-5"></section>
     <section class="tab-panel" id="panel-6"></section>
+    <section class="tab-panel" id="panel-7"></section>
   </div>
 </div>
 
@@ -442,6 +495,7 @@ input,select,button,textarea{font-family:inherit}
     <h1 class="profile-name" id="profileName"></h1>
     <div class="profile-pos" id="profilePos"></div>
     <div class="profile-stats-grid" id="profileStats"></div>
+    <div class="trophy-room" id="profileTrophies" style="display:none;"></div>
     <div class="profile-details" id="profileDetails"></div>
     <button class="profile-delete-btn" id="profileDeleteBtn" onclick="deleteFromProfile()" style="display:none">🗑 حذف اللاعب</button>
   </div>
@@ -463,7 +517,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/fireba
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-// إعدادات Firebase الخاصة بك
 const firebaseConfig = {
   apiKey: "AIzaSyAM4sc5E2MOhLpjuRJi5J-vlQElhnh4Ieg",
   authDomain: "banu-brza.firebaseapp.com",
@@ -479,7 +532,7 @@ const db = getFirestore(app);
 const TEAM_ID = "my-team";
 const teamDocRef = doc(db, "teams", TEAM_ID);
 
-let state = { players: [], matches: [], legendary: [], rules: "", announcements: [], notifs: [], team: { name: "فريق بني برزه", logo: "", loginBg: "" }, admins: [], coaches: [], mainAdminPhone: "admin" };
+let state = { players: [], matches: [], legendary: [], rules: "", announcements: [], notifs: [], team: { name: "فريق بني برزه", logo: "", loginBg: "" }, admins: [], coaches: [], board: [] };
 let pendingUsers = [];
 let approvedUsers = [];
 let unsubscribeTeam = null;
@@ -491,8 +544,8 @@ let currentTab = 0;
 let cardsTab = 'normal';
 let legendaryIndex = 0;
 let legendaryPaused = false;
-let legendaryPauseTimer = null;
 let currentProfileId = null;
+let tempLegendPhoto = '';
 
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
@@ -539,9 +592,7 @@ window.handleSignup = async function() {
     await setDoc(doc(db, "users", cred.user.uid), { name: name, phone: phone, dob: dob, role: "pending", joinedAt: new Date().toISOString() });
     alert("تم إنشاء الحساب! جاري تحويلك لصفحة الانتظار...");
     await signOut(auth);
-  } catch(e) {
-    alert("خطأ في إنشاء الحساب: " + e.message);
-  }
+  } catch(e) { alert("خطأ في إنشاء الحساب: " + e.message); }
 };
 
 window.logout = async function() {
@@ -556,8 +607,7 @@ onAuthStateChanged(auth, (user) => {
     currentUserPhone = user.email.replace('@futsal.com', ''); 
     checkUserStatus(user.uid); 
   } else {
-    $('#authScreen').style.display = 'flex'; 
-    $('#app').classList.remove('show'); 
+    $('#authScreen').style.display = 'flex'; $('#app').classList.remove('show'); 
     isAdmin = false; isCoach = false;
   }
 });
@@ -567,25 +617,17 @@ function checkUserStatus(uid) {
   onSnapshot(userRef, async (snap) => {
     if (!snap.exists()) {
       if (currentUserPhone === "admin") { 
-        await setDoc(userRef, { name: "المدير", phone: "admin", role: "admin", joinedAt: new Date().toISOString() }); 
-        return; 
+        await setDoc(userRef, { name: "المدير", phone: "admin", role: "admin", joinedAt: new Date().toISOString() }); return; 
       } else { 
-        $('#authScreen').style.display = 'flex'; 
-        window.showView('pending'); 
-        $('#app').classList.remove('show'); 
-        return; 
+        $('#authScreen').style.display = 'flex'; window.showView('pending'); $('#app').classList.remove('show'); return; 
       }
     }
     const data = snap.data();
     if (data.role === 'pending') { 
-      $('#authScreen').style.display = 'flex'; 
-      window.showView('pending');
-      $('#app').classList.remove('show'); 
+      $('#authScreen').style.display = 'flex'; window.showView('pending'); $('#app').classList.remove('show'); 
     } else {
-      $('#authScreen').style.display = 'none'; 
-      $('#app').classList.add('show');
-      isAdmin = (data.phone === "admin" || data.role === 'admin'); 
-      isCoach = (data.role === 'coach');
+      $('#authScreen').style.display = 'none'; $('#app').classList.add('show');
+      isAdmin = (data.phone === "admin" || data.role === 'admin'); isCoach = (data.role === 'coach');
       startAppSync();
     }
   });
@@ -599,25 +641,14 @@ function startAppSync() {
   unsubscribeTeam = onSnapshot(teamDocRef, (snap) => {
     if (snap.exists()) {
       state = snap.data();
-      state.players = state.players || []; 
-      state.matches = state.matches || [];
-      state.legendary = state.legendary || [];
-      state.rules = state.rules || ""; 
-      state.announcements = state.announcements || []; 
-      state.notifs = state.notifs || [];
-      state.admins = state.admins || []; 
-      state.coaches = state.coaches || []; 
+      state.players = state.players || []; state.matches = state.matches || []; state.legendary = state.legendary || [];
+      state.rules = state.rules || ""; state.announcements = state.announcements || []; state.notifs = state.notifs || [];
+      state.admins = state.admins || []; state.coaches = state.coaches || []; state.board = state.board || [];
       state.team = state.team || { name: "فريق بني برزه", logo: "", loginBg: "" };
-    } else {
-      save();
-    }
-    if(currentUserPhone !== "admin") { 
-      isAdmin = state.admins.includes(currentUserPhone); 
-      isCoach = state.coaches.includes(currentUserPhone); 
-    }
+    } else { save(); }
+    if(currentUserPhone !== "admin") { isAdmin = state.admins.includes(currentUserPhone); isCoach = state.coaches.includes(currentUserPhone); }
     updateUI();
     applyLoginBackground();
-    
     const activeEl = document.activeElement;
     const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
     if(!isTyping) renderAll();
@@ -640,16 +671,9 @@ function startAppSync() {
 }
 
 function applyLoginBackground() {
-  const bgImg = $('#authBgImg');
-  const card = $('#authCard');
-  if (state.team.loginBg) {
-    bgImg.style.backgroundImage = `url(${state.team.loginBg})`;
-    bgImg.classList.add('has-image');
-    card.classList.add('glass');
-  } else {
-    bgImg.classList.remove('has-image');
-    card.classList.remove('glass');
-  }
+  const bgImg = $('#authBgImg'); const card = $('#authCard');
+  if (state.team.loginBg) { bgImg.style.backgroundImage = `url(${state.team.loginBg})`; bgImg.classList.add('has-image'); card.classList.add('glass'); } 
+  else { bgImg.classList.remove('has-image'); card.classList.remove('glass'); }
 }
 
 function updateUI() {
@@ -658,15 +682,9 @@ function updateUI() {
   if(isAdmin) $('#adminTabBtn').style.display = 'block'; else $('#adminTabBtn').style.display = 'none';
   if (isAdmin) {
     $('#notifBtn').style.display = 'flex';
-    if(pendingUsers.length > 0) {
-      $('#notifBadge').style.display = 'flex';
-      $('#notifBadge').textContent = pendingUsers.length;
-    } else {
-      $('#notifBadge').style.display = 'none';
-    }
-  } else {
-    $('#notifBtn').style.display = 'none';
-  }
+    if(pendingUsers.length > 0) { $('#notifBadge').style.display = 'flex'; $('#notifBadge').textContent = pendingUsers.length; } 
+    else { $('#notifBadge').style.display = 'none'; }
+  } else { $('#notifBtn').style.display = 'none'; }
 }
 
 // التابات
@@ -684,29 +702,29 @@ function renderAll() {
   try { renderCards(); } catch(e) { console.error('cards', e); }
   try { renderMatches(); } catch(e) { console.error('matches', e); }
   try { renderStats(); } catch(e) { console.error('stats', e); }
+  try { renderHallOfFame(); } catch(e) { console.error('hall', e); }
   try { renderRules(); } catch(e) { console.error('rules', e); }
   try { renderAnns(); } catch(e) { console.error('anns', e); }
   try { renderAdmin(); } catch(e) { console.error('admin', e); }
 }
 
-// حساب OVR
+// الحسابات
 function getPlayerData(p) {
   let goals=0, assists=0, matches=0, motm=0, worst=0, bad=0, ratingSum=0, ratingCount=0;
+  let trophies = [];
   state.matches.forEach(m => {
     if(m.archived) {
       if((m.lineup||[]).includes(p.id)) {
-        matches++;
-        goals += (m.goals||{})[p.id] || 0; 
-        assists += (m.assists||{})[p.id] || 0;
+        matches++; goals += (m.goals||{})[p.id] || 0; assists += (m.assists||{})[p.id] || 0;
         if (m.ratings && m.ratings[p.id]) { ratingSum += m.ratings[p.id]; ratingCount++; }
       }
-      if (m.motm === p.id) motm++;
+      if (m.motm === p.id) { motm++; trophies.push(m); }
       if (m.worst === p.id) worst++;
       if ((m.bad||[]).includes(p.id)) bad++;
     }
   });
   const avgRating = ratingCount > 0 ? (ratingSum / ratingCount) : 0;
-  return { ...p, goals, assists, matches, motm, worst, bad, avgRating };
+  return { ...p, goals, assists, matches, motm, worst, bad, avgRating, trophies };
 }
 
 function calculateOVR(p) {
@@ -735,8 +753,14 @@ function renderPlayers() {
   else {
     html += '<div class="player-list">';
     state.players.forEach(p => {
+      const data = getPlayerData(p);
+      const hasStars = data.motm > 0;
+      const hasAura = data.motm >= 3;
       html += `<div class="player-card">
-        <div class="player-avatar" onclick="openProfile('${p.id}')">${p.photo ? `<img src="${p.photo}">` : '<span>👤</span>'}</div>
+        <div class="player-avatar ${hasAura ? 'star-aura' : ''}" onclick="openProfile('${p.id}')">
+          ${p.photo ? `<img src="${p.photo}">` : '<span>👤</span>'}
+          ${hasStars ? '<div class="star-badge">👑</div>' : ''}
+        </div>
         <div class="player-info" onclick="openProfile('${p.id}')"><div class="player-name">${esc(p.name)}</div><div class="player-pos">${esc(p.position||'لاعب')}</div></div>
         <div class="player-actions">
           ${isAdmin ? `<button class="icon-action" onclick="uploadPhoto('${p.id}')">📷</button>` : ''}
@@ -759,8 +783,7 @@ window.showAddPlayer = function() {
 };
 
 window.addPlayer = async function() {
-  const name = $('#np_name').value.trim();
-  if(!name) return alert("اكتب الاسم");
+  const name = $('#np_name').value.trim(); if(!name) return alert("اكتب الاسم");
   state.players.push({ id: uid(), name: name, position: $('#np_pos').value, photo: '', stats: { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 } });
   await save(); closeModal();
 };
@@ -791,13 +814,9 @@ window.deletePlayerComplete = async function(id) {
   const linkedUser = approvedUsers.find(u => u.uid === p.id || (u.name === p.name && u.phone === p.phone));
   if(linkedUser && linkedUser.phone === 'admin') return alert("❌ لا يمكن حذف الأدمن الرئيسي");
   if(!confirm("حذف اللاعب نهائياً وحذف أكونته (لو موجود)؟")) return;
-  
   state.players = state.players.filter(x => x.id !== id);
   await save();
-  
-  if(linkedUser) {
-     try { await deleteDoc(doc(db, "users", linkedUser.uid)); } catch(e) { console.error("Error deleting user: ", e); }
-  }
+  if(linkedUser) { try { await deleteDoc(doc(db, "users", linkedUser.uid)); } catch(e) { console.error(e); } }
   closeModal();
 };
 
@@ -828,6 +847,10 @@ window.openProfile = function(id) {
   currentProfileId = id;
   $('#profileBgImg').style.backgroundImage = p.photo ? `url(${p.photo})` : 'none';
   $('#profileAvatar').innerHTML = p.photo ? `<img src="${p.photo}">` : '👤';
+  if(p.motm > 0) $('#profileAvatar').innerHTML += '<div class="star-badge" style="font-size:26px; top:-10px; right:-10px;">👑</div>';
+  if(p.motm >= 3) $('#profileAvatar').classList.add('star-aura');
+  else $('#profileAvatar').classList.remove('star-aura');
+  
   $('#profileName').textContent = p.name;
   $('#profilePos').textContent = `${p.position} • التقييم ${calculateOVR(p)}`;
   $('#profileStats').innerHTML = `
@@ -837,6 +860,16 @@ window.openProfile = function(id) {
     <div class="stat-box"><b>${p.motm}</b><span>⭐ نجم</span></div>
     <div class="stat-box"><b>${p.avgRating.toFixed(1)}</b><span>تقييم</span></div>
     <div class="stat-box"><b>${p.bad}</b><span>👎 وحش</span></div>`;
+    
+  const trophiesDiv = $('#profileTrophies');
+  if(p.trophies.length > 0) {
+      trophiesDiv.style.display = 'block';
+      trophiesDiv.innerHTML = `<div class="trophy-title">🏆 خزانة الجوائز (${p.motm} نجمة)</div>` + 
+        p.trophies.slice(0, 5).map(m => `<div class="trophy-item">⭐ نجم ماتش ضد ${esc(m.opponentTeam)} <span>${m.date}</span></div>`).join('');
+  } else {
+      trophiesDiv.style.display = 'none';
+  }
+    
   $('#profileDetails').innerHTML = `📱 ${p.phone || '—'}`;
   $('#profileDeleteBtn').style.display = (isAdmin && p.phone !== 'admin') ? 'block' : 'none';
   $('#profileView').classList.add('show');
@@ -853,14 +886,17 @@ function buildCardHTML(p, ovr, tier, isLegend, forPreview) {
   const expandBtn = forPreview ? '' : `<button class="fifa-expand-center" onclick="event.stopPropagation();previewCard('${p.id}', ${isLegend})">⤢</button>`;
   const editBtn = (isLegend && isAdmin && !forPreview) ? `<button class="fifa-edit" onclick="event.stopPropagation();editLegend('${p.id}')">✏️</button>` : '';
   const delBtn = (isLegend && isAdmin && !forPreview) ? `<button class="fifa-del" onclick="event.stopPropagation();deleteLegend('${p.id}')">🗑</button>` : '';
+  const auraClass = (d.motm >= 3) ? 'star-aura' : '';
   
-  return `<div class="fifa-card-wrap" data-tier="${tier}">
+  return `<div class="fifa-card-wrap" data-tier="${tier}" id="card-capture-${p.id}">
     <div class="fifa-card-3d"><div class="fifa-card" onclick="this.classList.toggle('flipped')">
       <div class="fifa-face fifa-front"><div class="fifa-content">
         ${editBtn}${delBtn}
         <div class="fifa-top">
           <div class="fifa-rating-block"><div class="fifa-overall">${ovr}</div><div class="fifa-position">${p.position||'لاعب'}</div></div>
-          <div class="fifa-photo-wrap"><div class="fifa-photo-circle">${photo}</div></div>
+          <div class="fifa-photo-wrap ${auraClass}" style="border-radius:50%;">
+             <div class="fifa-photo-circle">${photo} ${d.motm>0?'<div class="star-badge" style="font-size:12px; top:-5px; right:-5px;">👑</div>':''}</div>
+          </div>
         </div>
         <div class="fifa-name-bar"><div class="fifa-name">${esc(p.name)}</div></div>
         <div class="fifa-season-stats">
@@ -899,34 +935,36 @@ function renderCards() {
       contentHtml += '</div>';
     }
   } else {
+    // Auto-generate Legendary cards for players with 10+ stars
+    let autoLegends = state.players.filter(p => getPlayerData(p).motm >= 10).map(p => {
+        return { ...p, id: 'leg_auto_' + p.id, isAuto: true }; // Temp ID to avoid conflict
+    });
+    let allLegends = [...state.legendary, ...autoLegends];
+
     if(isAdmin) contentHtml += `<div class="legendary-toolbar" style="margin-bottom:15px;"><button onclick="showAddLegend()">➕ إضافة كارت أسطوري جديد</button></div>`;
-    if(!state.legendary.length) contentHtml += '<div class="empty-state">مفيش كروت أسطورية</div>';
+    if(!allLegends.length) contentHtml += '<div class="empty-state">مفيش كروت أسطورية</div>';
     else {
-      if(legendaryIndex >= state.legendary.length) legendaryIndex = 0;
+      if(legendaryIndex >= allLegends.length) legendaryIndex = 0;
       contentHtml += `<div class="legendary-carousel"><div class="legendary-stage" id="legendaryStage">`;
-      state.legendary.forEach((p, i) => {
+      allLegends.forEach((p, i) => {
         contentHtml += `<div class="legendary-card" data-index="${i}" onclick="onLegendaryClick(event, ${i})">
           ${buildCardHTML(p, calculateOVR(p), 'legendary', true, false)}
         </div>`;
       });
-      contentHtml += `</div></div><div class="legendary-indicator" id="legendaryIndicator">${legendaryIndex+1} / ${state.legendary.length}</div>`;
+      contentHtml += `</div></div><div class="legendary-indicator" id="legendaryIndicator">${legendaryIndex+1} / ${allLegends.length}</div>`;
     }
   }
   
   el.innerHTML = tabsHtml + `<div id="cardsView">${contentHtml}</div>`;
-  if(cardsTab === 'legendary' && state.legendary.length) setTimeout(updateLegendaryPositions, 50);
+  if(cardsTab === 'legendary') setTimeout(updateLegendaryPositions, 50);
 }
 
 window.switchCardsTab = function(t) { cardsTab = t; renderCards(); };
 window.toggleMotion = function() { 
-  const grid = $('#cardsGrid');
-  if(!grid) return;
+  const grid = $('#cardsGrid'); if(!grid) return;
   grid.classList.toggle('motion'); 
   const btn = $('#motionBtn');
-  if(btn) {
-    if(grid.classList.contains('motion')) { btn.classList.add('active'); btn.innerHTML = '⏸️ إيقاف'; }
-    else { btn.classList.remove('active'); btn.innerHTML = '🎮 الحركة'; }
-  }
+  if(btn) { if(grid.classList.contains('motion')) { btn.classList.add('active'); btn.innerHTML = '⏸️ إيقاف'; } else { btn.classList.remove('active'); btn.innerHTML = '🎮 الحركة'; } }
 };
 
 function updateLegendaryPositions() {
@@ -934,13 +972,11 @@ function updateLegendaryPositions() {
   const cards = stage.querySelectorAll('.legendary-card'); const total = cards.length;
   cards.forEach((card, i) => {
     let offset = i - legendaryIndex;
-    if(offset > total/2) offset -= total;
-    if(offset < -total/2) offset += total;
+    if(offset > total/2) offset -= total; if(offset < -total/2) offset += total;
     const abs = Math.abs(offset);
     if(abs > 3) { card.style.opacity = '0'; card.style.pointerEvents = 'none'; return; }
     card.style.opacity = abs === 0 ? 1 : (abs === 1 ? 0.85 : 0.4);
-    card.style.pointerEvents = 'auto';
-    card.style.zIndex = 100 - abs;
+    card.style.pointerEvents = 'auto'; card.style.zIndex = 100 - abs;
     card.style.transform = `translateX(${offset*90}px) translateZ(${-abs*80}px) scale(${1-abs*0.12}) rotateY(${offset*-15}deg)`;
     card.classList.toggle('active', abs === 0);
   });
@@ -951,15 +987,19 @@ window.onLegendaryClick = function(e, i) {
   if(i === legendaryIndex) {
     const card = e.currentTarget.querySelector('.fifa-card'); if(card) card.classList.toggle('flipped');
     legendaryPaused = true; setTimeout(() => legendaryPaused = false, 8000);
-  } else {
-    legendaryIndex = i; updateLegendaryPositions();
-  }
+  } else { legendaryIndex = i; updateLegendaryPositions(); }
 };
 
 window.showAddLegend = function() {
+  tempLegendPhoto = '';
   openModal(`<h3>👑 كارت أسطوري جديد</h3>
     <label class="form-label">الاسم *</label><input id="lg_name" placeholder="اسم اللاعب">
     <label class="form-label">المركز</label><select id="lg_pos"><option>حارس</option><option>مدافع</option><option>وسط</option><option>مهاجم</option></select>
+    
+    <label class="form-label">صورة اللاعب</label>
+    <div id="lg_photo_preview" style="text-align:center; margin-bottom:10px; font-size:40px; color:var(--dim);">👤</div>
+    <button class="btn-purple btn-ghost" onclick="uploadLegendPhoto()" style="margin-bottom:10px">📷 اختيار صورة</button>
+
     <div class="grid-3" style="margin-top:10px">
       <div><label class="form-label">سرعة</label><input id="lg_pace" type="number" value="90"></div>
       <div><label class="form-label">تسديد</label><input id="lg_sho" type="number" value="90"></div>
@@ -971,18 +1011,39 @@ window.showAddLegend = function() {
     <button class="btn-purple" onclick="saveNewLegend()" style="margin-top:18px">حفظ</button>`);
 };
 
+window.uploadLegendPhoto = function() {
+  const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement('canvas'); const MAX = 250; let w = img.width, h = img.height;
+        if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } }
+        canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        tempLegendPhoto = canvas.toDataURL('image/jpeg', 0.7);
+        const prev = document.getElementById('lg_photo_preview');
+        if(prev) prev.innerHTML = `<img src="${tempLegendPhoto}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid var(--blue); box-shadow:0 0 15px rgba(59,130,246,.5);">`;
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+};
+
 window.saveNewLegend = async function() {
-  const name = $('#lg_name').value.trim();
-  if(!name) return alert("اكتب الاسم");
+  const name = $('#lg_name').value.trim(); if(!name) return alert("اكتب الاسم");
   const newLegend = {
-    id: 'leg_' + uid(), name: name, position: $('#lg_pos').value, photo: '', 
+    id: 'leg_' + uid(), name: name, position: $('#lg_pos').value, photo: tempLegendPhoto, 
     stats: { pace: +$('#lg_pace').value, shooting: +$('#lg_sho').value, passing: +$('#lg_pas').value, dribbling: +$('#lg_dri').value, defending: +$('#lg_def').value, physical: +$('#lg_phy').value }
   };
-  state.legendary.push(newLegend);
-  await save(); closeModal();
+  state.legendary.push(newLegend); await save(); closeModal();
 };
 
 window.editLegend = function(id) {
+  if(id.startsWith('leg_auto_')) return; // Prevent editing auto cards directly
   const p = state.legendary.find(x => x.id === id); if(!p) return;
   const s = p.stats || { pace:90, shooting:90, passing:90, dribbling:90, defending:90, physical:90 };
   openModal(`<h3>✏️ تعديل أسطورة</h3>
@@ -1006,13 +1067,14 @@ window.saveEditLegend = async function(id) {
 };
 
 window.deleteLegend = async function(id) {
+  if(id.startsWith('leg_auto_')) return alert("هذا الكارت تلقائي بناءً على نجوم اللاعب.");
   if(!confirm('حذف الكارت الأسطوري؟')) return;
-  state.legendary = state.legendary.filter(x => x.id !== id);
-  await save(); closeModal();
+  state.legendary = state.legendary.filter(x => x.id !== id); await save(); closeModal();
 };
 
 window.previewCard = function(id, isLegend) {
-  const p = isLegend ? state.legendary.find(x => x.id === id) : state.players.find(x => x.id === id);
+  let p = isLegend ? state.legendary.find(x => x.id === id) : state.players.find(x => x.id === id);
+  if(id.startsWith('leg_auto_')) p = state.players.find(x => 'leg_auto_' + x.id === id);
   if(!p) return;
   $('#previewContent').innerHTML = `<button class="preview-close" onclick="closePreview()">×</button>` + buildCardHTML(p, calculateOVR(p), isLegend?'legendary':getCardTier(calculateOVR(p)), isLegend, true);
   $('#previewOverlay').classList.add('show');
@@ -1020,10 +1082,21 @@ window.previewCard = function(id, isLegend) {
 window.closePreview = function() { $('#previewOverlay').classList.remove('show'); };
 
 window.shareCard = async function(id) {
-  const p = state.players.find(x => x.id === id); if(!p) return;
-  const text = `⚽ ${p.name}\n⭐ التقييم: ${calculateOVR(p)}\n📊 إحصائيات: ${p.goals} هدف، ${p.assists} أسيست`;
-  if(navigator.share) navigator.share({ title: p.name, text: text }).catch(()=>{});
-  else alert(text);
+  const cardEl = document.getElementById(`card-capture-${id}`);
+  if(!cardEl) return;
+  // Reset flip if flipped to capture front
+  const inner = cardEl.querySelector('.fifa-card');
+  if(inner) inner.classList.remove('flipped');
+  
+  try {
+    const canvas = await html2canvas(cardEl, { scale: 2, backgroundColor: null, useCORS: true });
+    const link = document.createElement('a');
+    link.download = `Card_${id}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+  } catch(e) {
+    alert("حدث خطأ أثناء تحميل الصورة: " + e.message);
+  }
 };
 
 // 3. الماتشات
@@ -1045,12 +1118,6 @@ function renderMatches() {
         <div class="vs">VS</div>
         <input type="text" id="m_t2" placeholder="الخصم">
       </div>
-      <label>النتيجة</label>
-      <div class="row">
-        <input type="number" id="m_s1" value="0" placeholder="أهدافنا">
-        <div class="vs">-</div>
-        <input type="number" id="m_s2" value="0" placeholder="أهدافهم">
-      </div>
       <button class="btn-purple" onclick="addMatch()" style="margin-top:10px">إضافة</button>
     </div>`;
   }
@@ -1058,11 +1125,12 @@ function renderMatches() {
   html += `<div class="section-header">⚽ الماتشات <span class="count">${ms.length}</span></div>`;
   if(!ms.length) html += `<div class="empty-state">مفيش ماتشات</div>`;
   else ms.forEach(m => {
+    const hasResult = m.ourScore !== null && m.theirScore !== null;
     html += `<div class="match-item" onclick="openMatchDetail('${m.id}')">
       <div class="match-header"><span>📅 ${m.date}</span><span>⏰ ${m.timeFrom} - ${m.timeTo}</span></div>
       <div class="match-teams">
         <div class="match-team">${esc(m.ourTeam)}</div>
-        <div class="match-score">${m.ourScore} - ${m.theirScore}</div>
+        <div class="match-score">${hasResult ? m.ourScore + ' - ' + m.theirScore : 'vs'}</div>
         <div class="match-team">${esc(m.opponentTeam)}</div>
       </div>
       <div class="match-meta"><span>📍 ${esc(m.place)}</span><span>👥 ${(m.lineup||[]).length} في التشكيل</span>${m.archived?'<span style="color:var(--red)">مؤرشف 🔒</span>':''}</div>
@@ -1075,33 +1143,39 @@ window.addMatch = async function() {
   const d = $('#m_date').value, place = $('#m_place').value;
   const t1 = $('#m_t1').value, t2 = $('#m_t2').value;
   if(!d || !t2) return alert("اكمل البيانات");
-  state.matches.push({ id: uid(), date: d, timeFrom: $('#m_from').value, timeTo: $('#m_to').value, ourTeam: t1, opponentTeam: t2, ourScore: +$('#m_s1').value, theirScore: +$('#m_s2').value, place: place, lineup: [], goals: {}, assists: {}, ratings: {}, motm: null, worst: null, bad: [], archived: false });
+  state.matches.push({ id: uid(), date: d, timeFrom: $('#m_from').value, timeTo: $('#m_to').value, ourTeam: t1, opponentTeam: t2, ourScore: null, theirScore: null, place: place, lineup: [], goals: {}, assists: {}, ratings: {}, motm: null, worst: null, bad: [], archived: false, comments: [] });
   await save();
 };
 
 window.openMatchDetail = function(id) {
   const m = state.matches.find(x => x.id === id); if(!m) return;
   const canEdit = (isAdmin || isCoach) && !m.archived;
+  
   let html = `<h3>${m.date}</h3>
     <div style="display:flex;justify-content:space-between;align-items:center;padding:14px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);border-radius:12px;margin-bottom:14px">
       <div style="flex:1;text-align:center;font-weight:800;color:var(--blue-lt);font-size:13px">${esc(m.ourTeam)}</div>
-      <div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:2px;direction:ltr;padding:0 10px">${m.ourScore} - ${m.theirScore}</div>
+      <div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:2px;direction:ltr;padding:0 10px">${m.ourScore !== null ? m.ourScore + ' - ' + m.theirScore : 'vs'}</div>
       <div style="flex:1;text-align:center;font-weight:800;color:var(--blue-lt);font-size:13px">${esc(m.opponentTeam)}</div>
-    </div>
-    <div class="lineup-section">
+    </div>`;
+
+  if(isAdmin && !m.archived) {
+      html += `<div style="display:flex;gap:10px;margin-bottom:14px;background:rgba(0,0,0,.2);padding:10px;border-radius:10px;">
+        <div style="flex:1"><label class="form-label" style="margin:0 0 5px;">أهدافنا</label><input type="number" value="${m.ourScore !== null ? m.ourScore : ''}" onchange="setMatchResult('${m.id}', 'ourScore', this.value)" style="width:100%;padding:8px;text-align:center;background:#000;border:1px solid #333;border-radius:6px;color:#fff;"></div>
+        <div style="flex:1"><label class="form-label" style="margin:0 0 5px;">أهدافهم</label><input type="number" value="${m.theirScore !== null ? m.theirScore : ''}" onchange="setMatchResult('${m.id}', 'theirScore', this.value)" style="width:100%;padding:8px;text-align:center;background:#000;border:1px solid #333;border-radius:6px;color:#fff;"></div>
+      </div>`;
+  }
+
+  html += `<div class="lineup-section">
       <div class="lineup-header" onclick="toggleMatchLineup()"><span class="lineup-title">${m.lineup.length ? `⚽ التشكيل (${m.lineup.length} لاعب)` : '⚽ لسه مفيش تشكيل'}</span><span class="lineup-toggle" id="lineupToggleIcon">▾</span></div>
       <div class="lineup-body" id="lineupBody">`;
   if(!state.players.length) html += `<div class="lineup-empty">ضيف لاعبين الأول</div>`;
   else {
     state.players.forEach(p => {
       const sel = m.lineup.includes(p.id);
-      html += `<div class="lineup-player ${sel?'selected':''}" onclick="toggleLineup('${m.id}', '${p.id}', ${canEdit})" style="display:flex; justify-content:space-between;">
-        <div style="display:flex; align-items:center; gap:10px;">
-            ${canEdit ? `<input type="checkbox" class="lineup-checkbox" ${sel?'checked':''} style="pointer-events:none;">` : ''}
-            <div class="lineup-avatar">${p.photo?`<img src="${p.photo}">`:'👤'}</div>
-            <div style="font-weight:700; font-size:14px; color:#fff;">${esc(p.name)}</div>
-        </div>
-        <div style="font-size:10px; color:var(--dim);">${esc(p.position||'لاعب')}</div>
+      html += `<div class="lineup-player ${sel?'selected':''}" onclick="toggleLineup('${m.id}', '${p.id}', ${canEdit})">
+        ${canEdit ? `<input type="checkbox" class="lineup-checkbox" ${sel?'checked':''} style="pointer-events:none;">` : ''}
+        <div class="lineup-avatar">${p.photo?`<img src="${p.photo}">`:'👤'}</div>
+        <div class="lineup-name">${esc(p.name)}<div class="lineup-pos">${esc(p.position||'')}</div></div>
       </div>`;
     });
     if(canEdit) html += `<div class="lineup-actions"><button onclick="selectAllLineup('${m.id}')">الكل</button><button onclick="clearLineup('${m.id}')">إلغاء الكل</button></div>`;
@@ -1129,25 +1203,47 @@ window.openMatchDetail = function(id) {
       </div>`;
     });
   }
+
+  // Match Comments
+  html += `<div class="comment-section">
+    <div style="font-size:12px;font-weight:800;color:var(--blue-lt);margin-bottom:8px;">💬 تعليقات الماتش</div>
+    <div class="comment-list">`;
+  if(!m.comments || !m.comments.length) html += `<div style="font-size:11px;color:var(--dim);text-align:center;">مفيش تعليقات</div>`;
+  else m.comments.forEach(c => {
+    html += `<div class="comment-item"><div class="comment-author">${esc(c.author)}</div><div class="comment-text">${esc(c.text)}</div></div>`;
+  });
+  html += `</div><div class="comment-input-row">
+    <input type="text" id="matchCommentInput" placeholder="اكتب تعليقك...">
+    <button class="btn-purple" onclick="addMatchComment('${m.id}')">نشر</button>
+  </div></div>`;
+
   if(isAdmin && !m.archived) html += `<button class="btn-purple btn-danger" style="margin-top:16px" onclick="archiveMatch('${m.id}')">🔒 أرشفة وقفل الماتش</button>`;
   if(isAdmin) html += `<button class="btn-purple btn-danger" style="margin-top:8px;background:transparent" onclick="deleteMatch('${m.id}')">🗑 حذف الماتش</button>`;
+  
   openModal(html);
 };
 
+window.setMatchResult = async function(mid, field, val) {
+  const m = state.matches.find(x => x.id === mid);
+  if(m) { m[field] = val !== '' ? +val : null; await save(); }
+};
+
+window.addMatchComment = async function(mid) {
+  const inp = document.getElementById('matchCommentInput');
+  if(!inp || !inp.value.trim()) return;
+  const m = state.matches.find(x => x.id === mid);
+  if(!m.comments) m.comments = [];
+  m.comments.push({ author: currentUserPhone !== 'admin' ? currentUserPhone : 'المدير', text: inp.value.trim() });
+  await save();
+  openMatchDetail(mid); // Refresh modal
+};
+
 window.toggleMatchLineup = function() { 
-  const body = document.getElementById('lineupBody');
-  const icon = document.getElementById('lineupToggleIcon');
+  const body = document.getElementById('lineupBody'); const icon = document.getElementById('lineupToggleIcon');
   if(body && icon) {
     const isOpen = body.style.display === 'block' || body.classList.contains('open');
-    if(isOpen) {
-      body.classList.remove('open');
-      body.style.display = 'none';
-      icon.textContent = '▾';
-    } else {
-      body.classList.add('open');
-      body.style.display = 'block';
-      icon.textContent = '▴';
-    }
+    if(isOpen) { body.classList.remove('open'); body.style.display = 'none'; icon.textContent = '▾'; } 
+    else { body.classList.add('open'); body.style.display = 'block'; icon.textContent = '▴'; }
   }
 };
 window.toggleLineup = async function(mid, pid, canEdit) {
@@ -1213,28 +1309,107 @@ function renderStats() {
   el.innerHTML = html;
 }
 
+// 4.5 عرش النجوم (Hall of Fame)
+function renderHallOfFame() {
+  const el = $('#panel-4');
+  const data = state.players.map(p => getPlayerData(p)).filter(p => p.motm > 0).sort((a,b) => b.motm - a.motm);
+  
+  if(!data.length) {
+    return el.innerHTML = '<div class="empty-state" style="padding-top:100px;"><div class="empty-icon">👑</div><div>لسه مفيش نجوم في الفريق<br>اختار أفضل لاعب في ماتش وأرشف الماتش عشان يظهر هنا.</div></div>';
+  }
+
+  let html = `<div class="hall-bg">
+    <div class="hall-title">👑 عرش النجوم 👑</div>`;
+    
+  // Month Star (Just top player for now as MVP)
+  const topStar = data[0];
+  html += `<div class="star-month-banner">
+      <div class="month-title">🌟 نجم الفريق 🌟</div>
+      <img src="${topStar.photo || 'https://via.placeholder.com/100/050a15/3b82f6?text=👤'}" class="month-star-img">
+      <div class="month-star-name">${esc(topStar.name)}</div>
+      <div class="month-star-count">⭐ ${topStar.motm} نجمة</div>
+  </div>`;
+
+  // Podium
+  html += `<div class="podium-container">`;
+  if(data[1]) html += `<div class="podium p2"><img src="${data[1].photo || 'https://via.placeholder.com/60/000/fff?text=👤'}" class="podium-avatar"><div class="podium-name">${esc(data[1].name)}</div><div class="podium-stars">🥈 ${data[1].motm}</div></div>`;
+  html += `<div class="podium p1"><div class="crown-p1">👑</div><img src="${data[0].photo || 'https://via.placeholder.com/80/000/fff?text=👤'}" class="podium-avatar"><div class="podium-name">${esc(data[0].name)}</div><div class="podium-stars">🥇 ${data[0].motm}</div></div>`;
+  if(data[2]) html += `<div class="podium p3"><img src="${data[2].photo || 'https://via.placeholder.com/60/000/fff?text=👤'}" class="podium-avatar"><div class="podium-name">${esc(data[2].name)}</div><div class="podium-stars">🥉 ${data[2].motm}</div></div>`;
+  html += `</div>`;
+
+  // List (4th onwards)
+  if(data.length > 3) {
+      html += `<div class="hall-list">`;
+      for(let i=3; i<data.length; i++) {
+          html += `<div class="hall-row">
+            <div class="hall-rank">#${i+1}</div>
+            <img src="${data[i].photo || 'https://via.placeholder.com/40/000/fff?text=👤'}" class="hall-avatar">
+            <div class="hall-name">${esc(data[i].name)}</div>
+            <div class="hall-count">⭐ ${data[i].motm}</div>
+          </div>`;
+      }
+      html += `</div>`;
+  }
+  
+  html += `</div>`;
+  el.innerHTML = html;
+}
+
 // 5. القوانين
 function renderRules() {
-  const el = $('#panel-4');
+  const el = $('#panel-5');
   el.innerHTML = `<div class="section-header">📋 القوانين</div>
     <textarea id="rulesText" style="width:100%;height:200px;background:var(--card);color:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;font-size:14px;line-height:1.6" ${(!isAdmin&&!isCoach)?'disabled':''} placeholder="مفيش قوانين">${esc(state.rules)}</textarea>
     ${(isAdmin||isCoach) ? `<button class="btn-purple" onclick="saveRules()" style="margin-top:10px">حفظ</button>` : ''}`;
 }
 window.saveRules = async function() { state.rules = $('#rulesText').value; await save(); alert('تم الحفظ'); };
 
-// 6. الإعلانات
+// 6. الإعلانات ولوحة النقاش
+let boardTab = 'anns';
+window.switchBoardTab = function(t) { boardTab = t; renderAnns(); };
+
 function renderAnns() {
-  const el = $('#panel-5');
-  let html = `<div class="section-header">📢 الإعلانات</div>`;
-  if(isAdmin || isCoach) html += `<div class="info-card"><input id="annText" placeholder="عنوان الإعلان" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;margin-bottom:8px"><button class="btn-purple" onclick="addAnn()">نشر</button></div>`;
-  if(!state.announcements.length) html += `<div class="empty-state">مفيش إعلانات</div>`;
-  else state.announcements.slice().reverse().forEach(a => {
-    html += `<div class="info-card"><div class="info-card-title"><span>${esc(a.text)}</span>${isAdmin?`<button onclick="delAnn('${a.id}')" style="background:none;border:none;color:var(--red);cursor:pointer">🗑</button>`:''}</div><div class="info-card-meta">${new Date(a.date).toLocaleString('ar-EG')}</div></div>`;
-  });
+  const el = $('#panel-6');
+  let html = `<div class="cards-subtabs">
+    <button class="subtabs-btn ${boardTab==='anns'?'active':''}" onclick="switchBoardTab('anns')">📢 الإعلانات</button>
+    <button class="subtabs-btn ${boardTab==='board'?'active':''}" onclick="switchBoardTab('board')">💬 لوحة النقاش</button>
+  </div>`;
+
+  if(boardTab === 'anns') {
+    html += `<div class="section-header">📢 الإعلانات الرسمية</div>`;
+    if(isAdmin || isCoach) html += `<div class="info-card"><input id="annText" placeholder="عنوان الإعلان" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;margin-bottom:8px"><button class="btn-purple" onclick="addAnn()">نشر</button></div>`;
+    if(!state.announcements.length) html += `<div class="empty-state">مفيش إعلانات</div>`;
+    else state.announcements.slice().reverse().forEach(a => {
+      html += `<div class="info-card"><div class="info-card-title"><span>${esc(a.text)}</span>${isAdmin?`<button onclick="delAnn('${a.id}')" style="background:none;border:none;color:var(--red);cursor:pointer">🗑</button>`:''}</div><div class="info-card-meta">${new Date(a.date).toLocaleString('ar-EG')}</div></div>`;
+    });
+  } else {
+    html += `<div class="section-header">💬 لوحة النقاش</div>
+    <div style="display:flex;gap:6px;margin-bottom:15px;">
+      <input type="text" id="boardMsgInput" placeholder="اكتب رسالة للفريق..." style="flex:1;padding:12px;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:10px;color:#fff;">
+      <button class="btn-purple" onclick="addBoardMsg()" style="width:auto;margin:0;padding:0 20px;">نشر</button>
+    </div>`;
+    
+    if(!state.board || !state.board.length) html += `<div class="empty-state">مفيش رسايل لسه، ابدأ الكلام!</div>`;
+    else state.board.slice().reverse().forEach(b => {
+      html += `<div class="info-card" style="padding:10px 14px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+            <span style="font-size:11px;font-weight:800;color:var(--blue-lt);">${esc(b.author)}</span>
+            <span style="font-size:10px;color:var(--dim);">${new Date(b.date).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</span>
+        </div>
+        <div style="font-size:13px;color:#eee;">${esc(b.text)}</div>
+      </div>`;
+    });
+  }
   el.innerHTML = html;
 }
 window.addAnn = async function() { const t = $('#annText').value; if(!t) return; state.announcements.push({id:uid(), text:t, date:new Date().toISOString()}); await save(); };
 window.delAnn = async function(id) { if(!confirm('حذف؟')) return; state.announcements = state.announcements.filter(x=>x.id!==id); await save(); };
+window.addBoardMsg = async function() { 
+  const inp = $('#boardMsgInput'); if(!inp || !inp.value.trim()) return;
+  if(!state.board) state.board = [];
+  state.board.push({ id: uid(), author: currentUserPhone !== 'admin' ? currentUserPhone : 'المدير', text: inp.value.trim(), date: new Date().toISOString() });
+  await save();
+};
 
 // 7. الإدارة
 window.showPendingModal = function() {
@@ -1250,7 +1425,7 @@ window.showPendingModal = function() {
 
 function renderAdmin() {
   if(!isAdmin) return;
-  const el = $('#panel-6');
+  const el = $('#panel-7');
   let html = `<div class="admin-section"><div class="admin-section-header"><div class="admin-section-icon">🛡️</div><div class="admin-section-title">شعار الفريق واسمه</div></div>
     <div class="admin-card">
       <div class="admin-logo-row">
