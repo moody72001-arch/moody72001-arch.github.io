@@ -217,37 +217,52 @@ input,select,button,textarea{font-family:inherit}
 @keyframes legendFloat{0%,100%{transform:translateY(-4px)}50%{transform:translateY(4px)}}
 .legendary-indicator{text-align:center;color:var(--gold-lt);font-size:12px;font-weight:700;margin-top:10px;letter-spacing:2px}
 
-/* HALL OF FAME (Star Throne) */
-.hall-bg{background:radial-gradient(circle at top, #1a1508 0%, #050a15 100%);min-height:100%;padding:10px;}
-.hall-title{text-align:center;font-size:24px;font-weight:900;color:var(--gold);text-shadow:0 0 15px rgba(212,175,55,0.5);margin-bottom:20px;letter-spacing:2px;}
-.star-month-banner{background:linear-gradient(135deg, rgba(212,175,55,0.2), rgba(0,0,0,0.8));border:1px solid var(--gold);border-radius:20px;padding:20px;text-align:center;margin-bottom:30px;position:relative;overflow:hidden;}
-.star-month-banner::before{content:'✨';position:absolute;top:10px;left:10px;font-size:20px;opacity:0.5;animation:pulse 2s infinite;}
-.star-month-banner::after{content:'✨';position:absolute;bottom:10px;right:10px;font-size:20px;opacity:0.5;animation:pulse 2s infinite;}
-@keyframes pulse{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.3);opacity:1}}
+/* HALL OF FAME (Star Throne) - ANIMATIONS */
+.hall-bg{background:radial-gradient(circle at top, #1a1508 0%, #050a15 100%);min-height:100%;padding:10px;position:relative;overflow:hidden;}
+/* Starry Background */
+.hall-bg::before{content:'';position:absolute;inset:0;background-image:radial-gradient(1px 1px at 20px 30px, #fff, transparent),radial-gradient(1.5px 1.5px at 40px 70px, rgba(212,175,55,0.8), transparent),radial-gradient(1px 1px at 90px 40px, #fff, transparent),radial-gradient(2px 2px at 160px 120px, rgba(255,255,255,0.8), transparent);background-repeat:repeat;background-size:200px 200px;opacity:0.3;animation:starDrift 60s linear infinite;z-index:0;pointer-events:none;}
+@keyframes starDrift{from{background-position:0 0}to{background-position:-200px -200px}}
+/* Marquee */
+.marquee-container{position:relative;z-index:1;overflow:hidden;white-space:nowrap;width:100%;background:rgba(212,175,55,0.1);border-radius:10px;padding:10px 0;margin-bottom:25px;border:1px solid rgba(212,175,55,0.3);box-shadow:0 0 15px rgba(212,175,55,0.2);}
+.marquee-text{display:inline-block;padding-left:100%;animation:marquee 15s linear infinite;color:var(--gold);font-weight:900;font-size:14px;text-shadow:0 0 10px rgba(212,175,55,0.5);}
+@keyframes marquee{0%{transform:translate(0,0)}100%{transform:translate(-100%,0)}}
+.hall-title{position:relative;z-index:1;text-align:center;font-size:24px;font-weight:900;color:var(--gold);text-shadow:0 0 15px rgba(212,175,55,0.5);margin-bottom:20px;letter-spacing:2px;}
+.star-month-banner{position:relative;z-index:1;background:linear-gradient(135deg, rgba(212,175,55,0.2), rgba(0,0,0,0.8));border:1px solid var(--gold);border-radius:20px;padding:20px;text-align:center;margin-bottom:30px;overflow:hidden;}
+.star-month-banner::before{content:'✨';position:absolute;top:10px;left:10px;font-size:20px;opacity:0.5;animation:pulseStar 2s infinite;}
+.star-month-banner::after{content:'✨';position:absolute;bottom:10px;right:10px;font-size:20px;opacity:0.5;animation:pulseStar 2s infinite;}
+@keyframes pulseStar{0%,100%{transform:scale(1);opacity:0.5}50%{transform:scale(1.3);opacity:1}}
 .month-title{font-size:12px;color:var(--gold-lt);font-weight:800;letter-spacing:2px;margin-bottom:10px;}
 .month-star-img{width:100px;height:100px;border-radius:50%;border:3px solid var(--gold);box-shadow:0 0 30px rgba(212,175,55,0.8);margin:0 auto 10px;object-fit:cover;}
 .month-star-name{font-size:20px;font-weight:900;color:#fff;}
 .month-star-count{display:inline-block;background:var(--gold);color:#000;padding:2px 10px;border-radius:10px;font-size:12px;font-weight:900;margin-top:5px;}
 
-.podium-container{display:flex;justify-content:center;align-items:flex-end;gap:10px;margin-bottom:30px;}
-.podium{display:flex;flex-direction:column;align-items:center;background:linear-gradient(180deg, rgba(255,255,255,0.1), rgba(0,0,0,0.5));border-radius:15px 15px 0 0;padding:10px;border:1px solid rgba(255,255,255,0.1);position:relative;}
-.podium.p1{height:170px;width:100px;border-color:var(--gold);background:linear-gradient(180deg, rgba(212,175,55,0.3), rgba(0,0,0,0.8));z-index:3;box-shadow:0 0 30px rgba(212,175,55,0.4);}
-.podium.p2{height:130px;width:90px;z-index:2;border-color:#c0c0c0;}
-.podium.p3{height:110px;width:90px;z-index:1;border-color:#cd7f32;}
+/* Podium Rise */
+.podium-container{position:relative;z-index:1;display:flex;justify-content:center;align-items:flex-end;gap:10px;margin-bottom:30px;}
+.podium{display:flex;flex-direction:column;align-items:center;background:linear-gradient(180deg, rgba(255,255,255,0.1), rgba(0,0,0,0.5));border-radius:15px 15px 0 0;padding:10px;border:1px solid rgba(255,255,255,0.1);position:relative;opacity:0;transform:translateY(50px);}
+.podium.p1{height:170px;width:100px;border-color:var(--gold);background:linear-gradient(180deg, rgba(212,175,55,0.3), rgba(0,0,0,0.8));z-index:3;box-shadow:0 0 30px rgba(212,175,55,0.4);animation:riseUp 0.8s cubic-bezier(0.2, 0.9, 0.3, 1) forwards 0.5s;}
+.podium.p2{height:130px;width:90px;z-index:2;border-color:#c0c0c0;animation:riseUp 0.8s cubic-bezier(0.2, 0.9, 0.3, 1) forwards 1s;}
+.podium.p3{height:110px;width:90px;z-index:1;border-color:#cd7f32;animation:riseUp 0.8s cubic-bezier(0.2, 0.9, 0.3, 1) forwards 1.5s;}
+@keyframes riseUp{to{opacity:1;transform:translateY(0)}}
 .podium-avatar{width:60px;height:60px;border-radius:50%;border:2px solid #fff;position:absolute;top:-30px;left:50%;transform:translateX(-50%);object-fit:cover;background:#000;}
-.p1 .podium-avatar{width:80px;height:80px;top:-40px;border-color:var(--gold);box-shadow:0 0 20px var(--gold);}
+.p1 .podium-avatar{width:80px;height:80px;top:-40px;border-color:var(--gold);animation:pulseGlow 2s infinite alternate;}
+@keyframes pulseGlow{from{box-shadow:0 0 10px rgba(212,175,55,0.5)}to{box-shadow:0 0 30px rgba(212,175,55,1), 0 0 15px rgba(255,255,255,0.5)}}
 .podium-name{font-size:12px;font-weight:800;color:#fff;text-align:center;margin-top:35px;line-height:1.2;}
 .p1 .podium-name{font-size:14px;margin-top:45px;}
 .podium-stars{font-size:11px;color:var(--gold);font-weight:900;margin-top:5px;background:rgba(0,0,0,0.5);padding:2px 6px;border-radius:10px;}
-.crown-p1{position:absolute;top:-55px;left:50%;transform:translateX(-50%);font-size:30px;filter:drop-shadow(0 0 10px gold);}
+.crown-p1{position:absolute;top:-55px;left:50%;transform:translateX(-50%);font-size:30px;filter:drop-shadow(0 0 10px gold);animation:floatCrown 3s ease-in-out infinite;}
+@keyframes floatCrown{0%,100%{transform:translate(-50%, -5px)}50%{transform:translate(-50%, 5px)}}
 
-.hall-list{background:rgba(0,0,0,0.4);border-radius:15px;border:1px solid rgba(255,255,255,0.1);overflow:hidden;}
+.hall-list{position:relative;z-index:1;background:rgba(0,0,0,0.4);border-radius:15px;border:1px solid rgba(255,255,255,0.1);overflow:hidden;}
 .hall-row{display:flex;align-items:center;gap:10px;padding:12px 15px;border-bottom:1px solid rgba(255,255,255,0.05);}
 .hall-row:last-child{border:none;}
 .hall-rank{font-size:14px;font-weight:900;color:var(--dim);width:25px;}
 .hall-avatar{width:40px;height:40px;border-radius:50%;border:1px solid var(--border);object-fit:cover;}
 .hall-name{flex:1;font-size:14px;font-weight:800;color:#fff;}
 .hall-count{font-size:14px;font-weight:900;color:var(--gold);}
+
+/* Sparkle click effect */
+.sparkle{position:fixed;pointer-events:none;font-size:24px;z-index:9999;animation:sparkleFly 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;}
+@keyframes sparkleFly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
 
 /* Modals, Board, Comments */
 .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
@@ -546,6 +561,7 @@ let legendaryIndex = 0;
 let legendaryPaused = false;
 let currentProfileId = null;
 let tempLegendPhoto = '';
+let hallAnimated = false;
 
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
@@ -694,6 +710,7 @@ $$('.tab-btn').forEach(btn => {
     $$('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === currentTab));
     $$('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === currentTab));
     if(currentTab !== 1) legendaryPaused = true;
+    if(currentTab !== 4) hallAnimated = false; // Reset animation flag when leaving hall of fame
   };
 });
 
@@ -1084,7 +1101,6 @@ window.closePreview = function() { $('#previewOverlay').classList.remove('show')
 window.shareCard = async function(id) {
   const cardEl = document.getElementById(`card-capture-${id}`);
   if(!cardEl) return;
-  // Reset flip if flipped to capture front
   const inner = cardEl.querySelector('.fifa-card');
   if(inner) inner.classList.remove('flipped');
   
@@ -1094,6 +1110,7 @@ window.shareCard = async function(id) {
     link.download = `Card_${id}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
+    // Optional: alert("تم حفظ الصورة في معرض الصور");
   } catch(e) {
     alert("حدث خطأ أثناء تحميل الصورة: " + e.message);
   }
@@ -1309,7 +1326,7 @@ function renderStats() {
   el.innerHTML = html;
 }
 
-// 4.5 عرش النجوم (Hall of Fame)
+// 4.5 عرش النجوم (Hall of Fame) - ANIMATIONS INCLUDED
 function renderHallOfFame() {
   const el = $('#panel-4');
   const data = state.players.map(p => getPlayerData(p)).filter(p => p.motm > 0).sort((a,b) => b.motm - a.motm);
@@ -1319,33 +1336,34 @@ function renderHallOfFame() {
   }
 
   let html = `<div class="hall-bg">
+    <div class="marquee-container"><div class="marquee-text">🌟 عرش النجوم - هنا يتواجد أساطير فريق بني برزه 🌟 عرش النجوم - هنا يتواجد أساطير فريق بني برزه 🌟</div></div>
     <div class="hall-title">👑 عرش النجوم 👑</div>`;
     
   // Month Star (Just top player for now as MVP)
   const topStar = data[0];
-  html += `<div class="star-month-banner">
+  html += `<div class="star-month-banner" onclick="triggerSparkles(event)">
       <div class="month-title">🌟 نجم الفريق 🌟</div>
       <img src="${topStar.photo || 'https://via.placeholder.com/100/050a15/3b82f6?text=👤'}" class="month-star-img">
       <div class="month-star-name">${esc(topStar.name)}</div>
-      <div class="month-star-count">⭐ ${topStar.motm} نجمة</div>
+      <div class="month-star-count count-up" data-target="${topStar.motm}">⭐ 0 نجمة</div>
   </div>`;
 
   // Podium
   html += `<div class="podium-container">`;
-  if(data[1]) html += `<div class="podium p2"><img src="${data[1].photo || 'https://via.placeholder.com/60/000/fff?text=👤'}" class="podium-avatar"><div class="podium-name">${esc(data[1].name)}</div><div class="podium-stars">🥈 ${data[1].motm}</div></div>`;
-  html += `<div class="podium p1"><div class="crown-p1">👑</div><img src="${data[0].photo || 'https://via.placeholder.com/80/000/fff?text=👤'}" class="podium-avatar"><div class="podium-name">${esc(data[0].name)}</div><div class="podium-stars">🥇 ${data[0].motm}</div></div>`;
-  if(data[2]) html += `<div class="podium p3"><img src="${data[2].photo || 'https://via.placeholder.com/60/000/fff?text=👤'}" class="podium-avatar"><div class="podium-name">${esc(data[2].name)}</div><div class="podium-stars">🥉 ${data[2].motm}</div></div>`;
+  if(data[1]) html += `<div class="podium p2" onclick="triggerSparkles(event)"><img src="${data[1].photo || 'https://via.placeholder.com/60/000/fff?text=👤'}" class="podium-avatar"><div class="podium-name">${esc(data[1].name)}</div><div class="podium-stars count-up" data-target="${data[1].motm}">🥈 0</div></div>`;
+  html += `<div class="podium p1" onclick="triggerSparkles(event)"><div class="crown-p1">👑</div><img src="${data[0].photo || 'https://via.placeholder.com/80/000/fff?text=👤'}" class="podium-avatar"><div class="podium-name">${esc(data[0].name)}</div><div class="podium-stars count-up" data-target="${data[0].motm}">🥇 0</div></div>`;
+  if(data[2]) html += `<div class="podium p3" onclick="triggerSparkles(event)"><img src="${data[2].photo || 'https://via.placeholder.com/60/000/fff?text=👤'}" class="podium-avatar"><div class="podium-name">${esc(data[2].name)}</div><div class="podium-stars count-up" data-target="${data[2].motm}">🥉 0</div></div>`;
   html += `</div>`;
 
   // List (4th onwards)
   if(data.length > 3) {
       html += `<div class="hall-list">`;
       for(let i=3; i<data.length; i++) {
-          html += `<div class="hall-row">
+          html += `<div class="hall-row" onclick="triggerSparkles(event)">
             <div class="hall-rank">#${i+1}</div>
             <img src="${data[i].photo || 'https://via.placeholder.com/40/000/fff?text=👤'}" class="hall-avatar">
             <div class="hall-name">${esc(data[i].name)}</div>
-            <div class="hall-count">⭐ ${data[i].motm}</div>
+            <div class="hall-count count-up" data-target="${data[i].motm}">⭐ 0</div>
           </div>`;
       }
       html += `</div>`;
@@ -1353,7 +1371,51 @@ function renderHallOfFame() {
   
   html += `</div>`;
   el.innerHTML = html;
+
+  // Trigger animations after render
+  if(!hallAnimated) {
+    hallAnimated = true;
+    setTimeout(() => {
+      document.querySelectorAll('.count-up').forEach(el => {
+        let target = parseInt(el.getAttribute('data-target'));
+        let current = 0;
+        let prefix = el.innerText.replace(/[0-9]/g, '').trim(); // get the emoji/star
+        let step = target / 30;
+        let timer = setInterval(() => {
+          current += step;
+          if(current >= target) { current = target; clearInterval(timer); }
+          el.innerText = `${prefix} ${Math.floor(current)}`;
+        }, 30);
+      });
+    }, 500);
+  } else {
+      // just set the final values without animation if already animated
+      document.querySelectorAll('.count-up').forEach(el => {
+        let target = parseInt(el.getAttribute('data-target'));
+        let prefix = el.innerText.replace(/[0-9]/g, '').trim();
+        el.innerText = `${prefix} ${target}`;
+      });
+  }
 }
+
+window.triggerSparkles = function(e) {
+  const emojis = ['✨', '⭐', '🌟', '👑'];
+  for(let i=0; i<6; i++) {
+      let sparkle = document.createElement('div');
+      sparkle.className = 'sparkle';
+      sparkle.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+      sparkle.style.left = e.pageX + 'px';
+      sparkle.style.top = e.pageY + 'px';
+      
+      let tx = (Math.random() - 0.5) * 200;
+      let ty = (Math.random() - 0.5) * 200 - 50;
+      sparkle.style.setProperty('--tx', tx + 'px');
+      sparkle.style.setProperty('--ty', ty + 'px');
+      
+      document.body.appendChild(sparkle);
+      setTimeout(() => sparkle.remove(), 800);
+  }
+};
 
 // 5. القوانين
 function renderRules() {
