@@ -5,10 +5,12 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <meta name="theme-color" content="#050a15">
 <title>فريق بني برزه</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--gold:#d4af37;--gold-lt:#f5d76e;--gold-dk:#8a6d1f;--blue:#3b82f6;--blue-lt:#93c5fd;--blue-dk:#1e40af;--blue-mid:#2563eb;--bg:#050a15;--card:#0c1425;--card-2:#131d33;--text:#fff;--dim:#7a8499;--red:#e74c3c;--green:#27ae60}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
-html,body{height:100vh;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;background:var(--bg);color:var(--text)}
+html,body{height:100vh;overflow:hidden;font-family:'Cairo', sans-serif;background:var(--bg);color:var(--text)}
 input,select,button,textarea{font-family:inherit}
 
 /* AUTH (gold) */
@@ -389,23 +391,25 @@ input,select,button,textarea{font-family:inherit}
 </style>
 </head>
 <body>
-
-<div class="bg-anim"><span class="ball ball-1">⚽</span><span class="ball ball-2">⚽</span><span class="ball ball-3">⚽</span><span class="ball ball-4">⚽</span></div>
-
-<!-- AUTH -->
-<div id="authScreen" class="auth-screen">
+  <!-- شاشة الدخول -->
+<div id="authScreen" class="auth-screen" style="display:none;">
   <div class="auth-bg-img" id="authBgImg"></div>
   <div class="auth-bg-overlay"></div>
   <div class="auth-card">
     <div class="auth-logo"><div class="logo-circle">⚽</div></div>
     <div class="auth-brand">فريق بني برزه</div>
     <div class="auth-sub">إدارة فريقك باحترافية</div>
+    
+    <!-- شاشة تسجيل الدخول -->
     <div id="loginView">
       <div class="field"><span class="field-icon">📱</span><input type="tel" id="loginPhone" placeholder="رقم الموبايل"></div>
       <div class="field"><span class="field-icon">🔒</span><input type="password" id="loginPassword" placeholder="الباسورد"></div>
       <button class="btn-gold" onclick="handleLogin()">تسجيل الدخول</button>
       <div class="auth-switch">ماعندكش حساب؟ <a onclick="showView('signup')">أنشئ حساب</a></div>
+      <div class="auth-switch" style="margin-top:10px;font-size:11px;">مدير النظام؟ <a onclick="handleAdminLogin()" style="color:#888;">دخول الإدارة 👑</a></div>
     </div>
+
+    <!-- شاشة إنشاء حساب -->
     <div id="signupView" style="display:none">
       <div class="field"><span class="field-icon">👤</span><input type="text" id="suName" placeholder="اسمك"></div>
       <div class="field"><span class="field-icon">📱</span><input type="tel" id="suPhone" placeholder="رقم الموبايل"></div>
@@ -415,19 +419,21 @@ input,select,button,textarea{font-family:inherit}
       <button class="btn-gold" onclick="handleSignup()">إنشاء الحساب</button>
       <div class="auth-switch">عندك حساب؟ <a onclick="showView('login')">سجل دخول</a></div>
     </div>
+
+    <!-- شاشة الانتظار -->
     <div id="pendingView" style="display:none">
       <div class="pending-icon">⏳</div>
       <div class="pending-title">طلبك قيد المراجعة</div>
-      <div class="pending-text">حسابك اتحول للمدير للموافقة</div>
-      <button class="btn-gold" onclick="showView('login')">رجوع</button>
+      <div class="pending-text">حسابك اتحول للمدير للموافقة عليه.<br>هيتم تفعيله قريبًا.</div>
+      <button class="btn-gold" onclick="logout()">تسجيل خروج</button>
     </div>
   </div>
 </div>
 
-<!-- APP -->
+<!-- التطبيق -->
 <div id="app" class="app">
   <header class="app-header">
-    <div class="app-logo">⚽</div>
+    <div class="app-logo" id="headerLogo">⚽</div>
     <div class="app-title" id="appTitle">فريق بني برزه</div>
     <button class="icon-btn" id="notifBtn" onclick="showPendingModal()" style="display:none">🔔<span class="badge" id="notifBadge" style="display:none">0</span></button>
     <button class="icon-btn" onclick="logout()">🚪</button>
@@ -440,7 +446,7 @@ input,select,button,textarea{font-family:inherit}
       <button class="tab-btn" data-tab="3">📊 الإحصائيات</button>
       <button class="tab-btn" data-tab="4">📋 القوانين</button>
       <button class="tab-btn" data-tab="5">📢 الإعلانات</button>
-      <button class="tab-btn" data-tab="6">⚙️ الإدارة</button>
+      <button class="tab-btn" data-tab="6" id="adminTabBtn" style="display:none">⚙️ الإدارة</button>
     </div>
   </nav>
   <div class="tabs-container" id="tabsContainer">
@@ -454,7 +460,7 @@ input,select,button,textarea{font-family:inherit}
   </div>
 </div>
 
-<!-- PROFILE -->
+<!-- شاشة البروفايل -->
 <div id="profileView" class="profile-view">
   <div class="profile-bg-img" id="profileBgImg"></div>
   <div class="profile-overlay"></div>
@@ -469,1383 +475,810 @@ input,select,button,textarea{font-family:inherit}
   </div>
 </div>
 
-<!-- PREVIEW -->
+<!-- عرض الكارت الكامل -->
 <div id="previewOverlay" class="preview-overlay" onclick="if(event.target===this)closePreview()">
   <div id="previewContent" class="preview-content"></div>
 </div>
 
-<!-- MODAL -->
+<!-- المودال العام -->
 <div class="modal-bg" id="modalBg" onclick="if(event.target===this)closeModal()">
   <div class="modal" id="modalContent"></div>
 </div>
 
-<!-- FIREBASE SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+<!-- مكتبات Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-<script>
-/* ====================================================================
-   FIREBASE CONFIG — استبدل هذا بالإعدادات من Firebase Console
-   Project Settings → General → Your apps → Firebase SDK snippet → Config
-   ==================================================================== */
-var firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+// إعدادات Firebase الخاصة بك
+const firebaseConfig = {
+  apiKey: "AIzaSyAM4sc5E2MOhLpjuRJi5J-vlQElhnh4Ieg",
+  authDomain: "banu-brza.firebaseapp.com",
+  projectId: "banu-brza",
+  storageBucket: "banu-brza.firebasestorage.app",
+  messagingSenderId: "965076075944",
+  appId: "1:965076075944:web:2ba500087fb2b717e7499d"
 };
 
-var firebaseApp = null, firebaseDB = null, firebaseStorage = null;
-var FIREBASE_READY = false;
-try {
-  if (typeof firebase !== 'undefined' && firebaseConfig.apiKey && firebaseConfig.apiKey.indexOf('YOUR_') !== 0) {
-    firebaseApp = firebase.initializeApp(firebaseConfig);
-    firebaseDB = firebase.firestore();
-    firebaseStorage = firebase.storage();
-    FIREBASE_READY = true;
-    console.log('Firebase initialized ✓');
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const TEAM_ID = "my-team";
+const teamDocRef = doc(db, "teams", TEAM_ID);
+
+let state = { players: [], matches: [], legendary: [], rules: "", announcements: [], notifs: [], team: { name: "فريق بني برزه", logo: "", loginBg: "" }, admins: [], coaches: [], mainAdminPhone: "admin" };
+let pendingUsers = [];
+let approvedUsers = [];
+let unsubscribeTeam = null;
+let unsubscribeUsers = null;
+let isAdmin = false;
+let isCoach = false;
+let currentUserPhone = "";
+let currentTab = 0;
+let cardsTab = 'normal';
+let legendaryIndex = 0;
+let legendaryPaused = false;
+let legendaryPauseTimer = null;
+let currentProfileId = null;
+let matchLineupExpanded = false;
+
+const $ = s => document.querySelector(s);
+const $$ = s => document.querySelectorAll(s);
+
+// مساعدات
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
+function esc(s) { return String(s||'').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+function formatPhone(p) { return p.includes('@') ? p : p + "@futsal.com"; }
+async function save() { try { await setDoc(teamDocRef, state); } catch(e) { console.error(e); alert("خطأ في الحفظ: " + e.message); } }
+
+// المصادقة
+window.showView = function(v) {
+  $('#loginView').style.display = v === 'login' ? 'block' : 'none';
+  $('#signupView').style.display = v === 'signup' ? 'block' : 'none';
+  $('#pendingView').style.display = v === 'pending' ? 'block' : 'none';
+};
+
+window.handleAdminLogin = async function() {
+  const pass = prompt("👑 ادخل باسورد الإدارة:");
+  if(!pass) return;
+  try { await signInWithEmailAndPassword(auth, "admin@futsal.com", pass); }
+  catch (e) { alert("الباسورد غلط أو الحساب مش موجود."); }
+};
+
+window.handleLogin = async function() {
+  const phone = $('#loginPhone').value.trim().replace(/\s+/g, '');
+  const pass = $('#loginPassword').value;
+  if(!phone || !pass) return alert("اكتب الرقم والباسورد");
+  try { await signInWithEmailAndPassword(auth, formatPhone(phone), pass); }
+  catch (e) { alert("بيانات الدخول غلط أو الحساب مش موجود."); }
+};
+
+window.handleSignup = async function() {
+  const name = $('#suName').value.trim();
+  const phone = $('#suPhone').value.trim().replace(/\s+/g, '');
+  const dob = $('#suBirth').value;
+  const pass = $('#suPass').value;
+  const conf = $('#suConfirm').value;
+  if(!name || !phone || !dob || !pass) return alert("كمل كل الحقول");
+  if(pass.length < 6) return alert("الباسورد 6 حروف/أرقام على الأقل");
+  if(pass !== conf) return alert("الباسورد مش متطابق");
+  
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, formatPhone(phone), pass);
+    await setDoc(doc(db, "users", cred.user.uid), { name: name, phone: phone, dob: dob, role: "pending", joinedAt: new Date().toISOString() });
+    alert("تم إنشاء الحساب! جاري تحويلك لصفحة الانتظار...");
+    await signOut(auth);
+  } catch(e) {
+    alert("خطأ في إنشاء الحساب: " + e.message);
+  }
+};
+
+window.logout = async function() {
+  if(!confirm("تسجيل الخروج؟")) return;
+  if(unsubscribeTeam) unsubscribeTeam();
+  if(unsubscribeUsers) unsubscribeUsers();
+  await signOut(auth);
+};
+
+onAuthStateChanged(auth, (user) => {
+  if (user) { 
+    currentUserPhone = user.email.replace('@futsal.com', ''); 
+    checkUserStatus(user.uid); 
   } else {
-    console.log('Firebase not configured — using localStorage fallback');
+    $('#authScreen').style.display = 'flex'; 
+    $('#app').classList.remove('show'); 
+    isAdmin = false; isCoach = false;
   }
-} catch(e) {
-  console.warn('Firebase init failed:', e);
-}
+});
 
-// ============ STORAGE ============
-var K = {users:'fca_users',players:'fca_players',session:'fca_session',matches:'fca_matches',rules:'fca_rules',anns:'fca_anns',team:'fca_team',notif:'fca_notif',legendary:'fca_legendary'};
-function load(k,d){try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}}
-function save(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){alert('المساحة ممتلئة — جرب صورة أصغر');return false}}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
-function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]})}
-function getUsers(){return load(K.users,[])}function setUsers(v){return save(K.users,v)}
-function getPlayers(){return load(K.players,[])}function setPlayers(v){return save(K.players,v)}
-function getMatches(){return load(K.matches,[])}function setMatches(v){return save(K.matches,v)}
-function getRules(){return load(K.rules,[])}function setRules(v){return save(K.rules,v)}
-function getAnns(){return load(K.anns,[])}function setAnns(v){return save(K.anns,v)}
-function getTeam(){return load(K.team,{name:'فريق بني برزه',logo:'',loginBg:''})}function setTeam(v){return save(K.team,v)}
-function getNotifs(){return load(K.notif,[])}function setNotifs(v){return save(K.notif,v)}
-function getLegendary(){return load(K.legendary,[])}function setLegendary(v){return save(K.legendary,v)}
-function getSession(){return localStorage.getItem(K.session)}
-function setSession(id){if(id)localStorage.setItem(K.session,id);else localStorage.removeItem(K.session)}
-function me(){var id=getSession();if(!id)return null;var us=getUsers();for(var i=0;i<us.length;i++)if(us[i].id===id)return us[i];return null}
-function isAdmin(){var u=me();return u&&u.role==='admin'}
-function canManage(){var u=me();return u&&(u.role==='admin'||u.role==='coach'||u.role==='supervisor')}
-function getPlayerById(id){var ps=getPlayers();for(var i=0;i<ps.length;i++)if(ps[i].id===id)return ps[i];return null}
-function getLegendaryById(id){var ls=getLegendary();for(var i=0;i<ls.length;i++)if(ls[i].id===id)return ls[i];return null}
-
-// Main admin migration
-function ensureMainAdmin(){
-  var us=getUsers();
-  if(us.length===0)return;
-  var has=false;
-  for(var i=0;i<us.length;i++)if(us[i].isMainAdmin){has=true;break}
-  if(!has){
-    for(var i=0;i<us.length;i++){if(us[i].role==='admin'){us[i].isMainAdmin=true;break}}
-    if(!has && us[0])us[0].isMainAdmin=true;
-    setUsers(us);
-  }
-}
-
-// ============ LOGIN BACKGROUND ============
-function applyLoginBackground(){
-  var t=getTeam(),el=document.getElementById('authBgImg');
-  if(!el)return;
-  if(t.loginBg){
-    el.style.backgroundImage='url('+t.loginBg+')';
-    el.classList.add('has-image');
-  }else{
-    el.style.backgroundImage='none';
-    el.classList.remove('has-image');
-  }
-}
-
-async function syncLoginBackground(){
-  if(FIREBASE_READY && firebaseDB){
-    try{
-      var doc=await firebaseDB.collection('settings').doc('team').get();
-      if(doc.exists && doc.data().loginBgUrl){
-        var t=getTeam();
-        t.loginBg=doc.data().loginBgUrl;
-        setTeam(t);
+function checkUserStatus(uid) {
+  const userRef = doc(db, "users", uid);
+  onSnapshot(userRef, async (snap) => {
+    if (!snap.exists()) {
+      if (currentUserPhone === "admin") { 
+        await setDoc(userRef, { name: "المدير", phone: "admin", role: "admin", joinedAt: new Date().toISOString() }); 
+        return; 
+      } else { 
+        $('#authScreen').style.display = 'none'; 
+        $('#app').classList.remove('show');
+        $('#authScreen').style.display = 'flex'; 
+        window.showView('pending'); 
+        return; 
       }
-    }catch(e){console.warn('Sync bg failed:',e)}
-  }
-  applyLoginBackground();
-}
-
-function dataURLtoBlob(dataUrl){
-  var parts=dataUrl.split(','),mime=parts[0].match(/:(.*?);/)[1],bstr=atob(parts[1]),n=bstr.length,u8=new Uint8Array(n);
-  while(n--)u8[n]=bstr.charCodeAt(n);
-  return new Blob([u8],{type:mime});
-}
-
-async function uploadLoginBackground(){
-  openModal('<h3>🖼️ خلفية شاشة الدخول</h3>'+
-    '<input type="file" id="bgFileInput" accept="image/*" style="display:block">'+
-    '<div id="bgPhotoPreview" style="margin:14px 0;text-align:center"></div>'+
-    '<button class="btn-purple" onclick="saveLoginBackground()">حفظ الخلفية</button>');
-  setTimeout(function(){
-    var inp=document.getElementById('bgFileInput');
-    if(!inp)return;
-    inp.onchange=function(e){
-      var f=e.target.files&&e.target.files[0];if(!f)return;
-      var reader=new FileReader();
-      reader.onload=function(ev){
-        var prev=document.getElementById('bgPhotoPreview');
-        if(prev)prev.innerHTML='<img src="'+ev.target.result+'" style="max-width:100%;max-height:180px;border-radius:10px;border:2px solid var(--blue)">';
-      };
-      reader.readAsDataURL(f);
-    };
-  },80);
-}
-
-async function saveLoginBackground(){
-  var inp=document.getElementById('bgFileInput');
-  if(!inp||!inp.files||!inp.files[0])return alert('اختر صورة أول');
-  var file=inp.files[0];
-  if(file.size>10*1024*1024)return alert('الصورة كبيرة جدًا');
-
-  var dataUrl=await compressImage(file,1200,0.75);
-
-  if(FIREBASE_READY && firebaseStorage && firebaseDB){
-    try{
-      var oldUrl=getTeam().loginBg;
-      if(oldUrl && oldUrl.indexOf('firebasestorage.googleapis.com')!==-1){
-        try{await firebaseStorage.refFromURL(oldUrl).delete()}catch(e){}
-      }
-      var blob=dataURLtoBlob(dataUrl);
-      var ref=firebaseStorage.ref('team/bg-'+Date.now()+'.jpg');
-      await ref.put(blob);
-      var url=await ref.getDownloadURL();
-      await firebaseDB.collection('settings').doc('team').set({loginBgUrl:url,updatedAt:Date.now()},{merge:true});
-      var t=getTeam();t.loginBg=url;setTeam(t);
-      applyLoginBackground();
-      closeModal();
-      renderAdmin();
-      alert('✓ تم رفع الخلفية — هتظهر عند الكل');
-      return;
-    }catch(e){
-      console.error('Firebase upload failed:',e);
-      alert('فشل الرفع على Firebase: '+e.message+'\nهيتم الحفظ على الجهاز فقط');
     }
-  }
-
-  var t=getTeam();t.loginBg=dataUrl;setTeam(t);
-  applyLoginBackground();
-  closeModal();
-  renderAdmin();
-  alert('✓ تم حفظ الخلفية على الجهاز');
-}
-
-async function removeLoginBackground(){
-  if(!confirm('إزالة خلفية شاشة الدخول؟'))return;
-  var t=getTeam();
-  if(FIREBASE_READY && firebaseStorage && t.loginBg && t.loginBg.indexOf('firebasestorage.googleapis.com')!==-1){
-    try{await firebaseStorage.refFromURL(t.loginBg).delete()}catch(e){}
-    try{await firebaseDB.collection('settings').doc('team').set({loginBgUrl:''},{merge:true})}catch(e){}
-  }
-  t.loginBg='';
-  setTeam(t);
-  applyLoginBackground();
-  renderAdmin();
-}
-
-// ============ AUTH ============
-function showView(v){
-  document.getElementById('loginView').style.display=v==='login'?'block':'none';
-  document.getElementById('signupView').style.display=v==='signup'?'block':'none';
-  document.getElementById('pendingView').style.display=v==='pending'?'block':'none';
-}
-function handleLogin(){
-  var phone=document.getElementById('loginPhone').value.trim();
-  var pass=document.getElementById('loginPassword').value;
-  if(!phone||!pass)return alert('اكتب الرقم والباسورد');
-  var us=getUsers(),u=null;
-  for(var i=0;i<us.length;i++)if(us[i].phone===phone&&us[i].password===pass){u=us[i];break}
-  if(!u)return alert('بيانات الدخول غلط');
-  if(u.status==='pending')return alert('حسابك في انتظار الموافقة');
-  if(u.status==='rejected')return alert('تم رفض حسابك');
-  setSession(u.id);enterApp();
-}
-function handleSignup(){
-  var name=document.getElementById('suName').value.trim();
-  var phone=document.getElementById('suPhone').value.trim();
-  var birth=document.getElementById('suBirth').value;
-  var pass=document.getElementById('suPass').value;
-  var conf=document.getElementById('suConfirm').value;
-  if(!name||!phone||!birth||!pass)return alert('كمل كل الحقول');
-  if(pass.length<4)return alert('الباسورد 4 حروف على الأقل');
-  if(pass!==conf)return alert('الباسورد مش متطابق');
-  var us=getUsers();
-  for(var i=0;i<us.length;i++)if(us[i].phone===phone)return alert('الرقم مسجل');
-  var isFirst=us.length===0;
-  var u={id:uid(),name:name,phone:phone,birthDate:birth,password:pass,status:isFirst?'approved':'pending',role:isFirst?'admin':'player',playerId:null,createdAt:Date.now(),isMainAdmin:isFirst};
-  us.push(u);setUsers(us);
-  if(isFirst){
-    var ps=getPlayers();
-    var p={id:uid(),name:name,phone:phone,birthDate:birth,position:'لاعب',photo:'',cardBackImage:'',
-      stats:{goals:0,assists:0,matches:0,motm:0,rating:0,pace:70,shooting:70,passing:70,dribbling:70,defending:70,physical:70,skills:3,weakFoot:3,jerseyNumber:0}};
-    ps.push(p);setPlayers(ps);
-    u.playerId=p.id;setUsers(us);setSession(u.id);enterApp();
-  }else{
-    showView('pending');
-    ['suName','suPhone','suBirth','suPass','suConfirm'].forEach(function(id){document.getElementById(id).value=''});
-  }
-}
-function logout(){
-  if(!confirm('تسجيل الخروج؟'))return;
-  setSession(null);
-  document.getElementById('app').classList.remove('show');
-  document.getElementById('authScreen').style.display='flex';
-  showView('login');
-}
-function enterApp(){
-  var u=me();
-  if(!u||u.status!=='approved'){document.getElementById('authScreen').style.display='flex';document.getElementById('app').classList.remove('show');return}
-  document.getElementById('authScreen').style.display='none';
-  document.getElementById('app').classList.add('show');
-  var t=getTeam();
-  var logoEl=document.querySelector('.app-logo');
-  if(logoEl)logoEl.innerHTML=t.logo?'<img src="'+t.logo+'">':'⚽';
-  var titleEl=document.getElementById('appTitle');
-  if(titleEl)titleEl.textContent=t.name||'فريق بني برزه';
-  renderAll();goTab(0);
-}
-
-// ============ TABS ============
-var currentTab=0;
-function goTab(idx){
-  currentTab=idx;
-  var panels=document.querySelectorAll('.tab-panel');
-  for(var i=0;i<panels.length;i++)panels[i].classList.toggle('active',i===idx);
-  var btns=document.querySelectorAll('.tab-btn');
-  for(var i=0;i<btns.length;i++)btns[i].classList.toggle('active',i===idx);
-  if(btns[idx])try{btns[idx].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'})}catch(e){}
-  if(idx!==1)legendaryPaused=true;
-}
-function renderAll(){
-  try{renderPlayers()}catch(e){console.error('players',e)}
-  try{renderCards()}catch(e){console.error('cards',e)}
-  try{renderMatches()}catch(e){console.error('matches',e)}
-  try{renderStats()}catch(e){console.error('stats',e)}
-  try{renderRules()}catch(e){console.error('rules',e)}
-  try{renderAnns()}catch(e){console.error('anns',e)}
-  try{renderAdmin()}catch(e){console.error('admin',e)}
-  updateNotifBadge();
-}
-
-// ============ FILE / IMAGE ============
-function openPhotoUpload(playerId,type){
-  var titles={avatar:'📷 صورة اللاعب',back:'🖼️ صورة ظهر الكارت',logo:'🛡️ شعار الفريق'};
-  openModal('<h3>'+(titles[type]||'رفع صورة')+'</h3>'+
-    '<input type="file" id="photoFileInput" accept="image/*" style="display:block">'+
-    '<div id="photoPreview" style="margin:14px 0;text-align:center"></div>'+
-    '<button class="btn-purple" onclick="savePhoto(\''+playerId+'\',\''+type+'\')">حفظ الصورة</button>');
-  setTimeout(function(){
-    var inp=document.getElementById('photoFileInput');
-    if(!inp)return;
-    inp.onchange=function(e){
-      var f=e.target.files&&e.target.files[0];if(!f)return;
-      var reader=new FileReader();
-      reader.onload=function(ev){
-        var prev=document.getElementById('photoPreview');
-        if(prev)prev.innerHTML='<img src="'+ev.target.result+'" style="max-width:100%;max-height:200px;border-radius:10px;border:2px solid var(--blue)">';
-      };
-      reader.readAsDataURL(f);
-    };
-  },80);
-}
-function savePhoto(playerId,type){
-  var inp=document.getElementById('photoFileInput');
-  if(!inp||!inp.files||!inp.files[0])return alert('اختر صورة أول');
-  var file=inp.files[0];
-  if(file.size>10*1024*1024)return alert('الصورة كبيرة جدًا');
-  compressImage(file,type==='avatar'?400:700,0.7).then(function(dataUrl){
-    if(type==='logo'){
-      var t=getTeam();t.logo=dataUrl;if(!setTeam(t))return;
-      document.querySelector('.app-logo').innerHTML='<img src="'+dataUrl+'">';
-      renderAdmin();
-    }else{
-      var ps=getPlayers(),found=false;
-      for(var i=0;i<ps.length;i++)if(ps[i].id===playerId){
-        if(type==='avatar')ps[i].photo=dataUrl;else ps[i].cardBackImage=dataUrl;
-        found=true;break;
-      }
-      if(!found)return alert('اللاعب غير موجود');
-      if(!setPlayers(ps))return;
-      renderPlayers();renderCards();
+    const data = snap.data();
+    if (data.role === 'pending') { 
+      $('#authScreen').style.display = 'flex'; 
+      window.showView('pending');
+      $('#app').classList.remove('show'); 
+    } else {
+      $('#authScreen').style.display = 'none'; 
+      $('#app').classList.add('show');
+      isAdmin = (data.phone === "admin" || data.role === 'admin'); 
+      isCoach = (data.role === 'coach');
+      startAppSync();
     }
-    closeModal();alert('✓ تم حفظ الصورة');
-  }).catch(function(err){alert('فشل: '+err.message)});
-}
-function compressImage(file,maxW,quality){
-  return new Promise(function(resolve,reject){
-    var reader=new FileReader();
-    reader.onload=function(){
-      var img=new Image();
-      img.onload=function(){
-        try{
-          var canvas=document.createElement('canvas');
-          var w=img.width,h=img.height;
-          if(w>maxW){h=h*maxW/w;w=maxW}
-          if(h>maxW){w=w*maxW/h;h=maxW}
-          canvas.width=w;canvas.height=h;
-          canvas.getContext('2d').drawImage(img,0,0,w,h);
-          resolve(canvas.toDataURL('image/jpeg',quality));
-        }catch(e){reject(e)}
-      };
-      img.onerror=function(){reject(new Error('فشل تحميل الصورة'))};
-      img.src=reader.result;
-    };
-    reader.onerror=function(){reject(new Error('فشل قراءة الملف'))};
-    reader.readAsDataURL(file);
   });
 }
 
-// ============ POSITION / TIER / OVERALL ============
-var posMap={'حارس':'GK','مدافع':'CB','وسط':'CM','مهاجم':'ST'};
-function posAbbr(pos){return posMap[pos]||'PLAYER'}
-function getCardTier(ovr){if(ovr>=90)return 'icon';if(ovr>=80)return 'gold';if(ovr>=70)return 'silver';return 'bronze'}
-function calcOverall(p){
-  var s=p.stats||{};
-  var pace=+s.pace||70,sho=+s.shooting||70,pas=+s.passing||70,dri=+s.dribbling||70,def=+s.defending||70,phy=+s.physical||70;
-  var w;
-  if(p.position==='حارس')w={pace:.5,sho:.2,pas:1,dri:.8,def:2.5,phy:2};
-  else if(p.position==='مدافع')w={pace:1.2,sho:.5,pas:1,dri:.8,def:2.5,phy:2};
-  else if(p.position==='وسط')w={pace:1.5,sho:1,pas:2.5,dri:2,def:1,phy:1};
-  else w={pace:2,sho:2.5,pas:1,dri:2,def:.3,phy:1.2};
-  var total=pace*w.pace+sho*w.sho+pas*w.pas+dri*w.dri+def*w.def+phy*w.phy;
-  var wsum=w.pace+w.sho+w.pas+w.dri+w.def+w.phy;
-  return Math.round(total/wsum);
+// المزامنة
+function startAppSync() {
+  if (unsubscribeTeam) unsubscribeTeam();
+  if (unsubscribeUsers) unsubscribeUsers();
+
+  unsubscribeTeam = onSnapshot(teamDocRef, (snap) => {
+    if (snap.exists()) {
+      state = snap.data();
+      state.players = state.players || []; 
+      state.matches = state.matches || [];
+      state.legendary = state.legendary || [];
+      state.rules = state.rules || ""; 
+      state.announcements = state.announcements || []; 
+      state.notifs = state.notifs || [];
+      state.admins = state.admins || []; 
+      state.coaches = state.coaches || []; 
+      state.team = state.team || { name: "فريق بني برزه", logo: "", loginBg: "" };
+    } else {
+      save(); // إنشاء الوثيقة لو مش موجودة
+    }
+    if(currentUserPhone !== "admin") { 
+      isAdmin = state.admins.includes(currentUserPhone); 
+      isCoach = state.coaches.includes(currentUserPhone); 
+    }
+    updateUI();
+    renderAll();
+    applyLoginBackground();
+  });
+
+  if (isAdmin) {
+    unsubscribeUsers = onSnapshot(collection(db, "users"), (snap) => {
+      pendingUsers = []; approvedUsers = [];
+      snap.forEach(d => {
+        const u = d.data();
+        if (u.role === 'pending') pendingUsers.push({uid: d.id, ...u});
+        else if (u.phone !== 'admin') approvedUsers.push({uid: d.id, ...u});
+      });
+      renderAdmin();
+    });
+  }
 }
 
-// ============ PLAYERS ============
-function renderPlayers(){
-  var el=document.getElementById('panel-0');
-  var user=me();if(!user){el.innerHTML='';return}
-  var players=getPlayers(),admin=user.role==='admin';
-  var html='';
-  if(admin)html+='<button class="btn-purple" onclick="showAddPlayer()" style="margin-bottom:16px">➕ إضافة لاعب جديد</button>';
-  html+='<div class="section-header">👥 اللاعبين <span class="count">'+players.length+'</span></div>';
-  if(!players.length)html+='<div class="empty-state"><div class="empty-icon">⚽</div><div>مفيش لاعبين لسه<br>ابدأ بإضافة لاعب</div></div>';
-  else{
-    html+='<div class="player-list">';
-    for(var i=0;i<players.length;i++){
-      var p=players[i];
-      html+='<div class="player-card">'+
-        '<div class="player-avatar" onclick="openProfile(\''+p.id+'\')">'+(p.photo?'<img src="'+p.photo+'">':'<span>👤</span>')+'</div>'+
-        '<div class="player-info" onclick="openProfile(\''+p.id+'\')"><div class="player-name">'+esc(p.name)+'</div><div class="player-pos">'+esc(p.position||'لاعب')+'</div></div>'+
-        '<div class="player-actions">'+
-        '<button class="icon-action" onclick="openPhotoUpload(\''+p.id+'\',\'avatar\')">📷</button>'+
-        '<button class="icon-action" onclick="editPlayerStats(\''+p.id+'\')">📊</button>'+
-        '<button class="icon-action" onclick="openProfile(\''+p.id+'\')">👁️</button>'+
-        (admin?'<button class="icon-action danger" onclick="deletePlayerCompletely(\''+p.id+'\')">🗑</button>':'')+
-        '</div></div>';
+function applyLoginBackground() {
+  if (state.team.loginBg) {
+    $('#authBgImg').style.backgroundImage = `url(${state.team.loginBg})`;
+    $('#authBgImg').classList.add('has-image');
+  } else {
+    $('#authBgImg').classList.remove('has-image');
+  }
+}
+
+function updateUI() {
+  $('#appTitle').textContent = state.team.name || "فريق بني برزه";
+  $('#headerLogo').innerHTML = state.team.logo ? `<img src="${state.team.logo}">` : '⚽';
+  if(isAdmin) $('#adminTabBtn').style.display = 'block'; else $('#adminTabBtn').style.display = 'none';
+  if (isAdmin) {
+    $('#notifBtn').style.display = 'flex';
+    if(pendingUsers.length > 0) {
+      $('#notifBadge').style.display = 'flex';
+      $('#notifBadge').textContent = pendingUsers.length;
+    } else {
+      $('#notifBadge').style.display = 'none';
     }
-    html+='</div>';
+  } else {
+    $('#notifBtn').style.display = 'none';
   }
-  el.innerHTML=html;
 }
-function showAddPlayer(){
-  var positions=['حارس','مدافع','وسط','مهاجم'],opts='';
-  for(var i=0;i<positions.length;i++)opts+='<option>'+positions[i]+'</option>';
-  openModal('<h3>➕ لاعب جديد</h3>'+
-    '<label class="form-label">الاسم *</label><input id="np_name" placeholder="اسم اللاعب">'+
-    '<label class="form-label">المركز</label><select id="np_pos">'+opts+'</select>'+
-    '<label class="form-label">رقم الموبايل</label><input id="np_phone" type="tel">'+
-    '<label class="form-label">تاريخ الميلاد</label><input id="np_birth" type="date">'+
-    '<button class="btn-purple" onclick="addPlayer()" style="margin-top:18px">إضافة</button>');
-}
-function addPlayer(){
-  var name=document.getElementById('np_name').value.trim();
-  if(!name)return alert('اكتب اسم اللاعب');
-  var ps=getPlayers();
-  ps.push({id:uid(),name:name,position:document.getElementById('np_pos').value,
-    phone:document.getElementById('np_phone').value.trim(),
-    birthDate:document.getElementById('np_birth').value,
-    photo:'',cardBackImage:'',
-    stats:{goals:0,assists:0,matches:0,motm:0,rating:0,pace:70,shooting:70,passing:70,dribbling:70,defending:70,physical:70,skills:3,weakFoot:3,jerseyNumber:0}});
-  if(!setPlayers(ps))return;
-  closeModal();renderAll();
-}
-function editPlayerStats(id){
-  var p=getPlayerById(id);if(!p)return;
-  var s=p.stats||{};
-  var positions=['حارس','مدافع','وسط','مهاجم'],posOpts='';
-  for(var j=0;j<positions.length;j++)posOpts+='<option '+(positions[j]===p.position?'selected':'')+'>'+positions[j]+'</option>';
-  var skillsOpts='',wfOpts='';
-  for(var k=1;k<=5;k++){
-    skillsOpts+='<option value="'+k+'" '+(+s.skills===k?'selected':'')+'>'+k+' ⭐</option>';
-    wfOpts+='<option value="'+k+'" '+(+s.weakFoot===k?'selected':'')+'>'+k+'/5</option>';
-  }
-  openModal('<h3>📊 '+esc(p.name)+'</h3>'+
-    '<label class="form-label">الاسم</label><input id="ep_name" value="'+esc(p.name)+'">'+
-    '<label class="form-label">المركز</label><select id="ep_pos">'+posOpts+'</select>'+
-    '<label class="form-label">إحصائيات FIFA (0-99)</label>'+
-    '<div class="grid-3">'+
-    '<div><label class="form-label">سرعة</label><input id="ep_pace" type="number" value="'+(s.pace||70)+'"></div>'+
-    '<div><label class="form-label">تسديد</label><input id="ep_sho" type="number" value="'+(s.shooting||70)+'"></div>'+
-    '<div><label class="form-label">تمرير</label><input id="ep_pas" type="number" value="'+(s.passing||70)+'"></div>'+
-    '<div><label class="form-label">مراوغة</label><input id="ep_dri" type="number" value="'+(s.dribbling||70)+'"></div>'+
-    '<div><label class="form-label">دفاع</label><input id="ep_def" type="number" value="'+(s.defending||70)+'"></div>'+
-    '<div><label class="form-label">بدنية</label><input id="ep_phy" type="number" value="'+(s.physical||70)+'"></div>'+
-    '</div>'+
-    '<label class="form-label">تفاصيل الكارت</label>'+
-    '<div class="grid-2">'+
-    '<div><label class="form-label">مهارات</label><select id="ep_skills">'+skillsOpts+'</select></div>'+
-    '<div><label class="form-label">قدم ضعيفة</label><select id="ep_wf">'+wfOpts+'</select></div>'+
-    '<div><label class="form-label">رقم القميص</label><input id="ep_num" type="number" min="0" max="99" value="'+(s.jerseyNumber||0)+'"></div>'+
-    '</div>'+
-    '<button class="btn-purple" onclick="savePlayerStats(\''+id+'\')" style="margin-top:18px">حفظ الإحصائيات</button>');
-}
-function savePlayerStats(id){
-  var ps=getPlayers(),p=null;
-  for(var i=0;i<ps.length;i++)if(ps[i].id===id){p=ps[i];break}
-  if(!p)return;
-  p.name=document.getElementById('ep_name').value.trim()||p.name;
-  p.position=document.getElementById('ep_pos').value;
-  var newStats={
-    goals:(p.stats&&p.stats.goals)||0,
-    assists:(p.stats&&p.stats.assists)||0,
-    matches:(p.stats&&p.stats.matches)||0,
-    motm:(p.stats&&p.stats.motm)||0,
-    rating:(p.stats&&p.stats.rating)||0,
-    pace:+document.getElementById('ep_pace').value||70,
-    shooting:+document.getElementById('ep_sho').value||70,
-    passing:+document.getElementById('ep_pas').value||70,
-    dribbling:+document.getElementById('ep_dri').value||70,
-    defending:+document.getElementById('ep_def').value||70,
-    physical:+document.getElementById('ep_phy').value||70,
-    skills:+document.getElementById('ep_skills').value||3,
-    weakFoot:+document.getElementById('ep_wf').value||3,
-    jerseyNumber:+document.getElementById('ep_num').value||0
+
+// التابات
+$$('.tab-btn').forEach(btn => {
+  btn.onclick = () => {
+    currentTab = parseInt(btn.dataset.tab);
+    $$('.tab-panel').forEach((p, i) => p.classList.toggle('active', i === currentTab));
+    $$('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === currentTab));
+    if(currentTab !== 1) legendaryPaused = true;
   };
-  p.stats=Object.assign({},p.stats||{},newStats);
-  if(!setPlayers(ps))return;
-  closeModal();renderAll();
+});
+
+function renderAll() {
+  try { renderPlayers(); } catch(e) { console.error('players', e); }
+  try { renderCards(); } catch(e) { console.error('cards', e); }
+  try { renderMatches(); } catch(e) { console.error('matches', e); }
+  try { renderStats(); } catch(e) { console.error('stats', e); }
+  try { renderRules(); } catch(e) { console.error('rules', e); }
+  try { renderAnns(); } catch(e) { console.error('anns', e); }
+  try { renderAdmin(); } catch(e) { console.error('admin', e); }
 }
 
-// ============ DELETE CASCADE ============
-function deletePlayerCompletely(playerId){
-  var users=getUsers();
-  var currentUser=me();
-  var linkedUser=null;
-  for(var i=0;i<users.length;i++){
-    if(users[i].playerId===playerId){linkedUser=users[i];break}
-  }
-  if(linkedUser&&linkedUser.isMainAdmin){
-    alert('❌ لا يمكن حذف الأدمن الرئيسي');
-    return false;
-  }
-  if(linkedUser&&currentUser&&linkedUser.id===currentUser.id){
-    alert('❌ لا يمكنك حذف حسابك الخاص');
-    return false;
-  }
-  if(!confirm('حذف اللاعب نهائيًا؟\nهيتم حذف أكونته من قايمة الصلاحيات كمان')){
-    return false;
-  }
-  setPlayers(getPlayers().filter(function(p){return p.id!==playerId}));
-  if(linkedUser){
-    setUsers(users.filter(function(u){return u.id!==linkedUser.id}));
-    if(getSession()===linkedUser.id){
-      setSession(null);
-      document.getElementById('app').classList.remove('show');
-      document.getElementById('authScreen').style.display='flex';
-      showView('login');
-      return true;
-    }
-  }
-  closeModal();renderAll();
-  return true;
-}
-
-function deletePlayer(id){deletePlayerCompletely(id)}
-function deleteFromProfile(){
-  if(!currentProfileId)return;
-  if(deletePlayerCompletely(currentProfileId))closeProfile();
-}
-
-// ============ PROFILE ============
-var currentProfileId=null;
-function openProfile(id){
-  var p=getPlayerById(id);if(!p)return;
-  currentProfileId=id;
-  var bg=document.getElementById('profileBgImg');
-  if(p.photo)bg.style.backgroundImage='url('+p.photo+')';else bg.style.backgroundImage='none';
-  document.getElementById('profileAvatar').innerHTML=p.photo?'<img src="'+p.photo+'">':'👤';
-  document.getElementById('profileName').textContent=p.name;
-  document.getElementById('profilePos').textContent=(p.position||'لاعب')+' • التقييم '+calcOverall(p);
-  var s=p.stats||{};
-  document.getElementById('profileStats').innerHTML=
-    '<div class="stat-box"><b>'+(s.goals||0)+'</b><span>أهداف</span></div>'+
-    '<div class="stat-box"><b>'+(s.assists||0)+'</b><span>أسيست</span></div>'+
-    '<div class="stat-box"><b>'+(s.matches||0)+'</b><span>ماتشات</span></div>'+
-    '<div class="stat-box"><b>'+(s.motm||0)+'</b><span>⭐ نجم</span></div>'+
-    '<div class="stat-box"><b>'+(s.pace||70)+'</b><span>سرعة</span></div>'+
-    '<div class="stat-box"><b>'+(s.shooting||70)+'</b><span>تسديد</span></div>'+
-    '<div class="stat-box"><b>'+(s.passing||70)+'</b><span>تمرير</span></div>'+
-    '<div class="stat-box"><b>'+(s.dribbling||70)+'</b><span>مراوغة</span></div>'+
-    '<div class="stat-box"><b>'+(s.defending||70)+'</b><span>دفاع</span></div>';
-  var det=[];
-  if(p.phone)det.push('📱 '+esc(p.phone));
-  if(p.birthDate)det.push('🎂 '+esc(p.birthDate));
-  if(!det.length)det.push('<span style="color:var(--dim)">لا توجد تفاصيل</span>');
-  document.getElementById('profileDetails').innerHTML=det.join('<br>');
-  var delBtn=document.getElementById('profileDeleteBtn');
-  if(delBtn){
-    var linkedUser=null,us=getUsers();
-    for(var i=0;i<us.length;i++)if(us[i].playerId===id){linkedUser=us[i];break}
-    var canDel=isAdmin()&&!(linkedUser&&linkedUser.isMainAdmin);
-    delBtn.style.display=canDel?'block':'none';
-  }
-  document.getElementById('profileView').classList.add('show');
-}
-function closeProfile(){document.getElementById('profileView').classList.remove('show');currentProfileId=null}
-
-// ============ CARD HTML BUILDER ============
-function buildCardInnerHTML(p,ovr,tier,forPreview,isLegendary){
-  var s=p.stats||{};
-  var stars='';var sk=+s.skills||3;
-  for(var i=0;i<5;i++)stars+=(i<sk?'★':'☆');
-  var photoHTML=p.photo?'<img src="'+p.photo+'" alt="">':'👤';
-  var numHTML=s.jerseyNumber?'<span>#'+s.jerseyNumber+'</span>':'<span>WF '+(s.weakFoot||3)+'</span>';
-  var editBtn=(isLegendary&&!forPreview&&isAdmin())?'<button class="fifa-edit" onclick="event.stopPropagation();editLegendClick(event,\''+p.id+'\')">✏️</button>':'';
-  var delBtn=(isLegendary&&!forPreview&&isAdmin())?'<button class="fifa-del" onclick="event.stopPropagation();delLegendClick(event,\''+p.id+'\')">🗑</button>':'';
-  var expandBtn=forPreview?'':'<button class="fifa-expand-center" onclick="event.stopPropagation();expandClick(event,\''+p.id+'\','+(isLegendary?'true':'false')+')">⤢</button>';
-  var backStyle=p.cardBackImage?'background-image:url('+p.cardBackImage+')':'';
-  var backTopBtns=forPreview?'':'<button class="fifa-back-btn" onclick="event.stopPropagation();shareClick(event,\''+p.id+'\','+(isLegendary?'true':'false')+')">📤</button>';
-
-  var seasonHTML=
-    '<div class="fifa-season-stats">'+
-      '<div class="fifa-season-stat"><b>'+(s.matches||0)+'</b><span>MATCH</span></div>'+
-      '<div class="fifa-season-stat"><b>'+(s.goals||0)+'</b><span>GOALS</span></div>'+
-      '<div class="fifa-season-stat"><b>'+(s.assists||0)+'</b><span>ASSIST</span></div>'+
-    '</div>';
-
-  var backStats=
-    '<div class="fifa-full-stats">'+
-      '<div class="fifa-stat-row">'+
-        '<div class="fifa-stat"><b>'+(s.pace||70)+'</b><span>PAC</span></div>'+
-        '<div class="fifa-stat"><b>'+(s.shooting||70)+'</b><span>SHO</span></div>'+
-        '<div class="fifa-stat"><b>'+(s.passing||70)+'</b><span>PAS</span></div>'+
-      '</div>'+
-      '<div class="fifa-stat-row">'+
-        '<div class="fifa-stat"><b>'+(s.dribbling||70)+'</b><span>DRI</span></div>'+
-        '<div class="fifa-stat"><b>'+(s.defending||70)+'</b><span>DEF</span></div>'+
-        '<div class="fifa-stat"><b>'+(s.physical||70)+'</b><span>PHY</span></div>'+
-      '</div>'+
-    '</div>';
-
-  return '<div class="fifa-face fifa-front">'+
-    '<div class="fifa-content">'+
-      editBtn+delBtn+
-      '<div class="fifa-top">'+
-        '<div class="fifa-rating-block"><div class="fifa-overall">'+ovr+'</div><div class="fifa-position">'+posAbbr(p.position)+'</div></div>'+
-        '<div class="fifa-photo-wrap"><div class="fifa-photo-circle">'+photoHTML+'</div></div>'+
-      '</div>'+
-      '<div class="fifa-name-bar"><div class="fifa-name">'+esc(p.name)+'</div></div>'+
-      seasonHTML+
-      '<div class="fifa-extra">'+
-        '<span class="fifa-stars">'+stars+'</span>'+
-        expandBtn+
-        numHTML+
-      '</div>'+
-    '</div>'+
-  '</div>'+
-  '<div class="fifa-face fifa-back" style="'+backStyle+'">'+
-    '<div class="fifa-back-overlay"></div>'+
-    '<div class="fifa-back-top">'+backTopBtns+'</div>'+
-    backStats+
-    '<div class="fifa-back-content">'+
-      '<div class="fifa-back-ovr">'+ovr+'</div>'+
-      '<div class="fifa-back-name">'+esc(p.name)+'</div>'+
-      '<div class="fifa-back-pos">'+posAbbr(p.position)+'</div>'+
-      '<div class="fifa-back-brand">فريق بني برزه</div>'+
-    '</div>'+
-  '</div>';
-}
-function buildNormalCardHTML(p){
-  var ovr=calcOverall(p),tier=getCardTier(ovr);
-  return '<div class="fifa-card-wrap" data-tier="'+tier+'" data-player="'+p.id+'">'+
-    '<div class="fifa-card-3d">'+
-      '<div class="fifa-card" onclick="flipCard(this)">'+buildCardInnerHTML(p,ovr,tier,false,false)+'</div>'+
-    '</div>'+
-  '</div>';
-}
-function buildLegendaryCardHTML(p,index){
-  var ovr=calcOverall(p);
-  return '<div class="legendary-card" data-index="'+index+'" onclick="onLegendaryClick(event,'+index+',this)">'+
-    '<div class="fifa-card-wrap" data-tier="legendary" data-player="'+p.id+'">'+
-      '<div class="fifa-card-3d">'+
-        '<div class="fifa-card">'+buildCardInnerHTML(p,ovr,'legendary',false,true)+'</div>'+
-      '</div>'+
-    '</div>'+
-  '</div>';
-}
-
-// ============ CARDS TAB ============
-var cardsTab='normal';
-var legendaryIndex=0;
-var legendaryPaused=false;
-var legendaryPauseTimer=null;
-
-function renderCards(){
-  var el=document.getElementById('panel-1');
-  if(!el)return;
-  el.innerHTML='<div class="cards-subtabs">'+
-    '<button class="subtabs-btn '+(cardsTab==='normal'?'active':'')+'" onclick="switchCardsTab(\'normal\')">⚡ عادية</button>'+
-    '<button class="subtabs-btn '+(cardsTab==='legendary'?'active':'')+'" onclick="switchCardsTab(\'legendary\')">👑 أسطورية</button>'+
-    '</div>'+
-    '<div id="cardsNormalView" style="'+(cardsTab==='normal'?'':'display:none;')+'">'+buildNormalCardsHTML()+'</div>'+
-    '<div id="cardsLegendaryView" style="'+(cardsTab==='legendary'?'':'display:none;')+'">'+buildLegendaryViewHTML()+'</div>';
-  if(cardsTab==='legendary')setTimeout(updateLegendaryPositions,50);
-}
-function buildNormalCardsHTML(){
-  var players=getPlayers();
-  if(!players.length)return '<div class="empty-state"><div class="empty-icon">🎴</div><div>ضيف لاعبين الأول عشان تظهر الكروت</div></div>';
-  var html='<div class="cards-toolbar"><button id="motionBtn" onclick="toggleMotion()">🎮 تشغيل الحركة</button></div>';
-  html+='<div class="cards-grid-2" id="cardsGrid">';
-  for(var i=0;i<players.length;i++)html+=buildNormalCardHTML(players[i]);
-  html+='</div>';
-  return html;
-}
-function buildLegendaryViewHTML(){
-  var legends=getLegendary();
-  var admin=isAdmin();
-  var html='';
-  if(admin)html+='<div class="legendary-toolbar"><button onclick="showAddLegend()">➕ إضافة كارت أسطوري</button></div>';
-  if(!legends.length){
-    html+='<div class="empty-state"><div class="empty-icon">👑</div><div>مفيش كروت أسطورية لسه'+(admin?'<br>اضغط "إضافة كارت أسطوري"':'')+'</div></div>';
-    return html;
-  }
-  if(legendaryIndex>=legends.length)legendaryIndex=0;
-  html+='<div class="legendary-carousel"><div class="legendary-stage" id="legendaryStage">';
-  for(var i=0;i<legends.length;i++)html+=buildLegendaryCardHTML(legends[i],i);
-  html+='</div></div>';
-  html+='<div class="legendary-indicator" id="legendaryIndicator">'+(legendaryIndex+1)+' / '+legends.length+'</div>';
-  return html;
-}
-function switchCardsTab(tab){cardsTab=tab;legendaryPaused=false;renderCards()}
-function updateLegendaryPositions(){
-  var stage=document.getElementById('legendaryStage');
-  if(!stage)return;
-  var cards=stage.querySelectorAll('.legendary-card');
-  var total=cards.length;
-  if(!total)return;
-  for(var i=0;i<cards.length;i++){
-    var offset=i-legendaryIndex;
-    if(offset>total/2)offset-=total;
-    if(offset<-total/2)offset+=total;
-    var abs=Math.abs(offset);
-    var card=cards[i];
-    if(abs>3){card.style.opacity='0';card.style.pointerEvents='none';card.style.transform='translateX('+(offset>0?400:-400)+'px) scale(0.3)';continue}
-    var translateX=offset*90,translateZ=-abs*80,scale=1-abs*0.12,rotateY=offset*-15;
-    var opacity=abs===0?1:(abs===1?0.85:(abs===2?0.55:0.25));
-    card.style.opacity=opacity;
-    card.style.pointerEvents='auto';
-    card.style.zIndex=100-abs;
-    card.style.transform='translateX('+translateX+'px) translateZ('+translateZ+'px) scale('+scale+') rotateY('+rotateY+'deg)';
-    card.classList.toggle('active',abs===0);
-  }
-  var ind=document.getElementById('legendaryIndicator');
-  if(ind)ind.textContent=(legendaryIndex+1)+' / '+total;
-}
-function onLegendaryClick(e,i,el){
-  if(e&&e.stopPropagation)e.stopPropagation();
-  if(i===legendaryIndex){
-    var inner=el.querySelector('.fifa-card');
-    if(inner)inner.classList.toggle('flipped');
-    pauseLegendaryAuto(true);
-  }else{
-    legendaryIndex=i;
-    updateLegendaryPositions();
-    pauseLegendaryAuto(false);
-  }
-}
-function pauseLegendaryAuto(short){
-  legendaryPaused=true;
-  if(legendaryPauseTimer)clearTimeout(legendaryPauseTimer);
-  legendaryPauseTimer=setTimeout(function(){legendaryPaused=false},short?8000:12000);
-}
-function toggleMotion(){
-  var grid=document.getElementById('cardsGrid');
-  if(!grid)return;
-  grid.classList.toggle('motion');
-  var btn=document.getElementById('motionBtn');
-  if(btn){
-    if(grid.classList.contains('motion')){btn.textContent='⏸️ إيقاف الحركة';btn.classList.add('active')}
-    else{btn.textContent='🎮 تشغيل الحركة';btn.classList.remove('active')}
-  }
-}
-function flipCard(el){
-  if(!el)return;
-  var card=el.classList&&el.classList.contains('fifa-card')?el:el.querySelector&&el.querySelector('.fifa-card');
-  if(card)card.classList.toggle('flipped');
-}
-function expandClick(e,id,isLegend){
-  if(e){if(e.stopPropagation)e.stopPropagation();if(e.preventDefault)e.preventDefault()}
-  previewCard(id,isLegend);
-}
-function shareClick(e,id,isLegend){
-  if(e){if(e.stopPropagation)e.stopPropagation()}
-  shareCardItem(id,isLegend);
-}
-function editLegendClick(e,id){if(e){e.stopPropagation();e.preventDefault()}editLegend(id)}
-function delLegendClick(e,id){if(e){e.stopPropagation();e.preventDefault()}deleteLegend(id)}
-function shareCardItem(id,isLegend){
-  var p=isLegend?getLegendaryById(id):getPlayerById(id);
-  if(!p)return;
-  var s=p.stats||{},ovr=calcOverall(p);
-  var text='⚽ '+p.name+'\n📍 '+posAbbr(p.position)+'\n⭐ التقييم: '+ovr+'\n\n'+
-    '🎯 التسديد: '+(s.shooting||70)+'\n⚡ السرعة: '+(s.pace||70)+'\n🎨 المراوغة: '+(s.dribbling||70)+'\n'+
-    '📤 التمرير: '+(s.passing||70)+'\n🛡️ الدفاع: '+(s.defending||70)+'\n💪 البدنية: '+(s.physical||70);
-  if(navigator.share){navigator.share({title:p.name,text:text}).catch(function(){})}
-  else if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){alert('✓ تم النسخ')}).catch(function(){alert(text)})}
-  else alert(text);
-}
-function previewCard(id,isLegend){
-  try{
-    var p=isLegend?getLegendaryById(id):getPlayerById(id);
-    if(!p)p=getPlayerById(id)||getLegendaryById(id);
-    if(!p)return;
-    var ovr=calcOverall(p);
-    var tier=isLegend?'legendary':getCardTier(ovr);
-    var content=document.getElementById('previewContent');
-    var overlay=document.getElementById('previewOverlay');
-    content.innerHTML='<button class="preview-close" onclick="closePreview()">×</button>'+
-      '<div class="fifa-card-wrap" data-tier="'+tier+'"><div class="fifa-card-3d"><div class="fifa-card">'+buildCardInnerHTML(p,ovr,tier,true,false)+'</div></div></div>';
-    overlay.classList.add('show');
-  }catch(e){console.error('preview',e);alert('خطأ: '+e.message)}
-}
-function closePreview(){document.getElementById('previewOverlay').classList.remove('show')}
-
-// ============ LEGENDARY CRUD ============
-var legendTempPhoto=null;
-var legendEditingId=null;
-
-function showAddLegend(){legendTempPhoto=null;legendEditingId=null;openLegendModal(null)}
-function editLegend(id){var p=getLegendaryById(id);if(!p)return;legendTempPhoto=p.photo||null;legendEditingId=id;openLegendModal(p)}
-function deleteLegend(id){
-  if(!confirm('حذف الكارت الأسطوري؟'))return;
-  setLegendary(getLegendary().filter(function(x){return x.id!==id}));
-  if(legendaryIndex>=getLegendary().length)legendaryIndex=0;
-  renderCards();closeModal();
-}
-function openLegendModal(editPlayer){
-  var isEdit=!!editPlayer;
-  var s=editPlayer?editPlayer.stats||{}:{pace:85,shooting:85,passing:85,dribbling:85,defending:85,physical:85,skills:5,weakFoot:4,jerseyNumber:10};
-  var positions=['حارس','مدافع','وسط','مهاجم'],posOpts='';
-  for(var j=0;j<positions.length;j++)posOpts+='<option '+(editPlayer&&positions[j]===editPlayer.position?'selected':'')+'>'+positions[j]+'</option>';
-  var skillsOpts='',wfOpts='';
-  for(var k=1;k<=5;k++){
-    skillsOpts+='<option value="'+k+'" '+(+s.skills===k?'selected':'')+'>'+k+' ⭐</option>';
-    wfOpts+='<option value="'+k+'" '+(+s.weakFoot===k?'selected':'')+'>'+k+'/5</option>';
-  }
-  var html='<h3>'+(isEdit?'✏️ تعديل':'👑 كارت أسطوري جديد')+'</h3>'+
-    '<label class="form-label">الاسم *</label><input id="lg_name" value="'+(editPlayer?esc(editPlayer.name):'')+'">'+
-    '<label class="form-label">المركز</label><select id="lg_pos">'+posOpts+'</select>'+
-    '<label class="form-label">الصورة</label>'+
-    '<div style="display:flex;gap:6px;margin-bottom:8px">'+
-    '<button class="btn-purple btn-sm" onclick="pickLegendFromDevice()" style="flex:1">📷 من جهازي</button>'+
-    '<button class="btn-purple btn-sm btn-ghost" onclick="pickLegendFromPlayers()" style="flex:1">👥 من اللاعبين</button>'+
-    '</div>'+
-    '<div id="lg_photo_preview" style="text-align:center;margin-bottom:8px">'+
-    (legendTempPhoto?'<img src="'+legendTempPhoto+'" style="max-width:100px;max-height:100px;border-radius:10px;border:2px solid var(--blue)">':'<span style="color:var(--dim);font-size:12px">مفيش صورة مختارة</span>')+
-    '</div>'+
-    '<input type="file" id="lg_file_input" accept="image/*" style="display:none">'+
-    '<label class="form-label">إحصائيات (0-99)</label>'+
-    '<div class="grid-3">'+
-    '<div><label class="form-label">سرعة</label><input id="lg_pace" type="number" value="'+(s.pace||85)+'"></div>'+
-    '<div><label class="form-label">تسديد</label><input id="lg_sho" type="number" value="'+(s.shooting||85)+'"></div>'+
-    '<div><label class="form-label">تمرير</label><input id="lg_pas" type="number" value="'+(s.passing||85)+'"></div>'+
-    '<div><label class="form-label">مراوغة</label><input id="lg_dri" type="number" value="'+(s.dribbling||85)+'"></div>'+
-    '<div><label class="form-label">دفاع</label><input id="lg_def" type="number" value="'+(s.defending||85)+'"></div>'+
-    '<div><label class="form-label">بدنية</label><input id="lg_phy" type="number" value="'+(s.physical||85)+'"></div>'+
-    '</div>'+
-    '<div class="grid-2">'+
-    '<div><label class="form-label">مهارات</label><select id="lg_skills">'+skillsOpts+'</select></div>'+
-    '<div><label class="form-label">قدم ضعيفة</label><select id="lg_wf">'+wfOpts+'</select></div>'+
-    '<div><label class="form-label">رقم القميص</label><input id="lg_num" type="number" min="0" max="99" value="'+(s.jerseyNumber||0)+'"></div>'+
-    '</div>'+
-    '<button class="btn-purple" onclick="saveLegend()" style="margin-top:18px">حفظ</button>';
-  openModal(html);
-  setTimeout(function(){
-    var inp=document.getElementById('lg_file_input');
-    if(!inp)return;
-    inp.onchange=function(e){
-      var f=e.target.files&&e.target.files[0];if(!f)return;
-      compressImage(f,500,0.7).then(function(dataUrl){
-        legendTempPhoto=dataUrl;
-        var prev=document.getElementById('lg_photo_preview');
-        if(prev)prev.innerHTML='<img src="'+dataUrl+'" style="max-width:100px;max-height:100px;border-radius:10px;border:2px solid var(--blue)">';
-      }).catch(function(err){alert('فشل: '+err.message)});
-    };
-  },100);
-}
-function pickLegendFromDevice(){var inp=document.getElementById('lg_file_input');if(inp)inp.click()}
-function pickLegendFromPlayers(){
-  var ps=getPlayers().filter(function(p){return p.photo});
-  if(!ps.length){alert('مفيش لاعبين عندهم صور');return}
-  var html='<h3>👥 اختيار صورة لاعب</h3><div class="photo-pick-grid">';
-  for(var i=0;i<ps.length;i++){
-    html+='<div class="photo-pick-cell" onclick="selectLegendPhotoFromPlayers(\''+ps[i].id+'\')"><img src="'+ps[i].photo+'"></div>';
-  }
-  html+='</div>';
-  openModal(html);
-}
-function selectLegendPhotoFromPlayers(playerId){
-  var p=getPlayerById(playerId);
-  if(!p||!p.photo)return;
-  legendTempPhoto=p.photo;
-  if(legendEditingId){
-    var lp=getLegendaryById(legendEditingId);
-    if(lp){lp.photo=legendTempPhoto;openLegendModal(lp);return}
-  }
-  openLegendModal({name:'',position:'لاعب',photo:legendTempPhoto,stats:{pace:85,shooting:85,passing:85,dribbling:85,defending:85,physical:85,skills:5,weakFoot:4,jerseyNumber:10}});
-}
-function saveLegend(){
-  var name=document.getElementById('lg_name').value.trim();
-  if(!name)return alert('اكتب الاسم');
-  var stats={
-    goals:0,assists:0,matches:0,motm:0,rating:0,
-    pace:+document.getElementById('lg_pace').value||85,
-    shooting:+document.getElementById('lg_sho').value||85,
-    passing:+document.getElementById('lg_pas').value||85,
-    dribbling:+document.getElementById('lg_dri').value||85,
-    defending:+document.getElementById('lg_def').value||85,
-    physical:+document.getElementById('lg_phy').value||85,
-    skills:+document.getElementById('lg_skills').value||5,
-    weakFoot:+document.getElementById('lg_wf').value||4,
-    jerseyNumber:+document.getElementById('lg_num').value||0
-  };
-  var position=document.getElementById('lg_pos').value;
-  var ls=getLegendary();
-  if(legendEditingId){
-    for(var i=0;i<ls.length;i++)if(ls[i].id===legendEditingId){
-      ls[i].name=name;ls[i].position=position;ls[i].photo=legendTempPhoto||'';ls[i].stats=stats;break;
-    }
-  }else{
-    ls.push({id:uid(),name:name,position:position,photo:legendTempPhoto||'',stats:stats});
-  }
-  if(!setLegendary(ls))return;
-  legendTempPhoto=null;legendEditingId=null;
-  closeModal();renderCards();
-  alert('✓ تم الحفظ');
-}
-
-// ============ MATCHES ============
-function renderMatches(){
-  var el=document.getElementById('panel-2');
-  var admin=isAdmin();
-  var html='';
-  if(admin){
-    html+='<div class="section-header" style="margin-top:0">➕ إضافة ماتش</div>';
-    html+='<div class="match-form">';
-    html+='<label class="match-form-label">التاريخ</label>';
-    html+='<input type="date" id="m_date" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;margin-bottom:8px">';
-    html+='<div class="grid-2" style="margin-bottom:8px">';
-    html+='<div><label class="match-form-label">من الساعة</label><input type="time" id="m_from" value="20:00" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff"></div>';
-    html+='<div><label class="match-form-label">إلى الساعة</label><input type="time" id="m_to" value="21:30" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff"></div>';
-    html+='</div>';
-    html+='<label class="match-form-label">الفريقان</label>';
-    html+='<div class="match-form-row">';
-    html+='<input type="text" id="m_team1" value="'+esc(getTeam().name)+'" placeholder="فريقنا" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff">';
-    html+='<div class="vs">VS</div>';
-    html+='<input type="text" id="m_team2" placeholder="الفريق المنافس" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff">';
-    html+='</div>';
-    html+='<label class="match-form-label">النتيجة</label>';
-    html+='<div class="match-form-row">';
-    html+='<input type="number" id="m_score1" min="0" value="0" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;text-align:center">';
-    html+='<div class="vs">-</div>';
-    html+='<input type="number" id="m_score2" min="0" value="0" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;text-align:center">';
-    html+='</div>';
-    html+='<label class="match-form-label">الملعب</label>';
-    html+='<input id="m_place" placeholder="مكان الملعب" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;margin-bottom:8px">';
-    html+='<label class="match-form-label">التكلفة</label>';
-    html+='<input type="number" id="m_cost" value="300" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;margin-bottom:8px">';
-    html+='<button class="btn-purple" onclick="addMatch()">إضافة الماتش</button>';
-    html+='</div>';
-  }
-  var ms=getMatches().slice().sort(function(a,b){return new Date(b.date||b.datetime)-new Date(a.date||a.datetime)});
-  html+='<div class="section-header">⚽ الماتشات <span class="count">'+ms.length+'</span></div>';
-  if(!ms.length)html+='<div class="empty-state"><div class="empty-icon">⚽</div><div>مفيش ماتشات</div></div>';
-  else for(var i=0;i<ms.length;i++){html+=renderMatchCard(ms[i])}
-  el.innerHTML=html;
-}
-function renderMatchCard(m){
-  var team1=m.ourTeam||m.team1||'فريقنا';
-  var team2=m.opponentTeam||m.team2||'الخصم';
-  var score1=m.ourScore!=null?m.ourScore:'-';
-  var score2=m.theirScore!=null?m.theirScore:'-';
-  var dateStr=m.date||(m.datetime?m.datetime.split('T')[0]:'');
-  var timeStr=(m.timeFrom||'')+(m.timeTo?' - '+m.timeTo:'');
-  var lineupCount=(m.lineup||[]).length;
-  return '<div class="match-item" onclick="openMatchDetail(\''+m.id+'\')">'+
-    '<div class="match-header"><span>📅 '+esc(dateStr)+'</span><span>⏰ '+esc(timeStr)+'</span></div>'+
-    '<div class="match-teams"><div class="match-team">'+esc(team1)+'</div><div class="match-score">'+score1+' - '+score2+'</div><div class="match-team">'+esc(team2)+'</div></div>'+
-    '<div class="match-meta"><span>📍 '+esc(m.place||'')+'</span><span>👥 '+lineupCount+' في التشكيل</span>'+(m.cost?'<span>💰 '+m.cost+' ج</span>':'')+'</div>'+
-    '</div>';
-}
-function addMatch(){
-  var d=document.getElementById('m_date').value;
-  var from=document.getElementById('m_from').value||'20:00';
-  var to=document.getElementById('m_to').value||'21:30';
-  var t1=document.getElementById('m_team1').value.trim()||getTeam().name;
-  var t2=document.getElementById('m_team2').value.trim();
-  var s1=+document.getElementById('m_score1').value||0;
-  var s2=+document.getElementById('m_score2').value||0;
-  var place=document.getElementById('m_place').value.trim();
-  var cost=+document.getElementById('m_cost').value||0;
-  if(!d)return alert('اختار التاريخ');
-  if(!t2)return alert('اكتب اسم الفريق المنافس');
-  var ms=getMatches();
-  ms.push({id:uid(),date:d,timeFrom:from,timeTo:to,ourTeam:t1,opponentTeam:t2,
-    ourScore:s1,theirScore:s2,place:place,cost:cost,
-    lineup:[],goals:{},assists:{},ratings:{},motm:null,worst:null,bad:[]});
-  if(!setMatches(ms))return;
-  renderMatches();
-}
-function fmtDate(dt){
-  try{var d=new Date(dt);return d.toLocaleDateString('ar-EG',{day:'numeric',month:'short'})+' — '+d.toLocaleTimeString('ar-EG',{hour:'2-digit',minute:'2-digit'})}catch(e){return dt}
-}
-var matchLineupExpanded=false;
-function openMatchDetail(id){
-  var ms=getMatches(),m=null;
-  for(var i=0;i<ms.length;i++)if(ms[i].id===id){m=ms[i];break}
-  if(!m)return;
-  var user=me();
-  var canEdit=(user.role==='admin'||user.role==='coach');
-  var lineup=m.lineup||[];
-  var team1=m.ourTeam||'فريقنا';
-  var team2=m.opponentTeam||'الخصم';
-  var html='<h3>'+esc(m.date||'')+'</h3>';
-  html+='<div style="text-align:center;color:var(--dim);margin-bottom:14px;font-size:12px">⏰ '+esc(m.timeFrom||'')+(m.timeTo?' - '+m.timeTo:'')+' • 📍 '+esc(m.place||'')+'</div>';
-  html+='<div style="display:flex;justify-content:space-between;align-items:center;padding:14px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);border-radius:12px;margin-bottom:14px">';
-  html+='<div style="flex:1;text-align:center;font-weight:800;color:var(--blue-lt);font-size:13px">'+esc(team1)+'</div>';
-  html+='<div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:2px;direction:ltr;padding:0 10px">'+(m.ourScore!=null?m.ourScore:'-')+' - '+(m.theirScore!=null?m.theirScore:'-')+'</div>';
-  html+='<div style="flex:1;text-align:center;font-weight:800;color:var(--blue-lt);font-size:13px">'+esc(team2)+'</div>';
-  html+='</div>';
-
-  // Lineup section
-  html+='<div class="lineup-section">';
-  html+='<div class="lineup-header" onclick="toggleMatchLineup()"><span class="lineup-title">'+(lineup.length?'⚽ التشكيل ('+lineup.length+' لاعب)':'⚽ لسه مفيش تشكيل محدد')+'</span><span class="lineup-toggle" id="lineupToggleIcon">'+(matchLineupExpanded?'▴':'▾')+'</span></div>';
-  html+='<div class="lineup-body '+(matchLineupExpanded?'open':'')+'" id="lineupBody">';
-  var players=getPlayers();
-  if(!players.length){
-    html+='<div class="lineup-empty">ضيف لاعبين الأول</div>';
-  }else{
-    for(var j=0;j<players.length;j++){
-      var p=players[j];
-      var sel=lineup.indexOf(p.id)!==-1;
-      html+='<div class="lineup-player '+(sel?'selected':'')+'" onclick="toggleLineupPlayer(\''+m.id+'\',\''+p.id+'\','+(canEdit?'true':'false')+')">';
-      if(canEdit)html+='<input type="checkbox" class="lineup-checkbox" '+(sel?'checked':'')+' onclick="event.stopPropagation()" onchange="toggleLineupPlayer(\''+m.id+'\',\''+p.id+'\',true)" style="pointer-events:none">';
-      html+='<div class="lineup-avatar">'+(p.photo?'<img src="'+p.photo+'">':'👤')+'</div>';
-      html+='<div class="lineup-name">'+esc(p.name)+'<div class="lineup-pos">'+esc(p.position||'')+'</div></div>';
-      html+='</div>';
-    }
-    if(canEdit){
-      html+='<div class="lineup-actions"><button onclick="selectAllLineup(\''+m.id+'\')">اختيار الكل</button><button onclick="clearLineup(\''+m.id+'\')">إلغاء الكل</button></div>';
-    }
-  }
-  html+='</div></div>';
-
-  // Stats section (only if lineup exists)
-  if(lineup.length===0){
-    html+='<div style="text-align:center;color:var(--dim);padding:20px;font-size:12px">اختار التشكيل الأول عشان تسجل الإحصائيات</div>';
-  }else{
-    for(var k=0;k<lineup.length;k++){
-      var pid=lineup[k];
-      var p=getPlayerById(pid);
-      if(!p)continue;
-      var g=(m.goals||{})[pid]||0,a=(m.assists||{})[pid]||0,r=(m.ratings||{})[pid]||0;
-      var isBest=m.motm===pid,isWorst=m.worst===pid,isBad=(m.bad||[]).indexOf(pid)!==-1;
-      html+='<div class="pm-row"><div class="pm-name">'+esc(p.name)+
-        (isBest?' <span class="pill pill-gold">⭐ أفضل</span>':'')+
-        (isWorst?' <span class="pill pill-red">💩 أوحش</span>':'')+
-        (isBad?' <span class="pill pill-gray">👎 وحش</span>':'')+
-        '</div>';
-      html+='<div class="pm-controls">'+
-        '<div class="pm-ctrl"><label>أهداف</label><input type="number" min="0" value="'+g+'" '+(canEdit?'':'disabled')+' onchange="setMatchStat(\''+m.id+'\',\'goals\',\''+pid+'\',this.value)"></div>'+
-        '<div class="pm-ctrl"><label>أسيست</label><input type="number" min="0" value="'+a+'" '+(canEdit?'':'disabled')+' onchange="setMatchStat(\''+m.id+'\',\'assists\',\''+pid+'\',this.value)"></div>'+
-        '<div class="pm-ctrl"><label>تقييم</label><input type="number" min="0" max="10" value="'+r+'" '+(canEdit?'':'disabled')+' onchange="setMatchStat(\''+m.id+'\',\'ratings\',\''+pid+'\',this.value)"></div>'+
-        '</div>';
-      if(canEdit){
-        html+='<div class="pm-actions">'+
-          '<button class="pm-award best '+(isBest?'active':'')+'" onclick="setMatchAward(\''+m.id+'\',\'motm\',\''+pid+'\')">⭐ أفضل</button>'+
-          '<button class="pm-award worst '+(isWorst?'active':'')+'" onclick="setMatchAward(\''+m.id+'\',\'worst\',\''+pid+'\')">💩 أوحش</button>'+
-          '<button class="pm-award bad '+(isBad?'active':'')+'" onclick="toggleMatchBad(\''+m.id+'\',\''+pid+'\')">👎 وحش</button>'+
-          '</div>';
+// حساب OVR
+function getPlayerData(p) {
+  let goals=0, assists=0, matches=0, motm=0, worst=0, bad=0, ratingSum=0, ratingCount=0;
+  state.matches.forEach(m => {
+    if(m.archived) {
+      if((m.lineup||[]).includes(p.id)) {
+        matches++;
+        goals += (m.goals||{})[p.id] || 0; 
+        assists += (m.assists||{})[p.id] || 0;
+        if (m.ratings && m.ratings[p.id]) { ratingSum += m.ratings[p.id]; ratingCount++; }
       }
-      html+='</div>';
+      if (m.motm === p.id) motm++;
+      if (m.worst === p.id) worst++;
+      if ((m.bad||[]).includes(p.id)) bad++;
     }
+  });
+  const avgRating = ratingCount > 0 ? (ratingSum / ratingCount) : 0;
+  return { ...p, goals, assists, matches, motm, worst, bad, avgRating };
+}
+
+function calculateOVR(p) {
+  const data = getPlayerData(p);
+  const stats = p.stats || { pace: 70, shooting: 70, passing: 70, dribbling: 70, defending: 70, physical: 70 };
+  const statsAvg = (Number(stats.pace) + Number(stats.shooting) + Number(stats.passing) + Number(stats.dribbling) + Number(stats.defending) + Number(stats.physical)) / 6;
+  let ovr = statsAvg + (data.goals * 0.1) + (data.assists * 0.05) + (data.motm * 0.25) + (data.avgRating * 0.1) - (data.bad * 0.3) - (data.worst * 0.5);
+  return Math.min(99, Math.max(40, Math.round(ovr)));
+}
+
+function getCardTier(ovr) {
+  if(ovr >= 99) return 'legendary';
+  if(ovr >= 90) return 'icon';
+  if(ovr >= 80) return 'gold';
+  if(ovr >= 70) return 'silver';
+  return 'bronze';
+}
+
+// ================= التابات =================
+
+// 1. اللاعبين
+function renderPlayers() {
+  const el = $('#panel-0');
+  let html = '';
+  if(isAdmin) html += `<button class="btn-purple" onclick="showAddPlayer()" style="margin-bottom:16px">➕ إضافة لاعب جديد</button>`;
+  html += `<div class="section-header">👥 اللاعبين <span class="count">${state.players.length}</span></div>`;
+  if(!state.players.length) html += `<div class="empty-state"><div class="empty-icon">⚽</div><div>مفيش لاعبين لسه</div></div>`;
+  else {
+    html += '<div class="player-list">';
+    state.players.forEach(p => {
+      html += `<div class="player-card">
+        <div class="player-avatar" onclick="openProfile('${p.id}')">${p.photo ? `<img src="${p.photo}">` : '<span>👤</span>'}</div>
+        <div class="player-info" onclick="openProfile('${p.id}')"><div class="player-name">${esc(p.name)}</div><div class="player-pos">${esc(p.position||'لاعب')}</div></div>
+        <div class="player-actions">
+          ${isAdmin ? `<button class="icon-action" onclick="uploadPhoto('${p.id}')">📷</button>` : ''}
+          <button class="icon-action" onclick="editPlayerStats('${p.id}')">📊</button>
+          <button class="icon-action" onclick="openProfile('${p.id}')">👁️</button>
+          ${isAdmin ? `<button class="icon-action danger" onclick="deletePlayerComplete('${p.id}')">🗑</button>` : ''}
+        </div>
+      </div>`;
+    });
+    html += '</div>';
   }
-  if(isAdmin()){
-    html+='<button class="btn-purple btn-danger" style="margin-top:16px" onclick="deleteMatch(\''+m.id+'\')">🗑 حذف الماتش</button>';
+  el.innerHTML = html;
+}
+
+window.showAddPlayer = function() {
+  openModal(`<h3>➕ لاعب جديد</h3>
+    <label class="form-label">الاسم *</label><input id="np_name" placeholder="اسم اللاعب">
+    <label class="form-label">المركز</label><select id="np_pos"><option>حارس</option><option>مدافع</option><option>وسط</option><option>مهاجم</option></select>
+    <button class="btn-purple" onclick="addPlayer()" style="margin-top:18px">إضافة</button>`);
+};
+
+window.addPlayer = async function() {
+  const name = $('#np_name').value.trim();
+  if(!name) return alert("اكتب الاسم");
+  state.players.push({ id: uid(), name: name, position: $('#np_pos').value, photo: '', stats: { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 } });
+  await save(); closeModal();
+};
+
+window.editPlayerStats = function(id) {
+  const p = state.players.find(x => x.id === id); if(!p) return;
+  const s = p.stats || { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 };
+  openModal(`<h3>📊 إحصائيات ${esc(p.name)}</h3>
+    <div class="grid-3">
+      <div><label class="form-label">سرعة</label><input id="ep_pace" type="number" value="${s.pace}"></div>
+      <div><label class="form-label">تسديد</label><input id="ep_sho" type="number" value="${s.shooting}"></div>
+      <div><label class="form-label">تمرير</label><input id="ep_pas" type="number" value="${s.passing}"></div>
+      <div><label class="form-label">مراوغة</label><input id="ep_dri" type="number" value="${s.dribbling}"></div>
+      <div><label class="form-label">دفاع</label><input id="ep_def" type="number" value="${s.defending}"></div>
+      <div><label class="form-label">بدنية</label><input id="ep_phy" type="number" value="${s.physical}"></div>
+    </div>
+    <button class="btn-purple" onclick="savePlayerStats('${id}')" style="margin-top:18px">حفظ</button>`);
+};
+
+window.savePlayerStats = async function(id) {
+  const p = state.players.find(x => x.id === id); if(!p) return;
+  p.stats = { pace: +$('#ep_pace').value, shooting: +$('#ep_sho').value, passing: +$('#ep_pas').value, dribbling: +$('#ep_dri').value, defending: +$('#ep_def').value, physical: +$('#ep_phy').value };
+  await save(); closeModal();
+};
+
+window.deletePlayerComplete = async function(id) {
+  const p = state.players.find(x => x.id === id); if(!p) return;
+  const linkedUser = approvedUsers.find(u => u.name === p.name && u.phone === p.phone);
+  if(linkedUser && linkedUser.phone === 'admin') return alert("❌ لا يمكن حذف الأدمن الرئيسي");
+  if(!confirm("حذف اللاعب نهائياً وحذف أكونته (لو موجود)؟")) return;
+  state.players = state.players.filter(x => x.id !== id);
+  await save();
+  // حذف الحساب من users (تحتاج Cloud Function في الواقع، لكن هنحاول نحدثها لـ rejected هنا)
+  if(linkedUser) {
+     await updateDoc(doc(db, "users", linkedUser.uid), { role: "rejected" });
   }
+  closeModal();
+};
+
+// رفع الصور
+window.uploadPhoto = function(id) {
+  if(!isAdmin) return;
+  const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas'); const MAX = 300; let w = img.width, h = img.height;
+        if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } }
+        canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        const p = state.players.find(x => x.id === id);
+        if(p) { p.photo = canvas.toDataURL('image/jpeg', 0.8); await save(); }
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+};
+
+// البروفايل
+window.openProfile = function(id) {
+  const p = getPlayerData(state.players.find(x => x.id === id)); if(!p) return;
+  currentProfileId = id;
+  $('#profileBgImg').style.backgroundImage = p.photo ? `url(${p.photo})` : 'none';
+  $('#profileAvatar').innerHTML = p.photo ? `<img src="${p.photo}">` : '👤';
+  $('#profileName').textContent = p.name;
+  $('#profilePos').textContent = `${p.position} • التقييم ${calculateOVR(p)}`;
+  $('#profileStats').innerHTML = `
+    <div class="stat-box"><b>${p.matches}</b><span>ماتشات</span></div>
+    <div class="stat-box"><b>${p.goals}</b><span>أهداف</span></div>
+    <div class="stat-box"><b>${p.assists}</b><span>أسيست</span></div>
+    <div class="stat-box"><b>${p.motm}</b><span>⭐ نجم</span></div>
+    <div class="stat-box"><b>${p.avgRating.toFixed(1)}</b><span>تقييم</span></div>
+    <div class="stat-box"><b>${p.bad}</b><span>👎 وحش</span></div>`;
+  $('#profileDetails').innerHTML = `📱 ${p.phone || '—'}`;
+  $('#profileDeleteBtn').style.display = (isAdmin && p.phone !== 'admin') ? 'block' : 'none';
+  $('#profileView').classList.add('show');
+};
+window.closeProfile = function() { $('#profileView').classList.remove('show'); };
+
+// 2. الكروت
+function buildCardHTML(p, ovr, tier, isLegend, forPreview) {
+  const s = p.stats || { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 };
+  const d = getPlayerData(p);
+  const photo = p.photo ? `<img src="${p.photo}">` : '👤';
+  const expandBtn = forPreview ? '' : `<button class="fifa-expand-center" onclick="event.stopPropagation();previewCard('${p.id}','${isLegend}')">⤢</button>`;
+  const editBtn = (isLegend && isAdmin && !forPreview) ? `<button class="fifa-edit" onclick="event.stopPropagation();editLegend('${p.id}')">✏️</button>` : '';
+  const delBtn = (isLegend && isAdmin && !forPreview) ? `<button class="fifa-del" onclick="event.stopPropagation();deleteLegend('${p.id}')">🗑</button>` : '';
+  
+  return `<div class="fifa-card-wrap" data-tier="${tier}">
+    <div class="fifa-card-3d"><div class="fifa-card" onclick="this.classList.toggle('flipped')">
+      <div class="fifa-face fifa-front"><div class="fifa-content">
+        ${editBtn}${delBtn}
+        <div class="fifa-top">
+          <div class="fifa-rating-block"><div class="fifa-overall">${ovr}</div><div class="fifa-position">${p.position||'لاعب'}</div></div>
+          <div class="fifa-photo-wrap"><div class="fifa-photo-circle">${photo}</div></div>
+        </div>
+        <div class="fifa-name-bar"><div class="fifa-name">${esc(p.name)}</div></div>
+        <div class="fifa-season-stats">
+          <div class="fifa-season-stat"><b>${d.matches}</b><span>MATCH</span></div>
+          <div class="fifa-season-stat"><b>${d.goals}</b><span>GOALS</span></div>
+          <div class="fifa-season-stat"><b>${d.assists}</b><span>ASSIST</span></div>
+        </div>
+        <div class="fifa-extra"><span class="fifa-stars">${'★'.repeat(Math.floor(ovr/20))}</span>${expandBtn}<span>#${p.number || ''}</span></div>
+      </div></div>
+      <div class="fifa-face fifa-back">
+        <div class="fifa-back-overlay"></div>
+        <div class="fifa-back-top">${!forPreview ? `<button class="fifa-back-btn" onclick="event.stopPropagation();shareCard('${p.id}')">📤</button>` : ''}</div>
+        <div class="fifa-full-stats">
+          <div class="fifa-stat-row"><div class="fifa-stat"><b>${s.pace}</b><span>PAC</span></div><div class="fifa-stat"><b>${s.shooting}</b><span>SHO</span></div><div class="fifa-stat"><b>${s.passing}</b><span>PAS</span></div></div>
+          <div class="fifa-stat-row"><div class="fifa-stat"><b>${s.dribbling}</b><span>DRI</span></div><div class="fifa-stat"><b>${s.defending}</b><span>DEF</span></div><div class="fifa-stat"><b>${s.physical}</b><span>PHY</span></div></div>
+        </div>
+        <div class="fifa-back-content"><div class="fifa-back-ovr">${ovr}</div><div class="fifa-back-name">${esc(p.name)}</div><div class="fifa-back-pos">${p.position||'لاعب'}</div></div>
+      </div>
+    </div></div>
+  </div>`;
+}
+
+function renderCards() {
+  const el = $('#panel-1');
+  el.innerHTML = `<div class="cards-subtabs">
+    <button class="subtabs-btn ${cardsTab==='normal'?'active':''}" onclick="switchCardsTab('normal')">⚡ عادية</button>
+    <button class="subtabs-btn ${cardsTab==='legendary'?'active':''}" onclick="switchCardsTab('legendary')">👑 أسطورية</button>
+  </div><div id="cardsView"></div>`;
+  const view = $('#cardsView');
+  
+  if(cardsTab === 'normal') {
+    if(!state.players.length) return view.innerHTML = '<div class="empty-state">مفيش لاعبين</div>';
+    let html = `<div class="cards-toolbar"><button onclick="toggleMotion()">🎮 الحركة</button></div><div class="cards-grid-2" id="cardsGrid">`;
+    state.players.forEach(p => html += buildCardHTML(p, calculateOVR(p), getCardTier(calculateOVR(p)), false, false));
+    html += '</div>';
+    view.innerHTML = html;
+  } else {
+    if(!state.legendary.length) return view.innerHTML = '<div class="empty-state">مفيش كروت أسطورية</div>';
+    if(legendaryIndex >= state.legendary.length) legendaryIndex = 0;
+    let html = isAdmin ? `<div class="legendary-toolbar"><button onclick="showAddLegend()">➕ إضافة كارت أسطوري</button></div>` : '';
+    html += `<div class="legendary-carousel"><div class="legendary-stage" id="legendaryStage">`;
+    state.legendary.forEach((p, i) => {
+      html += `<div class="legendary-card" data-index="${i}" onclick="onLegendaryClick(event, ${i})">
+        ${buildCardHTML(p, calculateOVR(p), 'legendary', true, false)}
+      </div>`;
+    });
+    html += `</div></div><div class="legendary-indicator" id="legendaryIndicator">${legendaryIndex+1} / ${state.legendary.length}</div>`;
+    view.innerHTML = html;
+    setTimeout(updateLegendaryPositions, 50);
+  }
+}
+
+window.switchCardsTab = function(t) { cardsTab = t; renderCards(); };
+window.toggleMotion = function() { $('#cardsGrid')?.classList.toggle('motion'); };
+
+function updateLegendaryPositions() {
+  const stage = $('#legendaryStage'); if(!stage) return;
+  const cards = stage.querySelectorAll('.legendary-card'); const total = cards.length;
+  cards.forEach((card, i) => {
+    let offset = i - legendaryIndex;
+    if(offset > total/2) offset -= total;
+    if(offset < -total/2) offset += total;
+    const abs = Math.abs(offset);
+    if(abs > 3) { card.style.opacity = '0'; card.style.pointerEvents = 'none'; return; }
+    card.style.opacity = abs === 0 ? 1 : (abs === 1 ? 0.85 : 0.4);
+    card.style.pointerEvents = 'auto';
+    card.style.zIndex = 100 - abs;
+    card.style.transform = `translateX(${offset*90}px) translateZ(${-abs*80}px) scale(${1-abs*0.12}) rotateY(${offset*-15}deg)`;
+    card.classList.toggle('active', abs === 0);
+  });
+  const ind = $('#legendaryIndicator'); if(ind) ind.textContent = `${legendaryIndex+1} / ${total}`;
+}
+
+window.onLegendaryClick = function(e, i) {
+  if(i === legendaryIndex) {
+    const card = e.currentTarget.querySelector('.fifa-card'); if(card) card.classList.toggle('flipped');
+    legendaryPaused = true; setTimeout(() => legendaryPaused = false, 8000);
+  } else {
+    legendaryIndex = i; updateLegendaryPositions();
+  }
+};
+
+// عرض الكارت
+window.previewCard = function(id, isLegend) {
+  const p = isLegend ? state.legendary.find(x => x.id === id) : state.players.find(x => x.id === id);
+  if(!p) return;
+  $('#previewContent').innerHTML = `<button class="preview-close" onclick="closePreview()">×</button>` + buildCardHTML(p, calculateOVR(p), isLegend?'legendary':getCardTier(calculateOVR(p)), isLegend, true);
+  $('#previewOverlay').classList.add('show');
+};
+window.closePreview = function() { $('#previewOverlay').classList.remove('show'); };
+
+// مشاركة الكارت
+window.shareCard = async function(id) {
+  const p = state.players.find(x => x.id === id); if(!p) return;
+  const text = `⚽ ${p.name}\n⭐ التقييم: ${calculateOVR(p)}\n📊 إحصائيات: ${p.goals} هدف، ${p.assists} أسيست`;
+  if(navigator.share) navigator.share({ title: p.name, text: text }).catch(()=>{});
+  else alert(text);
+};
+
+// 3. الماتشات
+function renderMatches() {
+  const el = $('#panel-2');
+  let html = '';
+  if(isAdmin) {
+    html += `<div class="match-form">
+      <h3 style="margin-bottom:10px;font-size:14px;color:var(--blue-lt)">➕ إضافة ماتش</h3>
+      <div class="grid-2">
+        <div><label class="form-label">التاريخ</label><input type="date" id="m_date"></div>
+        <div><label class="form-label">الملعب</label><input type="text" id="m_place"></div>
+      </div>
+      <div class="grid-2">
+        <div><label class="form-label">من ساعة</label><input type="time" id="m_from" value="20:00"></div>
+        <div><label class="form-label">إلى ساعة</label><input type="time" id="m_to" value="21:30"></div>
+      </div>
+      <div class="match-form-row" style="margin-top:10px">
+        <div><label class="form-label">فريقنا</label><input type="text" id="m_t1" value="${esc(state.team.name)}"></div>
+        <div class="vs">VS</div>
+        <div><label class="form-label">الخصم</label><input type="text" id="m_t2" placeholder="اسم المنافس"></div>
+      </div>
+      <div class="match-form-row">
+        <div><label class="form-label">أهدافنا</label><input type="number" id="m_s1" value="0"></div>
+        <div class="vs">-</div>
+        <div><label class="form-label">أهدافهم</label><input type="number" id="m_s2" value="0"></div>
+      </div>
+      <button class="btn-purple" onclick="addMatch()">إضافة</button>
+    </div>`;
+  }
+  const ms = state.matches.slice().sort((a,b) => new Date(b.date) - new Date(a.date));
+  html += `<div class="section-header">⚽ الماتشات <span class="count">${ms.length}</span></div>`;
+  if(!ms.length) html += `<div class="empty-state">مفيش ماتشات</div>`;
+  else ms.forEach(m => {
+    html += `<div class="match-item" onclick="openMatchDetail('${m.id}')">
+      <div class="match-header"><span>📅 ${m.date}</span><span>⏰ ${m.timeFrom} - ${m.timeTo}</span></div>
+      <div class="match-teams">
+        <div class="match-team">${esc(m.ourTeam)}</div>
+        <div class="match-score">${m.ourScore} - ${m.theirScore}</div>
+        <div class="match-team">${esc(m.opponentTeam)}</div>
+      </div>
+      <div class="match-meta"><span>📍 ${esc(m.place)}</span><span>👥 ${(m.lineup||[]).length} في التشكيل</span>${m.archived?'<span style="color:var(--red)">مؤرشف 🔒</span>':''}</div>
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+
+window.addMatch = async function() {
+  const d = $('#m_date').value, place = $('#m_place').value;
+  const t1 = $('#m_t1').value, t2 = $('#m_t2').value;
+  if(!d || !t2) return alert("اكمل البيانات");
+  state.matches.push({ id: uid(), date: d, timeFrom: $('#m_from').value, timeTo: $('#m_to').value, ourTeam: t1, opponentTeam: t2, ourScore: +$('#m_s1').value, theirScore: +$('#m_s2').value, place: place, lineup: [], goals: {}, assists: {}, ratings: {}, motm: null, worst: null, bad: [], archived: false });
+  await save();
+};
+
+window.openMatchDetail = function(id) {
+  const m = state.matches.find(x => x.id === id); if(!m) return;
+  const canEdit = (isAdmin || isCoach) && !m.archived;
+  let html = `<h3>${m.date}</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:14px;background:rgba(59,130,246,.08);border:1px solid rgba(59,130,246,.25);border-radius:12px;margin-bottom:14px">
+      <div style="flex:1;text-align:center;font-weight:800;color:var(--blue-lt);font-size:13px">${esc(m.ourTeam)}</div>
+      <div style="font-size:26px;font-weight:900;color:#fff;letter-spacing:2px;direction:ltr;padding:0 10px">${m.ourScore} - ${m.theirScore}</div>
+      <div style="flex:1;text-align:center;font-weight:800;color:var(--blue-lt);font-size:13px">${esc(m.opponentTeam)}</div>
+    </div>
+    <div class="lineup-section">
+      <div class="lineup-header" onclick="toggleMatchLineup()"><span class="lineup-title">${m.lineup.length ? `⚽ التشكيل (${m.lineup.length} لاعب)` : '⚽ لسه مفيش تشكيل'}</span><span class="lineup-toggle" id="lineupToggleIcon">${matchLineupExpanded?'▴':'▾'}</span></div>
+      <div class="lineup-body ${matchLineupExpanded?'open':''}" id="lineupBody">`;
+  if(!state.players.length) html += `<div class="lineup-empty">ضيف لاعبين الأول</div>`;
+  else {
+    state.players.forEach(p => {
+      const sel = m.lineup.includes(p.id);
+      html += `<div class="lineup-player ${sel?'selected':''}" onclick="toggleLineup('${m.id}', '${p.id}', ${canEdit})">
+        ${canEdit ? `<input type="checkbox" class="lineup-checkbox" ${sel?'checked':''}>` : ''}
+        <div class="lineup-avatar">${p.photo?`<img src="${p.photo}">`:'👤'}</div>
+        <div class="lineup-name">${esc(p.name)}</div>
+      </div>`;
+    });
+    if(canEdit) html += `<div class="lineup-actions"><button onclick="selectAllLineup('${m.id}')">الكل</button><button onclick="clearLineup('${m.id}')">إلغاء الكل</button></div>`;
+  }
+  html += `</div></div>`;
+  if(m.lineup.length === 0) html += `<div style="text-align:center;color:var(--dim);padding:20px">اختار التشكيل الأول</div>`;
+  else {
+    m.lineup.forEach(pid => {
+      const p = state.players.find(x=>x.id===pid); if(!p) return;
+      const g = (m.goals||{})[pid]||0, a = (m.assists||{})[pid]||0, r = (m.ratings||{})[pid]||0;
+      const isBest = m.motm===pid, isWorst = m.worst===pid, isBad = (m.bad||[]).includes(pid);
+      html += `<div class="pm-row">
+        <div class="pm-name">${esc(p.name)} ${isBest?'<span class="pill pill-gold">⭐ أفضل</span>':''} ${isWorst?'<span class="pill pill-red">💩 أوحش</span>':''} ${isBad?'<span class="pill pill-gray">👎 وحش</span>':''}</div>
+        <div class="pm-controls">
+          <div class="pm-ctrl"><label>أهداف</label><input type="number" value="${g}" ${canEdit?'':'disabled'} onchange="setStat('${m.id}','goals','${pid}',this.value)"></div>
+          <div class="pm-ctrl"><label>أسيست</label><input type="number" value="${a}" ${canEdit?'':'disabled'} onchange="setStat('${m.id}','assists','${pid}',this.value)"></div>
+          <div class="pm-ctrl"><label>تقييم</label><input type="number" value="${r}" ${canEdit?'':'disabled'} onchange="setStat('${m.id}','ratings','${pid}',this.value)"></div>
+        </div>
+        ${canEdit ? `<div class="pm-actions">
+          <button class="pm-award best ${isBest?'active':''}" onclick="setAward('${m.id}','motm','${pid}')">⭐ أفضل</button>
+          <button class="pm-award worst ${isWorst?'active':''}" onclick="setAward('${m.id}','worst','${pid}')">💩 أوحش</button>
+          <button class="pm-award bad ${isBad?'active':''}" onclick="toggleBad('${m.id}','${pid}')">👎 وحش</button>
+        </div>` : ''}
+      </div>`;
+    });
+  }
+  if(isAdmin && !m.archived) html += `<button class="btn-purple btn-danger" style="margin-top:16px" onclick="archiveMatch('${m.id}')">🔒 أرشفة وقفل الماتش</button>`;
+  if(isAdmin) html += `<button class="btn-purple btn-danger" style="margin-top:8px;background:transparent" onclick="deleteMatch('${m.id}')">🗑 حذف الماتش</button>`;
   openModal(html);
-}
-function toggleMatchLineup(){
-  matchLineupExpanded=!matchLineupExpanded;
-  var body=document.getElementById('lineupBody');
-  var icon=document.getElementById('lineupToggleIcon');
-  if(body)body.classList.toggle('open',matchLineupExpanded);
-  if(icon)icon.textContent=matchLineupExpanded?'▴':'▾';
-}
-function toggleLineupPlayer(mid,pid,canEdit){
-  if(!canEdit)return;
-  var ms=getMatches();
-  for(var i=0;i<ms.length;i++)if(ms[i].id===mid){
-    if(!ms[i].lineup)ms[i].lineup=[];
-    var idx=ms[i].lineup.indexOf(pid);
-    if(idx!==-1)ms[i].lineup.splice(idx,1);
-    else ms[i].lineup.push(pid);
-    break;
+};
+
+window.toggleMatchLineup = function() { matchLineupExpanded = !matchLineupExpanded; openMatchDetail(state.matches.find(x=>x.id==currentMatchId).id); }; // slight bug here, fix inside openMatch
+window.toggleLineup = async function(mid, pid, canEdit) {
+  if(!canEdit) return;
+  const m = state.matches.find(x => x.id === mid);
+  if(m.lineup.includes(pid)) m.lineup = m.lineup.filter(x => x !== pid); else m.lineup.push(pid);
+  await save(); openMatchDetail(mid);
+};
+window.selectAllLineup = async function(mid) { const m = state.matches.find(x=>x.id===mid); m.lineup = state.players.map(p=>p.id); await save(); openMatchDetail(mid); };
+window.clearLineup = async function(mid) { const m = state.matches.find(x=>x.id===mid); m.lineup = []; await save(); openMatchDetail(mid); };
+window.setStat = async function(mid, field, pid, val) { const m = state.matches.find(x=>x.id===mid); if(!m[field]) m[field]={}; m[field][pid] = +val; await save(); };
+window.setAward = async function(mid, field, pid) { 
+  const m = state.matches.find(x=>x.id===mid); 
+  m[field] = (m[field]===pid) ? null : pid;
+  if(field==='motm' && m.worst===pid) m.worst=null;
+  if(field==='worst' && m.motm===pid) m.motm=null;
+  m.bad = m.bad.filter(x=>x!==pid);
+  await save(); openMatchDetail(mid);
+};
+window.toggleBad = async function(mid, pid) {
+  const m = state.matches.find(x=>x.id===mid);
+  if(m.bad.includes(pid)) m.bad = m.bad.filter(x=>x!==pid);
+  else { m.bad.push(pid); if(m.motm===pid) m.motm=null; if(m.worst===pid) m.worst=null; }
+  await save(); openMatchDetail(mid);
+};
+window.archiveMatch = async function(id) { if(!confirm("أرشفة الماتش؟ مش هينفع تعدل تاني")) return; const m = state.matches.find(x=>x.id===id); m.archived=true; await save(); closeModal(); };
+window.deleteMatch = async function(id) { if(!confirm("حذف الماتش؟")) return; state.matches = state.matches.filter(x=>x.id!==id); await save(); closeModal(); };
+
+// 4. الإحصائيات
+function renderStats() {
+  const el = $('#panel-3');
+  if(!state.players.length) return el.innerHTML = '<div class="empty-state">ضيف لاعبين الأول</div>';
+  const data = state.players.map(p => getPlayerData(p));
+  
+  function buildCat(title, list, label, filterZero) {
+    let arr = [...list].sort((a,b) => b[label] - a[label]);
+    if(filterZero) arr = arr.filter(x => x[label] > 0);
+    if(!arr.length) return '';
+    const max = arr[0][label] || 1;
+    let h = `<div class="stat-category"><div class="stat-cat-title">${title}</div><div class="stat-cards">`;
+    arr.forEach((p, i) => {
+      let rCls = i===0?'rank-1':(i===1?'rank-2':(i===2?'rank-3':''));
+      let rIcon = i===0?'🥇':(i===1?'🥈':(i===2?'🥉':(i+1)));
+      let mCls = i===0?'medal-gold':(i===1?'medal-silver':(i===2?'medal-bronze':''));
+      h += `<div class="stat-player-card ${rCls}">
+        <div class="stat-rank ${mCls}">${rIcon}</div>
+        <div class="stat-photo">${p.photo?`<img src="${p.photo}">`:'👤'}</div>
+        <div class="stat-info"><div class="stat-name">${esc(p.name)}</div><div class="stat-pos">${p.position||'لاعب'}</div>
+          <div class="stat-progress"><div class="stat-progress-bar" style="width:${(p[label]/max)*100}%"></div></div>
+        </div>
+        <div class="stat-value-box"><div class="stat-value">${label==='avgRating'?p[label].toFixed(1):p[label]}</div><div class="stat-value-label">${label==='avgRating'?'تقييم':(label==='matches'?'ماتش':(label==='goals'?'هدف':(label==='assists'?'أسيست':(label==='motm'?'⭐':'👎'))))}</div></div>
+      </div>`;
+    });
+    return h + '</div></div>';
   }
-  setMatches(ms);openMatchDetail(mid);renderMatches();
-}
-function selectAllLineup(mid){
-  var ms=getMatches();
-  var ps=getPlayers();
-  for(var i=0;i<ms.length;i++)if(ms[i].id===mid){
-    ms[i].lineup=ps.map(function(p){return p.id});
-    break;
-  }
-  setMatches(ms);openMatchDetail(mid);renderMatches();
-}
-function clearLineup(mid){
-  var ms=getMatches();
-  for(var i=0;i<ms.length;i++)if(ms[i].id===mid){ms[i].lineup=[];break}
-  setMatches(ms);openMatchDetail(mid);renderMatches();
-}
-function setMatchStat(mid,field,pid,val){
-  var ms=getMatches();
-  for(var i=0;i<ms.length;i++)if(ms[i].id===mid){
-    if(!ms[i][field])ms[i][field]={};
-    ms[i][field][pid]=Math.max(0,+val||0);
-    break;
-  }
-  setMatches(ms);
-}
-function setMatchAward(mid,field,pid){
-  var ms=getMatches();
-  for(var i=0;i<ms.length;i++)if(ms[i].id===mid){
-    var m=ms[i];
-    if(m[field]===pid){m[field]=null}
-    else{
-      m[field]=pid;
-      if(field==='motm'&&m.worst===pid)m.worst=null;
-      if(field==='worst'&&m.motm===pid)m.motm=null;
-      if(!m.bad)m.bad=[];
-      m.bad=m.bad.filter(function(x){return x!==pid});
-    }
-    break;
-  }
-  setMatches(ms);openMatchDetail(mid);
-}
-function toggleMatchBad(mid,pid){
-  var ms=getMatches();
-  for(var i=0;i<ms.length;i++)if(ms[i].id===mid){
-    var m=ms[i];
-    if(!m.bad)m.bad=[];
-    var idx=m.bad.indexOf(pid);
-    if(idx!==-1){m.bad.splice(idx,1)}
-    else{
-      m.bad.push(pid);
-      if(m.motm===pid)m.motm=null;
-      if(m.worst===pid)m.worst=null;
-    }
-    break;
-  }
-  setMatches(ms);openMatchDetail(mid);
-}
-function deleteMatch(id){
-  if(!confirm('حذف الماتش؟'))return;
-  setMatches(getMatches().filter(function(m){return m.id!==id}));
-  closeModal();renderAll();
+
+  let html = '';
+  html += buildCat('⚽ هدافين', data, 'goals', true);
+  html += buildCat('🅰️ صناع', data, 'assists', true);
+  html += buildCat('⭐ نجوم', data, 'motm', true);
+  html += buildCat('👎 الوحشين', data, 'bad', true);
+  html += buildCat('👥 مشاركة', data, 'matches', false);
+  el.innerHTML = html;
 }
 
-// ============ STATS ============
-function renderStats(){
-  var el=document.getElementById('panel-3');
-  var players=getPlayers(),ms=getMatches();
-  if(!players.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">📊</div><div>ضيف لاعبين الأول</div></div>';return}
-  var agg={};
-  for(var i=0;i<players.length;i++){
-    var p=players[i];
-    agg[p.id]={id:p.id,name:p.name,pos:p.position,photo:p.photo||'',goals:0,assists:0,matches:0,motm:0,bad:0,rsum:0,rcount:0};
-  }
-  for(var j=0;j<ms.length;j++){
-    var m=ms[j];
-    var lineup=m.lineup||[];
-    if(lineup.length===0)continue;
-    for(var k=0;k<lineup.length;k++){
-      var pid=lineup[k];
-      if(!agg[pid])continue;
-      agg[pid].matches++;
-      agg[pid].goals+=(m.goals||{})[pid]||0;
-      agg[pid].assists+=(m.assists||{})[pid]||0;
-      if((m.ratings||{})[pid]){agg[pid].rsum+=(m.ratings||{})[pid];agg[pid].rcount++}
-    }
-    if(m.motm&&agg[m.motm])agg[m.motm].motm++;
-    var badArr=m.bad||[];
-    for(var b=0;b<badArr.length;b++)if(agg[badArr[b]])agg[badArr[b]].bad++;
-  }
-  var arr=[];
-  for(var id in agg){var a=agg[id];a.avg=a.rcount?a.rsum/a.rcount:0;arr.push(a)}
+// 5. القوانين
+function renderRules() {
+  const el = $('#panel-4');
+  el.innerHTML = `<div class="section-header">📋 القوانين</div>
+    <textarea id="rulesText" style="width:100%;height:200px;background:var(--card);color:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;font-size:14px;line-height:1.6" ${(!isAdmin&&!isCoach)?'disabled':''} placeholder="مفيش قوانين">${esc(state.rules)}</textarea>
+    ${(isAdmin||isCoach) ? `<button class="btn-purple" onclick="saveRules()" style="margin-top:10px">حفظ</button>` : ''}`;
+}
+window.saveRules = async function() { state.rules = $('#rulesText').value; await save(); alert('تم الحفظ'); };
 
-  function buildCategory(title,list,label){
-    if(!list.length)return '';
-    var maxVal=1;
-    for(var x=0;x<list.length;x++)if(+list[x].val>maxVal)maxVal=+list[x].val;
-    var h='<div class="stat-category"><div class="stat-cat-title">'+title+'</div><div class="stat-cards">';
-    for(var i=0;i<list.length;i++){
-      var r=list[i];
-      var rankCls='';var rankCls2='';
-      var rankIcon='';
-      if(i===0){rankCls='rank-1';rankCls2='medal-gold';rankIcon='🥇'}
-      else if(i===1){rankCls='rank-2';rankCls2='medal-silver';rankIcon='🥈'}
-      else if(i===2){rankCls='rank-3';rankCls2='medal-bronze';rankIcon='🥉'}
-      else{rankIcon=(i+1)}
-      var pct=Math.round((+r.val/maxVal)*100);
-      h+='<div class="stat-player-card '+rankCls+'">'+
-        '<div class="stat-rank '+rankCls2+'">'+rankIcon+'</div>'+
-        '<div class="stat-photo">'+(r.photo?'<img src="'+r.photo+'">':'👤')+'</div>'+
-        '<div class="stat-info">'+
-          '<div class="stat-name">'+esc(r.name)+'</div>'+
-          '<div class="stat-pos">'+esc(r.pos||'لاعب')+'</div>'+
-          '<div class="stat-progress"><div class="stat-progress-bar" style="width:'+pct+'%"></div></div>'+
-        '</div>'+
-        '<div class="stat-value-box"><div class="stat-value">'+r.val+'</div><div class="stat-value-label">'+label+'</div></div>'+
-        '</div>';
-    }
-    return h+'</div></div>';
-  }
-  function srt(key,filter){
-    var l=arr.slice().sort(function(a,b){return b[key]-a[key]});
-    if(filter)l=l.filter(function(a){return a[key]>0});
-    return l.map(function(a){return{name:a.name,pos:a.pos,photo:a.photo,val:key==='avg'?a[key].toFixed(1):a[key]}});
-  }
-  var html='';
-  html+=buildCategory('⚽ هدافين',srt('goals',true),'أهداف');
-  html+=buildCategory('🅰️ صناع',srt('assists',true),'أسيست');
-  html+=buildCategory('⭐ نجوم',srt('motm',true),'مرات');
-  html+=buildCategory('👎 الوحشين',srt('bad',true),'مرات');
-  html+=buildCategory('🏆 أفضل تقييم',srt('avg',true),'متوسط');
-  html+=buildCategory('👥 مشاركة',srt('matches',false),'ماتش');
-  el.innerHTML=html||'<div class="empty-state">لسه مفيش ماتشات مسجلة</div>';
+// 6. الإعلانات
+function renderAnns() {
+  const el = $('#panel-5');
+  let html = `<div class="section-header">📢 الإعلانات</div>`;
+  if(isAdmin || isCoach) html += `<div class="info-card"><input id="annText" placeholder="عنوان الإعلان" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;margin-bottom:8px"><button class="btn-purple" onclick="addAnn()">نشر</button></div>`;
+  if(!state.announcements.length) html += `<div class="empty-state">مفيش إعلانات</div>`;
+  else state.announcements.slice().reverse().forEach(a => {
+    html += `<div class="info-card"><div class="info-card-title"><span>${esc(a.text)}</span>${isAdmin?`<button onclick="delAnn('${a.id}')" style="background:none;border:none;color:var(--red);cursor:pointer">🗑</button>`:''}</div><div class="info-card-meta">${new Date(a.date).toLocaleString('ar-EG')}</div></div>`;
+  });
+  el.innerHTML = html;
+}
+window.addAnn = async function() { const t = $('#annText').value; if(!t) return; state.announcements.push({id:uid(), text:t, date:new Date().toISOString()}); await save(); };
+window.delAnn = async function(id) { if(!confirm('حذف؟')) return; state.announcements = state.announcements.filter(x=>x.id!==id); await save(); };
+
+// 7. الإدارة
+function renderAdmin() {
+  if(!isAdmin) return;
+  const el = $('#panel-6');
+  let html = `<div class="admin-section"><div class="admin-section-header"><div class="admin-section-icon">🛡️</div><div class="admin-section-title">شعار الفريق واسمه</div></div>
+    <div class="admin-card">
+      <div class="admin-logo-row">
+        <div class="admin-logo-preview">${state.team.logo?`<img src="${state.team.logo}">`:'⚽'}</div>
+        <div class="admin-logo-info"><input id="teamNameInput" value="${esc(state.team.name)}"><button class="btn-purple btn-sm" onclick="saveTeamName()">حفظ الاسم</button><button class="btn-purple btn-sm btn-ghost" onclick="uploadLogo()">📤 رفع شعار</button></div>
+      </div>
+    </div></div>
+    
+    <div class="admin-section"><div class="admin-section-header"><div class="admin-section-icon">🖼️</div><div class="admin-section-title">خلفية شاشة الدخول</div></div>
+    <div class="admin-card"><div class="admin-bg-preview" style="${state.team.loginBg?`background-image:url(${state.team.loginBg})`:''}">${!state.team.loginBg?'مفيش خلفية':''}</div>
+    <div class="admin-bg-actions"><button class="btn-purple" onclick="uploadLoginBg()">📤 تغيير</button><button class="btn-purple btn-danger" onclick="removeLoginBg()">🗑 إزالة</button></div>
+    <div class="firebase-status ok">✓ متصل بـ Firebase</div>
+    </div></div>
+
+    <div class="admin-section"><div class="admin-section-header"><div class="admin-section-icon">🔔</div><div class="admin-section-title">إشعارات الفريق</div></div>
+    <div class="admin-card"><input id="notifTitle" placeholder="عنوان" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;margin-bottom:8px"><button class="btn-purple" onclick="addNotif()">إرسال</button></div></div>
+
+    <div class="admin-section"><div class="admin-section-header"><div class="admin-section-icon">📨</div><div class="admin-section-title">طلبات الانضمام (${pendingUsers.length})</div></div>
+    <div class="admin-card">`;
+  if(!pendingUsers.length) html += `<div style="text-align:center;color:var(--dim);font-size:12px;padding:12px">مفيش طلبات</div>`;
+  else pendingUsers.forEach(u => {
+    html += `<div class="pending-request"><div class="pr-info"><div class="pr-name">${esc(u.name)}</div><div class="pr-phone">📱 ${esc(u.phone)}</div><div class="pr-date">🎂 ${esc(u.dob)}</div></div><div class="pr-actions"><button class="btn-approve" onclick="approveUser('${u.uid}')">✓</button><button class="btn-reject" onclick="rejectUser('${u.uid}')">✗</button></div></div>`;
+  });
+  html += `</div></div>
+
+    <div class="admin-section"><div class="admin-section-header"><div class="admin-section-icon">👑</div><div class="admin-section-title">الصلاحيات (${approvedUsers.length})</div></div>
+    <div class="admin-card">`;
+  approvedUsers.forEach(u => {
+    const isMain = u.phone === 'admin';
+    html += `<div class="perm-row ${isMain?'main':''}"><div class="perm-info"><div class="perm-name">${esc(u.name)} ${isMain?'👑':''}</div><div class="perm-meta"><span class="perm-role ${isMain?'role-main':'role-'+u.role}">${isMain?'الأدمن الرئيسي':u.role}</span><span>${esc(u.phone)}</span></div></div>`;
+    if(isMain) html += `<div class="perm-lock">🔒</div>`;
+    else html += `<select onchange="changeRole('${u.uid}', this.value)" style="width:auto;padding:6px;font-size:11px;background:rgba(0,0,0,.5);border:1px solid rgba(59,130,246,.35);border-radius:8px;color:#fff"><option value="player" ${u.role==='player'?'selected':''}>لاعب</option><option value="coach" ${u.role==='coach'?'selected':''}>مدير فني</option></select>`;
+    html += `</div>`;
+  });
+  html += `</div></div>`;
+  el.innerHTML = html;
 }
 
-// ============ RULES ============
-function renderRules(){
-  var el=document.getElementById('panel-4');
-  var rules=getRules(),admin=isAdmin();
-  var html='<div class="section-header">📋 القوانين</div>';
-  if(admin)html+='<div class="info-card"><input id="r_title" placeholder="عنوان القانون" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;margin-bottom:8px"><textarea id="r_body" placeholder="التفاصيل" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;min-height:70px;margin-bottom:8px"></textarea><button class="btn-purple" onclick="addRule()">إضافة</button></div>';
-  if(!rules.length)html+='<div class="empty-state">مفيش قوانين</div>';
-  else for(var i=0;i<rules.length;i++){var r=rules[i];
-    html+='<div class="info-card"><div class="info-card-title"><span>'+esc(r.title)+'</span>'+(admin?'<button onclick="delRule(\''+r.id+'\')" style="background:none;border:none;color:#e74c3c;cursor:pointer">🗑</button>':'')+'</div><div class="info-card-body">'+esc(r.body).replace(/\n/g,'<br>')+'</div></div>';}
-  el.innerHTML=html;
-}
-function addRule(){var t=document.getElementById('r_title').value.trim();var b=document.getElementById('r_body').value.trim();if(!t)return alert('اكتب عنوان');var rs=getRules();rs.push({id:uid(),title:t,body:b,date:Date.now()});if(!setRules(rs))return;renderRules()}
-function delRule(id){if(!confirm('حذف؟'))return;setRules(getRules().filter(function(r){return r.id!==id}));renderRules()}
+window.saveTeamName = async function() { state.team.name = $('#teamNameInput').value || 'فريق بني برزه'; await save(); updateUI(); };
+window.uploadLogo = function() {
+  const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas'); const MAX = 200; let w = img.width, h = img.height;
+        if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } }
+        canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        state.team.logo = canvas.toDataURL('image/jpeg', 0.8); await save(); updateUI();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+};
+window.uploadLoginBg = function() {
+  const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
+  input.onchange = (e) => {
+    const file = e.target.files[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const img = new Image();
+      img.onload = async () => {
+        const canvas = document.createElement('canvas'); const MAX = 800; let w = img.width, h = img.height;
+        if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } }
+        canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        state.team.loginBg = canvas.toDataURL('image/jpeg', 0.7); await save();
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+};
+window.removeLoginBg = async function() { state.team.loginBg = ""; await save(); };
+window.addNotif = async function() { const t = $('#notifTitle').value; if(!t) return; state.notifs.push({id:uid(), text:t, date:new Date().toISOString()}); await save(); alert('تم'); };
 
-// ============ ANNOUNCEMENTS ============
-function renderAnns(){
-  var el=document.getElementById('panel-5');
-  var anns=getAnns().slice().sort(function(a,b){return b.date-a.date});
-  var admin=isAdmin();
-  var html='<div class="section-header">📢 الإعلانات</div>';
-  if(admin)html+='<div class="info-card"><input id="a_title" placeholder="عنوان الإعلان" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;margin-bottom:8px"><textarea id="a_body" placeholder="التفاصيل" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;min-height:70px;margin-bottom:8px"></textarea><button class="btn-purple" onclick="addAnn()">نشر</button></div>';
-  if(!anns.length)html+='<div class="empty-state">مفيش إعلانات</div>';
-  else for(var i=0;i<anns.length;i++){var a=anns[i];
-    html+='<div class="info-card"><div class="info-card-title"><span>'+esc(a.title)+'</span>'+(admin?'<button onclick="delAnn(\''+a.id+'\')" style="background:none;border:none;color:#e74c3c;cursor:pointer">🗑</button>':'')+'</div><div class="info-card-meta">'+new Date(a.date).toLocaleString('ar-EG')+(a.author?' — '+esc(a.author):'')+'</div><div class="info-card-body">'+esc(a.body).replace(/\n/g,'<br>')+'</div></div>';}
-  el.innerHTML=html;
-}
-function addAnn(){var t=document.getElementById('a_title').value.trim();var b=document.getElementById('a_body').value.trim();if(!t)return alert('اكتب عنوان');var u=me();var arr=getAnns();arr.push({id:uid(),title:t,body:b,date:Date.now(),author:u?u.name:''});if(!setAnns(arr))return;renderAnns()}
-function delAnn(id){if(!confirm('حذف؟'))return;setAnns(getAnns().filter(function(a){return a.id!==id}));renderAnns()}
-
-// ============ ADMIN (redesigned) ============
-function renderAdmin(){
-  var el=document.getElementById('panel-6');
-  var u=me();if(!u){el.innerHTML='';return}
-  if(!canManage()){el.innerHTML='<div class="empty-state"><div class="empty-icon">🔒</div><div>الإدارة للأدمن/المدرب/المشرف</div></div>';return}
-  var team=getTeam(),users=getUsers(),notifs=getNotifs().slice().sort(function(a,b){return b.date-a.date});
-  var admin=u.role==='admin';
-  var html='';
-
-  // Section 1: Logo & Name
-  html+='<div class="admin-section">';
-  html+='<div class="admin-section-header"><div class="admin-section-icon">🛡️</div><div class="admin-section-title">شعار الفريق واسمه</div></div>';
-  html+='<div class="admin-card">';
-  html+='<div class="admin-logo-row">';
-  html+='<div class="admin-logo-preview">'+(team.logo?'<img src="'+team.logo+'">':'⚽')+'</div>';
-  html+='<div class="admin-logo-info"><input id="team_name" value="'+esc(team.name)+'" placeholder="اسم الفريق">';
-  html+='<button class="btn-purple btn-sm" onclick="saveTeamName()">💾 حفظ الاسم</button>';
-  html+='<button class="btn-purple btn-sm btn-ghost" onclick="openPhotoUpload(\'\',\'logo\')">📤 رفع شعار</button>';
-  html+='</div></div></div></div>';
-
-  // Section 2: Login Background
-  html+='<div class="admin-section">';
-  html+='<div class="admin-section-header"><div class="admin-section-icon">🖼️</div><div class="admin-section-title">خلفية شاشة الدخول</div></div>';
-  html+='<div class="admin-card">';
-  html+='<div class="admin-bg-preview" id="adminBgPreview" style="'+(team.loginBg?'background-image:url('+team.loginBg+')':'')+'">'+(team.loginBg?'':'مفيش خلفية مخصصة')+'</div>';
-  html+='<div class="admin-bg-actions">';
-  html+='<button class="btn-purple" onclick="uploadLoginBackground()">📤 تغيير</button>';
-  html+='<button class="btn-purple btn-danger" onclick="removeLoginBackground()">🗑 إزالة</button>';
-  html+='</div>';
-  html+='<div class="firebase-status '+(FIREBASE_READY?'ok':'warn')+'">'+(FIREBASE_READY?'✓ Firebase متصل — الخلفية تظهر عند الكل':'⚠️ Firebase غير مُفعّل — الخلفية على هذا الجهاز فقط')+'</div>';
-  html+='</div></div>';
-
-  // Section 3: Notifications
-  html+='<div class="admin-section">';
-  html+='<div class="admin-section-header"><div class="admin-section-icon">🔔</div><div class="admin-section-title">إشعارات الفريق</div></div>';
-  html+='<div class="admin-card">';
-  html+='<input id="n_title" placeholder="عنوان الإشعار" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;margin-bottom:8px">';
-  html+='<textarea id="n_body" placeholder="النص" style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:#fff;min-height:60px;margin-bottom:8px"></textarea>';
-  html+='<button class="btn-purple" onclick="addNotif()">📨 إرسال</button>';
-  if(notifs.length){
-    html+='<div style="margin-top:14px">';
-    for(var i=0;i<notifs.length;i++){
-      var n=notifs[i];
-      html+='<div style="padding:10px;border-bottom:1px solid rgba(59,130,246,.15)"><div style="font-weight:700;color:var(--blue-lt);font-size:13px">'+esc(n.title)+'</div><div style="font-size:10px;color:var(--dim);margin-top:2px">'+new Date(n.date).toLocaleString('ar-EG')+'</div><div style="font-size:12px;color:#ccc;margin-top:4px">'+esc(n.body)+'</div></div>';
-    }
-    html+='</div>';
-  }
-  html+='</div></div>';
-
-  // Section 4: Join Requests
-  var pending=users.filter(function(x){return x.status==='pending'});
-  html+='<div class="admin-section">';
-  html+='<div class="admin-section-header"><div class="admin-section-icon">📨</div><div class="admin-section-title">طلبات الانضمام ('+pending.length+')</div></div>';
-  html+='<div class="admin-card">';
-  if(!pending.length){
-    html+='<div style="text-align:center;color:var(--dim);font-size:12px;padding:12px">مفيش طلبات</div>';
-  }else{
-    for(var k=0;k<pending.length;k++){
-      var pr=pending[k];
-      html+='<div class="pending-request"><div class="pr-info"><div class="pr-name">'+esc(pr.name)+'</div><div class="pr-phone">📱 '+esc(pr.phone)+'</div><div class="pr-date">🎂 '+esc(pr.birthDate||'—')+'</div></div><div class="pr-actions"><button class="btn-approve" onclick="approveUser(\''+pr.id+'\')">✓</button><button class="btn-reject" onclick="rejectUser(\''+pr.id+'\')">✗</button></div></div>';
+window.approveUser = async function(uid) {
+  if(!isAdmin) return;
+  const snap = await getDoc(doc(db, "users", uid));
+  if(snap.exists()) {
+    const data = snap.data();
+    const exists = state.players.find(p => p.name === data.name && p.phone === data.phone);
+    if(!exists) {
+      state.players.push({ id: uid, name: data.name, phone: data.phone, position: 'لاعب', photo: '', stats: { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 } });
+      await save();
     }
   }
-  html+='</div></div>';
+  await updateDoc(doc(db, "users", uid), { role: 'player' });
+};
+window.rejectUser = async function(uid) { await updateDoc(doc(db, "users", uid), { role: 'rejected' }); };
+window.changeRole = async function(uid, role) { await updateDoc(doc(db, "users", uid), { role: role }); };
 
-  // Section 5: Permissions
-  html+='<div class="admin-section">';
-  html+='<div class="admin-section-header"><div class="admin-section-icon">👑</div><div class="admin-section-title">الصلاحيات ('+users.length+')</div></div>';
-  html+='<div class="admin-card">';
-  for(var m=0;m<users.length;m++){
-    var usr=users[m];
-    var isMain=usr.isMainAdmin;
-    var isSelf=usr.id===u.id;
-    var roleLabel=({admin:'أدمن',player:'لاعب',coach:'مدير فني',supervisor:'مشرف'})[usr.role]||usr.role;
-    var roleCls=isMain?'role-main':'role-'+usr.role;
-    html+='<div class="perm-row '+(isMain?'main':'')+'">';
-    html+='<div class="perm-info"><div class="perm-name">'+esc(usr.name)+(isMain?' 👑':'')+'</div>';
-    html+='<div class="perm-meta"><span class="perm-role '+roleCls+'">'+(isMain?'الأدمن الرئيسي':roleLabel)+'</span><span>'+esc(usr.phone)+'</span></div></div>';
-    if(isMain||isSelf){
-      html+='<div class="perm-lock">'+(isMain?'🔒':'👤')+'</div>';
-    }else if(admin){
-      html+='<select onchange="changeRole(\''+usr.id+'\',this.value)" style="width:auto;padding:6px;font-size:11px;background:rgba(0,0,0,.5);border:1px solid rgba(59,130,246,.35);border-radius:8px;color:#fff"><option value="player" '+(usr.role==='player'?'selected':'')+'>لاعب</option><option value="coach" '+(usr.role==='coach'?'selected':'')+'>مدير فني</option><option value="supervisor" '+(usr.role==='supervisor'?'selected':'')+'>مشرف</option><option value="admin" '+(usr.role==='admin'?'selected':'')+'>أدمن</option></select>';
-    }
-    html+='</div>';
-  }
-  html+='</div></div>';
-  el.innerHTML=html;
-}
-function saveTeamName(){
-  var t=getTeam();
-  var newName=document.getElementById('team_name').value.trim()||'فريق بني برزه';
-  t.name=newName;
-  if(!setTeam(t))return;
-  var titleEl=document.getElementById('appTitle');
-  if(titleEl)titleEl.textContent=newName;
-  renderAdmin();
-  alert('✓ تم تحديث اسم الفريق');
-}
-function addNotif(){
-  var t=document.getElementById('n_title').value.trim();
-  var b=document.getElementById('n_body').value.trim();
-  if(!t)return alert('اكتب عنوان');
-  var arr=getNotifs();
-  arr.push({id:uid(),title:t,body:b,date:Date.now()});
-  if(!setNotifs(arr))return;
-  renderAdmin();
-}
-function changeRole(userId,role){
-  var us=getUsers();
-  var target=null;
-  for(var i=0;i<us.length;i++)if(us[i].id===userId){target=us[i];break}
-  if(!target)return;
-  if(target.isMainAdmin)return alert('لا يمكن تغيير دور الأدمن الرئيسي');
-  target.role=role;
-  if(!setUsers(us))return;
-  renderAdmin();
-}
+// المودال
+window.openModal = function(html) { $('#modalContent').innerHTML = html; $('#modalBg').classList.add('show'); };
+window.closeModal = function() { $('#modalBg').classList.remove('show'); };
 
-// ============ PENDING ============
-function updateNotifBadge(){
-  var u=me(),btn=document.getElementById('notifBtn'),badge=document.getElementById('notifBadge');
-  if(!u||u.role!=='admin'){if(btn)btn.style.display='none';return}
-  if(btn)btn.style.display='flex';
-  var pending=getUsers().filter(function(x){return x.status==='pending'}).length;
-  if(badge){if(pending>0){badge.textContent=pending;badge.style.display='flex'}else{badge.style.display='none'}}
-}
-function showPendingModal(){
-  var pending=getUsers().filter(function(x){return x.status==='pending'});
-  if(!pending.length){openModal('<h3>🔔 طلبات</h3><div class="empty-state"><div class="empty-icon">✨</div><div>مفيش طلبات</div></div>');return}
-  var html='<h3>🔔 طلبات ('+pending.length+')</h3>';
-  for(var i=0;i<pending.length;i++){var u=pending[i];
-    html+='<div class="pending-request"><div class="pr-info"><div class="pr-name">'+esc(u.name)+'</div><div class="pr-phone">📱 '+esc(u.phone)+'</div><div class="pr-date">🎂 '+esc(u.birthDate||'—')+'</div></div><div class="pr-actions"><button class="btn-approve" onclick="approveUser(\''+u.id+'\')">✓</button><button class="btn-reject" onclick="rejectUser(\''+u.id+'\')">✗</button></div></div>';}
-  openModal(html);
-}
-function approveUser(id){
-  var us=getUsers(),u=null;
-  for(var i=0;i<us.length;i++)if(us[i].id===id){u=us[i];break}
-  if(!u)return;
-  u.status='approved';u.role=u.role||'player';
-  var ps=getPlayers(),pl=null;
-  for(var j=0;j<ps.length;j++)if(ps[j].phone===u.phone){pl=ps[j];break}
-  if(!pl){
-    pl={id:uid(),name:u.name,position:'لاعب',phone:u.phone,birthDate:u.birthDate,photo:'',cardBackImage:'',stats:{goals:0,assists:0,matches:0,motm:0,rating:0,pace:70,shooting:70,passing:70,dribbling:70,defending:70,physical:70,skills:3,weakFoot:3,jerseyNumber:0}};
-    ps.push(pl);setPlayers(ps);
-  }
-  u.playerId=pl.id;setUsers(us);
-  closeModal();renderAll();
-  alert('✓ تم قبول '+u.name);
-}
-function rejectUser(id){
-  if(!confirm('رفض؟'))return;
-  var us=getUsers();
-  for(var i=0;i<us.length;i++)if(us[i].id===id){us[i].status='rejected';break}
-  setUsers(us);closeModal();renderAll();
-}
-
-// ============ MODAL ============
-function openModal(html){document.getElementById('modalContent').innerHTML=html;document.getElementById('modalBg').classList.add('show')}
-function closeModal(){document.getElementById('modalBg').classList.remove('show');matchLineupExpanded=false}
-
-// ============ BOOT ============
-(function boot(){
-  ensureMainAdmin();
-  syncLoginBackground();
-  var btns=document.querySelectorAll('.tab-btn');
-  for(var i=0;i<btns.length;i++){
-    (function(btn){btn.onclick=function(){goTab(parseInt(btn.dataset.tab,10))}})(btns[i]);
-  }
-  var u=me();
-  if(u&&u.status==='approved')enterApp();
-  else{if(u)setSession(null);showView('login')}
-  setInterval(function(){var user=me();if(user&&user.role==='admin')updateNotifBadge()},15000);
-  setInterval(function(){
-    if(cardsTab==='legendary'&&!legendaryPaused&&currentTab===1){
-      var ls=getLegendary();
-      if(ls.length>1){legendaryIndex=(legendaryIndex+1)%ls.length;updateLegendaryPositions()}
-    }
-  },5500);
-})();
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal();closeProfile();closePreview()}});
+// التهيئة الأولى
+window.showView('login');
 </script>
 </body>
 </html>
