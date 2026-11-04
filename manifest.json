@@ -1,24 +1,20 @@
 {
   "name": "فريق بني برزه",
   "short_name": "بني برزه",
-  "description": "تطبيق إدارة فريق كرة القدم",
   "start_url": "./index.html",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#050a15",
   "theme_color": "#050a15",
   "icons": [
     {
       "src": "./launchericon-192x192.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "./launchericon-512x512.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }
