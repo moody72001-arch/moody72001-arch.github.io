@@ -11,7 +11,7 @@
 <style>
 :root{--gold:#d4af37;--gold-lt:#f5d76e;--gold-dk:#8a6d1f;--blue:#3b82f6;--blue-lt:#93c5fd;--blue-dk:#1e40af;--blue-mid:#2563eb;--bg:#050a15;--card:#0c1425;--card-2:#131d33;--text:#fff;--dim:#7a8499;--red:#e74c3c;--green:#27ae60;--border:rgba(59,130,246,.25)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
-html,body{height:100vh;overflow:hidden;overscroll-behavior-y: contain;font-family:'Cairo', sans-serif;background:var(--bg);color:var(--text)}
+html,body{height:100vh;overflow:hidden;font-family:'Cairo', sans-serif;background:var(--bg);color:var(--text)}
 input,select,button,textarea{font-family:inherit}
 
 /* AUTH */
@@ -25,10 +25,8 @@ input,select,button,textarea{font-family:inherit}
 .auth-bg-img.has-image{opacity:1}
 .auth-bg-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,.5),rgba(0,0,0,.85));z-index:1;display:none}
 .auth-bg-img.has-image ~ .auth-bg-overlay{display:block}
-
-.auth-card{position:relative;z-index:2;width:100%;max-width:400px;background:rgba(15,12,8,.9);backdrop-filter:blur(20px);border:1px solid rgba(212,175,55,.35);border-radius:24px;padding:28px 22px;box-shadow:0 0 100px rgba(212,175,55,.12),0 20px 60px rgba(0,0,0,.8);transition:all .4s ease}
-.auth-card.glass{background:rgba(10,10,15,.4);border-color:rgba(212,175,55,.5);backdrop-filter:blur(30px);box-shadow:0 0 50px rgba(0,0,0,.5)}
-
+.auth-card{position:relative;z-index:2;width:100%;max-width:400px;background:rgba(15,12,8,.95);border:1px solid rgba(212,175,55,.35);border-radius:24px;padding:28px 22px;box-shadow:0 0 100px rgba(212,175,55,.12),0 20px 60px rgba(0,0,0,.8);transition:all .4s ease}
+.auth-card.glass{background:rgba(10,10,15,.85);border-color:rgba(212,175,55,.5);box-shadow:0 0 50px rgba(0,0,0,.5)}
 .auth-logo{display:flex;justify-content:center;margin-bottom:8px}
 .logo-circle{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#f5d76e,#d4af37,#8a6d1f);display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 0 40px rgba(212,175,55,.6)}
 .auth-brand{text-align:center;font-size:24px;font-weight:900;letter-spacing:2px;background:linear-gradient(135deg,#f5d76e,#d4af37,#8a6d1f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
@@ -61,7 +59,8 @@ input,select,button,textarea{font-family:inherit}
 .tab-btn{background:transparent;border:1px solid var(--border);color:var(--dim);padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;font-weight:700;transition:all .3s}
 .tab-btn.active{background:#3b82f6;color:#fff;border-color:#3b82f6;box-shadow:0 0 15px rgba(59,130,246,.5);text-shadow:0 1px 2px rgba(0,0,0,.5)}
 
-.tabs-container{flex:1;overflow-y:auto;overflow-x:hidden}
+/* SMOOTH SCROLL FIX */
+.tabs-container{flex:1;overflow-y:auto;overflow-x:hidden; touch-action: pan-y; -webkit-overflow-scrolling: touch;}
 .tab-panel{display:none;width:100%;height:100%;overflow-y:auto;padding:16px;padding-bottom:60px}
 .tab-panel.active{display:block;animation:panelIn .25s ease}
 @keyframes panelIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
@@ -202,7 +201,7 @@ input,select,button,textarea{font-family:inherit}
 
 .fifa-back-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,9,25,.3),rgba(10,6,18,.85));z-index:0}
 .fifa-back-top{position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:3}
-.fifa-back-btn{width:30px;height:30px;background:rgba(0,0,0,.7);border:1px solid var(--blue);border-radius:50%;color:var(--blue-lt);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
+.fifa-back-btn{width:30px;height:30px;background:rgba(0,0,0,.7);border:1px solid var(--blue);border-radius:50%;color:var(--blue-lt);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 .fifa-full-stats{position:relative;z-index:2;padding:44px 8px 8px;margin-top:auto}
 .fifa-full-stats .fifa-stat-row{display:flex;gap:4px;margin-bottom:4px}
 .fifa-full-stats .fifa-stat{flex:1;text-align:center;padding:5px 2px;border-radius:5px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1)}
@@ -269,7 +268,7 @@ input,select,button,textarea{font-family:inherit}
 @keyframes sparkleFly{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--tx),var(--ty)) scale(0);opacity:0}}
 
 /* Modals, Board, Comments */
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
 .modal-bg.show{display:flex}
 .modal{background:linear-gradient(135deg,#0d1728,#141e30);border:1px solid rgba(59,130,246,.4);border-radius:20px;padding:22px;width:100%;max-width:460px;max-height:85vh;overflow-y:auto}
 .modal h3{color:var(--blue-lt);font-size:18px;font-weight:800;text-align:center;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid rgba(59,130,246,.25)}
@@ -403,18 +402,18 @@ input,select,button,textarea{font-family:inherit}
 .role-supervisor{background:rgba(230,126,34,.2);color:#e67e22}
 .role-main{background:linear-gradient(135deg,#f5d76e,#d4af37);color:#000}
 
-.preview-overlay{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.96);backdrop-filter:blur(8px);animation:fadeIn .3s ease}
+.preview-overlay{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.96);animation:fadeIn .3s ease}
 .preview-overlay.show{display:flex}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .preview-content{max-width:300px;width:100%;position:relative;animation:packOpen .8s cubic-bezier(.2,.9,.3,1)}
 @keyframes packOpen{0%{opacity:0;transform:scale(.2) rotateY(180deg)}60%{transform:scale(1.05) rotateY(0)}100%{opacity:1;transform:scale(1) rotateY(0)}}
-.preview-close{position:absolute;top:-50px;right:0;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;width:40px;height:40px;border-radius:50%;font-size:22px;cursor:pointer;backdrop-filter:blur(6px)}
+.preview-close{position:absolute;top:-50px;right:0;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;width:40px;height:40px;border-radius:50%;font-size:22px;cursor:pointer;}
 .preview-content .fifa-card-wrap{width:100%;cursor:pointer}
 
 /* DELUXE PROFILE */
 .profile-view{position:fixed;inset:0;z-index:60;overflow-y:auto;background:#050a15;display:none}
 .profile-view.show{display:block}
-.profile-bg-img{position:fixed;inset:0;background-size:cover;background-position:center;filter:blur(15px) brightness(.3);transform:scale(1.2);z-index:0;animation:kenBurns 20s ease-in-out infinite alternate;}
+.profile-bg-img{position:fixed;inset:0;background-size:cover;background-position:center;filter:brightness(.3);transform:scale(1.2);z-index:0;animation:kenBurns 20s ease-in-out infinite alternate;}
 @keyframes kenBurns{0%{transform:scale(1.1) translate(0,0)}100%{transform:scale(1.3) translate(-20px,-20px)}}
 .profile-overlay{position:fixed;inset:0;background:linear-gradient(180deg,rgba(5,10,21,.2),rgba(5,10,21,.8) 60%,rgba(5,10,21,.98));z-index:1}
 .profile-particles{position:fixed;inset:0;z-index:1;pointer-events:none;overflow:hidden;}
@@ -431,11 +430,11 @@ input,select,button,textarea{font-family:inherit}
 @keyframes nameShine{0%,100%{left:-100%}50%{left:200%}}
 .profile-pos{display:inline-block;background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff;padding:4px 16px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:24px;box-shadow:0 4px 10px rgba(0,0,0,0.5)}
 .profile-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:400px;margin-bottom:20px}
-.stat-box{background:rgba(12,20,37,.75);border:1px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center;backdrop-filter:blur(10px)}
+.stat-box{background:rgba(12,20,37,.95);border:1px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center;}
 .stat-box b{display:block;font-size:22px;font-weight:900;color:var(--blue-lt);margin-bottom:2px}
 .stat-box span{font-size:11px;color:var(--dim);font-weight:600}
 
-.profile-stats-bars{width:100%;max-width:400px;background:rgba(12,20,37,.75);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:20px;backdrop-filter:blur(10px);}
+.profile-stats-bars{width:100%;max-width:400px;background:rgba(12,20,37,.95);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:20px;}
 .p-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .p-bar-row:last-child{margin-bottom:0;}
 .p-bar-label{width:50px;font-size:12px;font-weight:800;color:var(--dim);}
@@ -455,10 +454,10 @@ input,select,button,textarea{font-family:inherit}
 .badges-container{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:20px;width:100%;max-width:400px;}
 .achievement-badge{background:linear-gradient(135deg,rgba(212,175,55,0.2),rgba(0,0,0,0.5));border:1px solid var(--gold);padding:6px 10px;border-radius:10px;font-size:11px;font-weight:800;color:var(--gold-lt);display:flex;align-items:center;gap:4px;box-shadow:0 0 10px rgba(212,175,55,0.2);}
 
-.profile-details{width:100%;max-width:400px;background:rgba(12,20,37,.75);border:1px solid var(--border);border-radius:14px;padding:16px;font-size:14px;line-height:2;color:#ddd;text-align:center;margin-bottom:24px;backdrop-filter:blur(10px)}
+.profile-details{width:100%;max-width:400px;background:rgba(12,20,37,.95);border:1px solid var(--border);border-radius:14px;padding:16px;font-size:14px;line-height:2;color:#ddd;text-align:center;margin-bottom:24px;}
 .profile-delete-btn{width:100%;max-width:400px;padding:14px;background:rgba(231,76,60,.1);border:1px solid var(--red);color:var(--red);font-size:14px;font-weight:800;border-radius:14px;cursor:pointer;margin-top:8px;margin-bottom:20px;}
 
-.trophy-room{width:100%;max-width:400px;background:linear-gradient(135deg,rgba(212,175,55,0.1),rgba(12,20,37,0.8));border:1px solid rgba(212,175,55,0.3);border-radius:14px;padding:16px;margin-bottom:24px;backdrop-filter:blur(10px)}
+.trophy-room{width:100%;max-width:400px;background:linear-gradient(135deg,rgba(212,175,55,0.1),rgba(12,20,37,0.9));border:1px solid rgba(212,175,55,0.3);border-radius:14px;padding:16px;margin-bottom:24px;}
 .trophy-title{font-size:14px;font-weight:900;color:var(--gold);text-align:center;margin-bottom:12px;border-bottom:1px solid rgba(212,175,55,0.2);padding-bottom:8px;}
 .trophy-item{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:#ddd;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.1);}
 .trophy-item:last-child{border:none;}
@@ -733,9 +732,11 @@ function startAppSync() {
     if(currentUserPhone !== "admin") { isAdmin = state.admins.includes(currentUserPhone); isCoach = state.coaches.includes(currentUserPhone); }
     updateUI();
     applyLoginBackground();
+    
+    // التحديث الذكي: تحديث التاب الحالي فقط
     const activeEl = document.activeElement;
     const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
-    if(!isTyping) renderAll();
+    if(!isTyping) renderTab(currentTab);
   });
 
   if (isAdmin) {
@@ -747,9 +748,11 @@ function startAppSync() {
         else if (u.phone !== 'admin') approvedUsers.push({uid: d.id, ...u});
       });
       updateUI();
-      const activeEl = document.activeElement;
-      const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
-      if(!isTyping) renderAdmin();
+      if(currentTab === 7) {
+          const activeEl = document.activeElement;
+          const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
+          if(!isTyping) renderAdmin();
+      }
     });
   }
 }
@@ -794,10 +797,6 @@ function renderTab(idx) {
     if(idx === 7) renderAdmin();
 }
 
-function renderAll() {
-  renderTab(currentTab);
-}
-
 // الحسابات
 function getPlayerData(p) {
   let goals=0, assists=0, matches=0, motm=0, worst=0, bad=0, ratingSum=0, ratingCount=0;
@@ -810,7 +809,7 @@ function getPlayerData(p) {
         matches++; goals += (m.goals||{})[p.id] || 0; assists += (m.assists||{})[p.id] || 0;
         if (m.ratings && m.ratings[p.id]) { 
             ratingSum += m.ratings[p.id]; ratingCount++; 
-            recentMatches.push({ opponent: m.opponentTeam, rating: m.ratings[p.id], date: m.date });
+            recentMatches.push({ opponent: m.opponentTeam, rating: m.ratings[p.id], date: m.date, goals: (m.goals||{})[p.id] || 0 });
         }
       }
       if (m.motm === p.id) { motm++; trophies.push(m); }
@@ -887,7 +886,7 @@ window.addPlayer = async function() {
 };
 
 window.editPlayerStats = function(id) {
-  if(!isAdmin && !isCoach) return; // Security restriction
+  if(!isAdmin && !isCoach) return;
   const p = state.players.find(x => x.id === id); if(!p) return;
   const s = p.stats || { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 };
   openModal(`<h3>📊 إحصائيات ${esc(p.name)}</h3>
@@ -974,9 +973,8 @@ window.openProfile = function(id) {
   if(bgUrl) { $('#profileBgImg').style.backgroundImage = `url(${bgUrl})`; } 
   else { $('#profileBgImg').style.backgroundImage = 'none'; }
   
-  // Generate particles
   let particlesHTML = '';
-  for(let i=0; i<15; i++) {
+  for(let i=0; i<5; i++) {
       const left = Math.random() * 100;
       const delay = Math.random() * 5;
       const dur = 5 + Math.random() * 5;
@@ -1056,7 +1054,6 @@ window.shareProfile = async function(id) {
     const captureArea = document.getElementById('profileContentCapture');
     if(!captureArea) return;
     
-    // Hide the share and delete buttons temporarily
     const btnShare = captureArea.querySelector('.btn-purple');
     const btnDel = document.getElementById('profileDeleteBtn');
     const originalDisplayShare = btnShare.style.display;
@@ -1288,7 +1285,6 @@ window.shareCard = async function(id) {
   const p = state.players.find(x => x.id === id) || state.legendary.find(x => x.id === id);
   if(!p) return;
   
-  // Create a clean version of the card in the hidden capture container
   const captureDiv = document.getElementById('capture-container');
   captureDiv.innerHTML = buildCardHTML(p, calculateOVR(p), getCardTier(calculateOVR(p)), false, false, true);
   
@@ -1307,7 +1303,7 @@ window.shareCard = async function(id) {
   }
 };
 
-// 3. الماتشات (محدث بالعداد التنازلي و RSVP و H2H)
+// 3. الماتشات
 let countdownInterval;
 
 function renderMatches() {
@@ -1332,7 +1328,6 @@ function renderMatches() {
     </div>`;
   }
 
-  // Countdown for Next Match
   const today = new Date(); today.setHours(0,0,0,0);
   const upcomingMatches = state.matches.filter(m => !m.archived && new Date(m.date) >= today).sort((a,b) => new Date(a.date) - new Date(b.date));
   
@@ -1358,7 +1353,6 @@ function renderMatches() {
   else ms.forEach(m => {
     const hasResult = m.ourScore !== null && m.theirScore !== null;
     
-    // My RSVP Status
     let myRsvp = '';
     if(m.rsvp && m.rsvp[currentUserPhone]) {
         myRsvp = m.rsvp[currentUserPhone] === 'yes' ? '✅ أنت جاي' : '❌ أنت مش جاي';
@@ -1427,7 +1421,6 @@ window.openMatchDetail = function(id) {
       <div style="flex:1;text-align:center;font-weight:800;color:var(--blue-lt);font-size:13px">${esc(m.opponentTeam)}</div>
     </div>`;
 
-  // Head to Head (H2H)
   const h2hMatches = state.matches.filter(x => x.id !== m.id && x.archived && x.opponentTeam === m.opponentTeam && x.ourScore !== null && x.theirScore !== null);
   if(h2hMatches.length > 0) {
       let wins=0, draws=0, losses=0;
@@ -1446,7 +1439,6 @@ window.openMatchDetail = function(id) {
       </div>`;
   }
 
-  // RSVP Section (For active matches)
   if(!m.archived) {
       const myRsvp = m.rsvp && m.rsvp[currentUserPhone] ? m.rsvp[currentUserPhone] : '';
       html += `<div class="rsvp-box">
@@ -1456,7 +1448,6 @@ window.openMatchDetail = function(id) {
       </div>`;
   }
 
-  // Result Input (Admin only)
   if(isAdmin && !m.archived) {
       html += `<div style="display:flex;gap:10px;margin-bottom:14px;background:rgba(0,0,0,.2);padding:10px;border-radius:10px;">
         <div style="flex:1"><label class="form-label" style="margin:0 0 5px;">أهدافنا</label><input type="number" value="${m.ourScore !== null ? m.ourScore : ''}" onchange="setMatchResult('${m.id}', 'ourScore', this.value)" style="width:100%;padding:8px;text-align:center;background:#000;border:1px solid #333;border-radius:6px;color:#fff;"></div>
@@ -1464,7 +1455,6 @@ window.openMatchDetail = function(id) {
       </div>`;
   }
 
-  // Lineup
   html += `<div class="lineup-section">
       <div class="lineup-header" onclick="toggleMatchLineup()"><span class="lineup-title">${m.lineup.length ? `⚽ التشكيل (${m.lineup.length} لاعب)` : '⚽ لسه مفيش تشكيل'}</span><span class="lineup-toggle" id="lineupToggleIcon">▾</span></div>
       <div class="lineup-body" id="lineupBody">`;
@@ -1482,7 +1472,6 @@ window.openMatchDetail = function(id) {
   }
   html += `</div></div>`;
   
-  // Stats
   if(m.lineup.length === 0) html += `<div style="text-align:center;color:var(--dim);padding:20px">اختار التشكيل الأول</div>`;
   else {
     m.lineup.forEach(pid => {
@@ -1505,7 +1494,6 @@ window.openMatchDetail = function(id) {
     });
   }
 
-  // Match Comments
   html += `<div class="comment-section">
     <div style="font-size:12px;font-weight:800;color:var(--blue-lt);margin-bottom:8px;">💬 تعليقات الماتش</div>
     <div class="comment-list">`;
@@ -1587,7 +1575,6 @@ function renderStats() {
   const el = $('#panel-3');
   if(!state.players.length) return el.innerHTML = '<div class="empty-state">ضيف لاعبين الأول</div>';
   
-  // Team Form (Last 5 matches)
   const last5 = state.matches.filter(m => m.archived && m.ourScore !== null && m.theirScore !== null)
                             .sort((a,b) => new Date(b.date) - new Date(a.date)).slice(0, 5);
   let formHTML = `<div class="team-form-box"><div class="team-form-title">حالة الفريق (آخر 5 ماتشات)</div><div class="team-form-row">`;
@@ -1635,7 +1622,7 @@ function renderStats() {
   el.innerHTML = html;
 }
 
-// 4.5 عرش النجوم (Hall of Fame)
+// 4.5 عرش النجوم
 function renderHallOfFame() {
   const el = $('#panel-4');
   const data = state.players.map(p => getPlayerData(p)).filter(p => p.motm > 0).sort((a,b) => b.motm - a.motm);
@@ -1931,22 +1918,6 @@ window.changeRole = async function(uid, role) { await updateDoc(doc(db, "users",
 // المودال
 window.openModal = function(html) { $('#modalContent').innerHTML = html; $('#modalBg').classList.add('show'); };
 window.closeModal = function() { $('#modalBg').classList.remove('show'); };
-
-// ============ منع الريفريش عند السحب لأسفل ============
-let startY = 0;
-document.addEventListener('touchstart', function(e) {
-    startY = e.touches[0].clientY;
-}, {passive: true});
-
-document.addEventListener('touchmove', function(e) {
-    let currentY = e.touches[0].clientY;
-    let container = e.target.closest('.tabs-container');
-    let isAtTop = container ? container.scrollTop <= 0 : true;
-    
-    if (isAtTop && currentY > startY) {
-        if (e.cancelable) e.preventDefault();
-    }
-}, {passive: false});
 
 // التهيئة الأولى
 window.showView('login');
