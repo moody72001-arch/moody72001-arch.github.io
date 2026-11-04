@@ -1,8 +1,10 @@
 {
+  "id": "/",
   "name": "فريق بني برزه",
   "short_name": "بني برزه",
   "description": "تطبيق إدارة فريق كرة القدم",
-  "start_url": "./index.html",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#050a15",
