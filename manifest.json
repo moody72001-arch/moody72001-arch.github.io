@@ -1,22 +1,24 @@
 {
   "name": "فريق بني برزه",
   "short_name": "بني برزه",
+  "description": "تطبيق إدارة فريق كرة القدم",
   "start_url": "./index.html",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#050a15",
   "theme_color": "#050a15",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/192/53/53283.png",
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxOTIgMTkyIj48Y2lyY2xlIGN4PSI5NiIgY3k9Ijk2IiByPSI4MCIgZmlsbD0iIzA1MGExNSIgc3Ryb2tlPSIjZDRhZjM3IiBzdHJva2Utd2lkdGg9IjEwIi8+PHRleHQgeD0iOTYiIHk9IjExMCIgZm9udC1zaXplPSI2MCIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZmlsbD0iI2Q0YWYzNyIgZm9udC1mYW1pbHk9IkFyaWFsIj7YqNmG2Yog2KjYsdmHPC90ZXh0Pjwvc3ZnPg==",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     },
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/53/53283.png",
+      "src": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA1MTIgNTEyIj48Y2lyY2xlIGN4PSIyNTYiIGN5PSIyNTYiIHI9IjIxMyIgZmlsbD0iIzA1MGExNSIgc3Ryb2tlPSIjZDRhZjM3IiBzdHJva2Utd2lkdGg9IjI2Ii8+PHRleHQgeD0iMjU2IiB5PSIyOTAiIGZvbnQtc2l6ZT0iMTYwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjZDRhZjM3IiBmb250LWZhbWlseT0iQXJpYWwiPtio2YbZiiDYqNix2Yc8L3RleHQ+PC9zdmc+",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
-  ],
-  "id": "com.moody.banubrza",
-  "description": "تطبيق إداره فريق كره القدم"
+  ]
 }
