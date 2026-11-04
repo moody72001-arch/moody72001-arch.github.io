@@ -8,22 +8,26 @@
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Teko:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--gold:#d4af37;--gold-lt:#f5d76e;--gold-dk:#8a6d1f;--blue:#3b82f6;--blue-lt:#93c5fd;--blue-dk:#1e40af;--blue-mid:#2563eb;--bg:#050a15;--card:#0c1425;--card-2:#131d33;--text:#fff;--dim:#7a8499;--red:#e74c3c;--green:#27ae60}
+:root{--gold:#d4af37;--gold-lt:#f5d76e;--gold-dk:#8a6d1f;--blue:#3b82f6;--blue-lt:#93c5fd;--blue-dk:#1e40af;--blue-mid:#2563eb;--bg:#050a15;--card:#0c1425;--card-2:#131d33;--text:#fff;--dim:#7a8499;--red:#e74c3c;--green:#27ae60;--border:rgba(59,130,246,.25)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
 html,body{height:100vh;overflow:hidden;font-family:'Cairo', sans-serif;background:var(--bg);color:var(--text)}
 input,select,button,textarea{font-family:inherit}
 
-/* AUTH (gold) */
+/* AUTH (Gold & Glass) */
 .bg-anim{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 20% 20%,rgba(212,175,55,.18),transparent 45%),radial-gradient(ellipse at 80% 80%,rgba(212,175,55,.12),transparent 45%),linear-gradient(135deg,#000,#0a0805 50%,#000);overflow:hidden}
 .ball{position:absolute;font-size:44px;opacity:.07;animation:drift 30s linear infinite}
 .ball-1{top:10%;left:15%}.ball-2{top:70%;left:80%;animation-delay:-5s}.ball-3{top:30%;left:70%;animation-delay:-10s}.ball-4{top:80%;left:20%;animation-delay:-15s}
 @keyframes drift{0%{transform:translate(0,0) rotate(0)}25%{transform:translate(30px,-40px) rotate(90deg)}50%{transform:translate(-20px,30px) rotate(180deg)}75%{transform:translate(40px,20px) rotate(270deg)}100%{transform:translate(0,0) rotate(360deg)}}
+
 .auth-screen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto}
 .auth-bg-img{position:absolute;inset:0;background-size:cover;background-position:center;background-repeat:no-repeat;z-index:0;opacity:0;transition:opacity .6s ease}
 .auth-bg-img.has-image{opacity:1}
-.auth-bg-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,.4),rgba(0,0,0,.75));z-index:1;display:none}
+.auth-bg-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,.5),rgba(0,0,0,.85));z-index:1;display:none}
 .auth-bg-img.has-image ~ .auth-bg-overlay{display:block}
-.auth-card{position:relative;z-index:2;width:100%;max-width:400px;background:rgba(15,12,8,.9);backdrop-filter:blur(20px);border:1px solid rgba(212,175,55,.35);border-radius:24px;padding:28px 22px;box-shadow:0 0 100px rgba(212,175,55,.12),0 20px 60px rgba(0,0,0,.8)}
+
+.auth-card{position:relative;z-index:2;width:100%;max-width:400px;background:rgba(15,12,8,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid rgba(212,175,55,.35);border-radius:24px;padding:28px 22px;box-shadow:0 0 100px rgba(212,175,55,.12),0 20px 60px rgba(0,0,0,.8);transition:all .4s ease}
+.auth-card.glass{background:rgba(10,10,15,.4);border-color:rgba(212,175,55,.5);backdrop-filter:blur(30px);-webkit-backdrop-filter:blur(30px);box-shadow:0 0 50px rgba(0,0,0,.5)}
+
 .auth-logo{display:flex;justify-content:center;margin-bottom:8px}
 .logo-circle{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#f5d76e,#d4af37,#8a6d1f);display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 0 40px rgba(212,175,55,.6)}
 .auth-brand{text-align:center;font-size:24px;font-weight:900;letter-spacing:2px;background:linear-gradient(135deg,#f5d76e,#d4af37,#8a6d1f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
@@ -39,7 +43,7 @@ input,select,button,textarea{font-family:inherit}
 .pending-title{text-align:center;font-size:20px;font-weight:800;color:var(--gold-lt);margin-bottom:10px}
 .pending-text{text-align:center;font-size:13px;color:var(--dim);line-height:1.7;margin-bottom:24px}
 
-/* APP (blue) */
+/* APP (Blue) */
 .app{position:fixed;inset:0;z-index:10;display:none;flex-direction:column;background:linear-gradient(180deg,#050912,#050a15 40%,#050912)}
 .app.show{display:flex}
 .app-header{flex-shrink:0;display:flex;align-items:center;gap:10px;padding:12px 16px;background:linear-gradient(135deg,#0a1424,#0f1a30);border-bottom:2px solid var(--blue-mid);box-shadow:0 4px 24px rgba(37,99,235,.25)}
@@ -48,11 +52,16 @@ input,select,button,textarea{font-family:inherit}
 .app-title{flex:1;font-size:15px;font-weight:900;letter-spacing:1px;background:linear-gradient(135deg,#93c5fd,#3b82f6);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .icon-btn{background:rgba(59,130,246,.12);border:1px solid rgba(59,130,246,.35);color:var(--blue-lt);width:40px;height:40px;border-radius:50%;font-size:18px;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .badge{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;font-size:10px;font-weight:800;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;border:2px solid var(--bg)}
+
+/* TABS Gradient */
 .tabs-nav{flex-shrink:0;background:#0a1424;border-bottom:1px solid rgba(59,130,246,.18);overflow-x:auto;scrollbar-width:none}
 .tabs-nav::-webkit-scrollbar{display:none}
-.tabs-scroll{display:flex;gap:6px;padding:10px 12px;min-width:max-content}
-.tab-btn{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);color:var(--dim);padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;font-weight:600;transition:all .2s}
-.tab-btn.active{background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff;border-color:var(--blue);box-shadow:0 4px 18px rgba(59,130,246,.5)}
+.tabs-scroll{display:flex;gap:8px;padding:12px;min-width:max-content}
+.tab-btn{background:rgba(59,130,246,.06);border:1px solid rgba(59,130,246,.2);color:var(--dim);padding:8px 16px;border-radius:20px;font-size:13px;cursor:pointer;white-space:nowrap;font-weight:700;transition:all .3s cubic-bezier(.4,0,.2,1);position:relative;overflow:hidden}
+.tab-btn.active{background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff;border-color:transparent;box-shadow:0 4px 15px rgba(59,130,246,.4);text-shadow:0 2px 4px rgba(0,0,0,.3)}
+.tab-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(to top, rgba(255,255,255,.2), transparent);opacity:0;transition:opacity .3s}
+.tab-btn.active::before{opacity:1}
+
 .tabs-container{flex:1;overflow-y:auto;overflow-x:hidden}
 .tab-panel{display:none;width:100%;height:100%;overflow-y:auto;padding:16px;padding-bottom:60px}
 .tab-panel.active{display:block;animation:panelIn .25s ease}
@@ -62,35 +71,40 @@ input,select,button,textarea{font-family:inherit}
 .section-header .count{background:rgba(59,130,246,.18);color:var(--blue-lt);padding:2px 10px;border-radius:10px;font-size:12px;font-weight:700}
 .empty-state{text-align:center;padding:50px 20px;color:var(--dim);font-size:14px}
 .empty-icon{font-size:60px;opacity:.4;margin-bottom:12px}
-.btn-purple{position:relative;width:100%;padding:14px;background:linear-gradient(135deg,#3b82f6,#1e40af);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;margin-top:6px;box-shadow:0 4px 18px rgba(59,130,246,.35)}
+.btn-purple{position:relative;width:100%;padding:14px;background:linear-gradient(135deg,#3b82f6,#1e40af);border:none;border-radius:12px;color:#fff;font-size:15px;font-weight:800;cursor:pointer;margin-top:6px;box-shadow:0 4px 18px rgba(59,130,246,.35);transition:all .2s}
 .btn-purple:active{transform:scale(.98)}
-.btn-purple.btn-sm{padding:8px 12px;font-size:12px;width:auto;margin:4px 4px 4px 0;display:inline-block}
-.btn-purple.btn-ghost{background:rgba(59,130,246,.15);color:var(--blue-lt);border:1px solid rgba(59,130,246,.35);box-shadow:none}
-.btn-purple.btn-danger{background:rgba(231,76,60,.1);color:var(--red);border:1px solid var(--red);box-shadow:none}
+.btn-sm{padding:8px 12px;font-size:12px;width:auto;margin:4px 4px 4px 0;display:inline-block}
+.btn-ghost{background:rgba(59,130,246,.15);color:var(--blue-lt);border:1px solid rgba(59,130,246,.35);box-shadow:none}
+.btn-danger{background:rgba(231,76,60,.1);color:var(--red);border:1px solid var(--red);box-shadow:none}
 
-/* Players */
+/* Matches Form (Fixed Layout) */
+.match-form{background:linear-gradient(135deg,var(--card),var(--card-2));border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px}
+.match-form label{display:block;font-size:12px;color:var(--blue-lt);font-weight:700;margin:10px 0 4px}
+.match-form input{width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:10px;color:#fff;font-size:14px;margin-bottom:8px}
+.match-form input:focus{outline:none;border-color:var(--blue)}
+.match-form .row{display:flex;gap:8px;align-items:center}
+.match-form .row input{flex:1}
+.match-form .vs{color:var(--dim);font-weight:900;font-size:14px;padding:0 4px}
+
+/* Players List */
 .player-list{display:flex;flex-direction:column;gap:10px}
 .player-card{display:flex;align-items:center;gap:8px;padding:12px;background:linear-gradient(135deg,var(--card),var(--card-2));border:1px solid rgba(59,130,246,.2);border-radius:16px}
-.player-avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#1a2a44,#050a15);border:2px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden;box-shadow:0 0 15px rgba(59,130,246,.25)}
+.player-avatar{width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#1a2a44,#050a15);border:2px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;overflow:hidden}
 .player-avatar img{width:100%;height:100%;object-fit:cover}
 .player-info{flex:1;min-width:0;cursor:pointer}
 .player-name{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .player-pos{font-size:11px;color:var(--blue-lt);margin-top:2px;font-weight:600}
 .player-actions{display:flex;gap:3px;flex-shrink:0}
 .icon-action{width:32px;height:32px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.28);border-radius:9px;color:var(--blue-lt);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center}
-.icon-action:active{transform:scale(.9);background:rgba(59,130,246,.25)}
 .icon-action.danger{color:var(--red);border-color:rgba(231,76,60,.4);background:rgba(231,76,60,.08)}
-.icon-action.danger:active{background:rgba(231,76,60,.25)}
 
-/* CARDS SUBTABS */
+/* Cards */
 .cards-subtabs{display:flex;gap:6px;margin-bottom:14px;background:rgba(59,130,246,.06);padding:4px;border-radius:14px;border:1px solid rgba(59,130,246,.2)}
 .subtabs-btn{flex:1;padding:10px;background:transparent;border:none;color:var(--dim);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
 .subtabs-btn.active{background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff;box-shadow:0 4px 14px rgba(59,130,246,.4)}
-
-/* FIFA CARDS */
 .cards-toolbar{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.cards-toolbar button{flex:1;min-width:140px;padding:10px;background:linear-gradient(135deg,#3b82f6,#1e40af);border:none;border-radius:10px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;box-shadow:0 3px 12px rgba(59,130,246,.3);transition:all .2s}
-.cards-toolbar button.active{background:linear-gradient(135deg,#f5d76e,#d4af37);color:#000}
+.cards-toolbar button{flex:1;min-width:140px;padding:10px;background:linear-gradient(135deg,#3b82f6,#1e40af);border:none;border-radius:10px;color:#fff;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s}
+.cards-toolbar button.active{background:linear-gradient(135deg,#f5d76e,#d4af37);color:#000;box-shadow:0 4px 15px rgba(212,175,55,.4)}
 .cards-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .fifa-card-wrap{width:100%;perspective:1200px;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .fifa-card-3d{position:relative;width:100%;aspect-ratio:2/3;transform-style:preserve-3d;transition:transform .5s cubic-bezier(.2,.9,.3,1);will-change:transform}
@@ -100,8 +114,6 @@ input,select,button,textarea{font-family:inherit}
 .cards-grid-2.motion .fifa-card-wrap:nth-child(3n) .fifa-card-3d{animation-delay:-1s}
 .fifa-card{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.4,.2,.2,1)}
 .fifa-card.flipped{transform:rotateY(180deg)}
-
-/* CHAMFERED FACE */
 .fifa-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;clip-path:polygon(16px 0%,calc(100% - 16px) 0%,100% 16px,100% calc(100% - 16px),calc(100% - 16px) 100%,16px 100%,0% calc(100% - 16px),0% 16px);background:linear-gradient(135deg,#1e40af,#0a1428,#1e40af);box-shadow:0 8px 24px rgba(0,0,0,.7)}
 .fifa-face.fifa-back{transform:rotateY(180deg)}
 .fifa-content{position:absolute;inset:2px;clip-path:polygon(15px 0%,calc(100% - 15px) 0%,100% 15px,100% calc(100% - 15px),calc(100% - 15px) 100%,15px 100%,0% calc(100% - 15px),0% 15px);padding:8px;display:flex;flex-direction:column;overflow:hidden;background:linear-gradient(160deg,#0a1428,#050a15)}
@@ -120,9 +132,9 @@ input,select,button,textarea{font-family:inherit}
 @keyframes legendaryShift{0%,100%{background-position:0% 0%}50%{background-position:100% 100%}}
 [data-tier="legendary"] .fifa-content{background:radial-gradient(circle at 50% 20%,rgba(245,215,110,.2),transparent 55%),conic-gradient(from 45deg at 50% 50%,#0a0a0a 0deg,#1a1208 90deg,#0a0a0a 180deg,#1a1208 270deg,#0a0a0a 360deg)}
 
-.fifa-expand{position:absolute;top:6px;right:6px;width:32px;height:32px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.5);border-radius:50%;color:#fff;font-size:14px;cursor:pointer;z-index:15;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-.fifa-del{position:absolute;top:6px;left:6px;width:32px;height:32px;background:rgba(231,76,60,.85);border:1px solid rgba(255,255,255,.4);border-radius:50%;color:#fff;font-size:14px;cursor:pointer;z-index:15;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
-.fifa-edit{position:absolute;top:44px;left:6px;width:32px;height:32px;background:rgba(59,130,246,.85);border:1px solid rgba(255,255,255,.4);border-radius:50%;color:#fff;font-size:14px;cursor:pointer;z-index:15;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.fifa-expand-center{width:24px;height:24px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.5);border-radius:50%;color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;justify-self:center;z-index:15}
+.fifa-edit{position:absolute;top:44px;left:6px;width:32px;height:32px;background:rgba(59,130,246,.85);border:1px solid rgba(255,255,255,.4);border-radius:50%;color:#fff;font-size:14px;cursor:pointer;z-index:15;display:flex;align-items:center;justify-content:center;}
+.fifa-del{position:absolute;top:6px;left:6px;width:32px;height:32px;background:rgba(231,76,60,.85);border:1px solid rgba(255,255,255,.4);border-radius:50%;color:#fff;font-size:14px;cursor:pointer;z-index:15;display:flex;align-items:center;justify-content:center;}
 
 .fifa-top{display:flex;align-items:flex-start;gap:6px;margin-bottom:4px;position:relative;z-index:2}
 .fifa-rating-block{display:flex;flex-direction:column;align-items:center;padding:3px 8px;border-radius:6px;min-width:46px;flex-shrink:0}
@@ -151,7 +163,6 @@ input,select,button,textarea{font-family:inherit}
 [data-tier="icon"] .fifa-name{color:#f5d76e;text-shadow:0 0 8px rgba(245,215,110,.5)}
 [data-tier="legendary"] .fifa-name{color:#f5d76e;text-shadow:0 0 10px rgba(245,215,110,.7)}
 
-/* SEASON STATS (front) */
 .fifa-season-stats{display:flex;gap:3px;margin-top:auto;padding:3px 0;position:relative;z-index:2;direction:ltr}
 .fifa-season-stat{flex:1;text-align:center;padding:3px 2px;border-radius:4px;background:rgba(0,0,0,.2)}
 .fifa-season-stat b{display:block;font-size:16px;font-weight:900;line-height:1}
@@ -169,7 +180,6 @@ input,select,button,textarea{font-family:inherit}
 [data-tier="legendary"] .fifa-season-stat b{color:#f5d76e}
 [data-tier="legendary"] .fifa-season-stat span{color:rgba(245,215,110,.75)}
 
-/* EXTRA row with centered expand */
 .fifa-extra{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;padding:3px 2px 0;border-top:1px solid rgba(0,0,0,.15);font-size:9px;font-weight:800;position:relative;z-index:2;margin-top:3px;gap:4px}
 .fifa-extra>:first-child{justify-self:start}
 .fifa-extra>:last-child{justify-self:end}
@@ -180,31 +190,19 @@ input,select,button,textarea{font-family:inherit}
 [data-tier="icon"] .fifa-extra{color:#f5d76e}
 [data-tier="legendary"] .fifa-extra{color:#f5d76e}
 
-.fifa-expand-center{width:24px;height:24px;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.5);border-radius:50%;color:#fff;font-size:11px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;justify-self:center;z-index:15}
-.fifa-expand-center:active{transform:scale(.9)}
-
-/* BACK full stats */
 .fifa-back-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(15,9,25,.3),rgba(10,6,18,.85));z-index:0}
 .fifa-back-top{position:absolute;top:8px;right:8px;display:flex;gap:6px;z-index:3}
 .fifa-back-btn{width:30px;height:30px;background:rgba(0,0,0,.7);border:1px solid var(--blue);border-radius:50%;color:var(--blue-lt);font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(6px)}
-.fifa-back-btn:active{transform:scale(.9)}
-
 .fifa-full-stats{position:relative;z-index:2;padding:44px 8px 8px;margin-top:auto}
 .fifa-full-stats .fifa-stat-row{display:flex;gap:4px;margin-bottom:4px}
 .fifa-full-stats .fifa-stat{flex:1;text-align:center;padding:5px 2px;border-radius:5px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.1)}
 .fifa-full-stats .fifa-stat b{display:block;font-size:15px;font-weight:900;line-height:1;color:#fff}
 .fifa-full-stats .fifa-stat span{font-size:7px;font-weight:700;margin-top:2px;display:block;letter-spacing:.3px;color:rgba(255,255,255,.7)}
-
 .fifa-back-content{padding:8px;position:relative;z-index:2;text-align:center;background:linear-gradient(180deg,transparent,rgba(0,0,0,.6))}
 .fifa-back-ovr{font-size:26px;font-weight:900;color:var(--blue-lt);line-height:1;text-shadow:0 2px 12px rgba(59,130,246,.7)}
 .fifa-back-name{font-size:13px;font-weight:900;color:#fff;margin-top:3px;letter-spacing:.6px;text-transform:uppercase;text-shadow:0 2px 8px rgba(0,0,0,.9)}
 .fifa-back-pos{font-size:10px;color:var(--blue-lt);margin-top:2px;letter-spacing:2px;font-weight:700;opacity:.85}
-.fifa-back-brand{font-size:8px;color:rgba(147,197,253,.6);margin-top:6px;letter-spacing:2px;font-weight:700}
-[data-tier="legendary"] .fifa-back-ovr{color:#f5d76e;text-shadow:0 0 20px rgba(245,215,110,.8)}
-[data-tier="legendary"] .fifa-back-pos{color:#f5d76e}
-[data-tier="legendary"] .fifa-back-btn{border-color:#f5d76e;color:#f5d76e}
 
-/* LEGENDARY CAROUSEL */
 .legendary-toolbar{display:flex;gap:8px;margin-bottom:10px}
 .legendary-toolbar button{flex:1;padding:10px;background:linear-gradient(135deg,#f5d76e,#d4af37,#8a6d1f);border:none;border-radius:10px;color:#000;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 3px 14px rgba(212,175,55,.4)}
 .legendary-carousel{position:relative;height:400px;perspective:1400px;overflow:hidden;margin:0 -16px;padding:0 16px}
@@ -217,34 +215,25 @@ input,select,button,textarea{font-family:inherit}
 @keyframes legendFloat{0%,100%{transform:translateY(-4px)}50%{transform:translateY(4px)}}
 .legendary-indicator{text-align:center;color:var(--gold-lt);font-size:12px;font-weight:700;margin-top:10px;letter-spacing:2px}
 
-/* PREVIEW */
-.preview-overlay{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:20px;background:radial-gradient(ellipse at center,rgba(59,130,246,.2),rgba(0,0,0,.96));backdrop-filter:blur(8px);animation:fadeIn .3s ease}
-.preview-overlay.show{display:flex}
-@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-.preview-content{max-width:300px;width:100%;position:relative;animation:packOpen .8s cubic-bezier(.2,.9,.3,1)}
-@keyframes packOpen{0%{opacity:0;transform:scale(.2) rotateY(180deg) rotateZ(-15deg)}60%{transform:scale(1.05) rotateY(0) rotateZ(2deg)}100%{opacity:1;transform:scale(1) rotateY(0) rotateZ(0)}}
-.preview-close{position:absolute;top:-50px;right:0;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;width:40px;height:40px;border-radius:50%;font-size:22px;cursor:pointer;backdrop-filter:blur(6px)}
-.preview-content .fifa-card-wrap{width:100%;cursor:pointer}
+/* Modals */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-bg.show{display:flex}
+.modal{background:linear-gradient(135deg,#0d1728,#141e30);border:1px solid rgba(59,130,246,.4);border-radius:20px;padding:22px;width:100%;max-width:460px;max-height:85vh;overflow-y:auto}
+.modal h3{color:var(--blue-lt);font-size:18px;font-weight:800;text-align:center;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid rgba(59,130,246,.25)}
+.modal input,.modal select,.modal textarea{width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:10px;color:var(--text);font-size:14px;margin-bottom:8px}
+.modal input:focus,.modal select:focus,.modal textarea:focus{outline:none;border-color:var(--blue)}
+.form-label{display:block;color:var(--blue-lt);font-size:12px;font-weight:700;margin:12px 0 4px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 
-/* MATCHES */
-.match-item{background:linear-gradient(135deg,var(--card),var(--card-2));border:1px solid rgba(59,130,246,.25);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .2s}
-.match-item:active{transform:scale(.99);border-color:var(--blue)}
+/* Others */
+.match-item{background:linear-gradient(135deg,var(--card),var(--card-2));border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer}
 .match-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-size:11px;color:var(--dim)}
 .match-teams{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-top:1px solid rgba(59,130,246,.15);border-bottom:1px solid rgba(59,130,246,.15);margin-bottom:8px}
-.match-team{flex:1;text-align:center;font-size:13px;font-weight:800;color:var(--blue-lt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.match-team{flex:1;text-align:center;font-size:13px;font-weight:800;color:var(--blue-lt)}
 .match-score{font-size:22px;font-weight:900;color:#fff;letter-spacing:2px;direction:ltr}
-.match-time{text-align:center;font-size:12px;color:var(--dim);margin-bottom:6px;direction:ltr}
 .match-meta{display:flex;gap:12px;justify-content:center;font-size:11px;color:var(--dim);flex-wrap:wrap}
-.match-meta span{display:flex;align-items:center;gap:3px}
 
-/* MATCH FORM */
-.match-form{background:linear-gradient(135deg,var(--card),var(--card-2));border:1px solid rgba(59,130,246,.3);border-radius:14px;padding:14px;margin-bottom:14px}
-.match-form-row{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;margin-bottom:8px}
-.match-form-row .vs{font-weight:900;color:var(--blue-lt);font-size:13px;text-align:center;padding:8px}
-.match-form-label{font-size:11px;color:var(--dim);font-weight:700;margin-bottom:3px;display:block}
-
-/* LINEUP */
-.lineup-section{background:rgba(59,130,246,.05);border:1px solid rgba(59,130,246,.25);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.lineup-section{background:rgba(59,130,246,.05);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden}
 .lineup-header{display:flex;justify-content:space-between;align-items:center;padding:12px 14px;cursor:pointer;background:rgba(59,130,246,.08)}
 .lineup-title{font-size:13px;font-weight:800;color:var(--blue-lt)}
 .lineup-toggle{font-size:16px;color:var(--blue-lt)}
@@ -253,98 +242,58 @@ input,select,button,textarea{font-family:inherit}
 .lineup-player{display:flex;align-items:center;gap:8px;padding:8px;border-radius:8px;margin-bottom:6px;background:rgba(0,0,0,.3);cursor:pointer}
 .lineup-player.selected{border:1px solid var(--blue);background:rgba(59,130,246,.15)}
 .lineup-checkbox{width:18px;height:18px;accent-color:#3b82f6;flex-shrink:0}
-.lineup-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#1a2a44,#050a15);border:1.5px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;flex-shrink:0}
+.lineup-avatar{width:32px;height:32px;border-radius:50%;background:#1a2a44;border:1.5px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;font-size:14px;overflow:hidden;flex-shrink:0}
 .lineup-avatar img{width:100%;height:100%;object-fit:cover}
 .lineup-name{font-size:13px;font-weight:700;flex:1}
 .lineup-pos{font-size:10px;color:var(--dim)}
 .lineup-actions{display:flex;gap:6px;margin-top:10px}
-.lineup-actions button{flex:1;padding:8px;border-radius:8px;border:1px solid rgba(59,130,246,.35);background:rgba(59,130,246,.1);color:var(--blue-lt);font-size:11px;font-weight:700;cursor:pointer}
-.lineup-empty{text-align:center;color:var(--dim);font-size:12px;padding:16px}
+.lineup-actions button{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:rgba(59,130,246,.1);color:var(--blue-lt);font-size:11px;font-weight:700;cursor:pointer}
 
-/* STATS (improved cards) */
 .stat-category{margin-bottom:22px}
 .stat-cat-title{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;color:var(--blue-lt);margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid rgba(59,130,246,.25)}
 .stat-cards{display:flex;flex-direction:column;gap:10px}
-.stat-player-card{display:flex;align-items:center;gap:10px;padding:14px;background:linear-gradient(135deg,var(--card),var(--card-2));border:1px solid rgba(59,130,246,.2);border-radius:16px;position:relative}
-.stat-player-card.rank-1{border-color:#d4af37;background:linear-gradient(135deg,#1a1a08,#2a2410);box-shadow:0 0 24px rgba(212,175,55,.3)}
+.stat-player-card{display:flex;align-items:center;gap:10px;padding:14px;background:linear-gradient(135deg,var(--card),var(--card-2));border:1px solid var(--border);border-radius:16px}
+.stat-player-card.rank-1{border-color:#d4af37;background:linear-gradient(135deg,#1a1a08,#2a2410)}
 .stat-player-card.rank-2{border-color:#c0c0c0;background:linear-gradient(135deg,#1a1a22,#25252e)}
 .stat-player-card.rank-3{border-color:#cd7f32;background:linear-gradient(135deg,#1a130a,#2a1e0f)}
-.stat-rank{width:42px;height:42px;border-radius:50%;background:rgba(59,130,246,.15);border:1.5px solid rgba(59,130,246,.35);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:var(--blue-lt);flex-shrink:0}
-.stat-rank.medal-gold{background:linear-gradient(135deg,#f5d76e,#d4af37,#8a6d1f);color:#000;border-color:#f5d76e;box-shadow:0 0 15px rgba(212,175,55,.5)}
-.stat-rank.medal-silver{background:linear-gradient(135deg,#f0f0f0,#c0c0c0,#888);color:#000;border-color:#e0e0e0;box-shadow:0 0 15px rgba(192,192,192,.4)}
-.stat-rank.medal-bronze{background:linear-gradient(135deg,#e8a866,#cd7f32,#8b5a2b);color:#000;border-color:#cd7f32;box-shadow:0 0 15px rgba(205,127,50,.4)}
-.stat-photo{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#1a2a44,#050a15);border:2px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;flex-shrink:0}
+.stat-rank{width:42px;height:42px;border-radius:50%;background:rgba(59,130,246,.15);border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:900;color:var(--blue-lt);flex-shrink:0}
+.stat-rank.medal-gold{background:linear-gradient(135deg,#f5d76e,#d4af37,#8a6d1f);color:#000;border-color:#f5d76e}
+.stat-rank.medal-silver{background:linear-gradient(135deg,#f0f0f0,#c0c0c0,#888);color:#000;border-color:#e0e0e0}
+.stat-rank.medal-bronze{background:linear-gradient(135deg,#e8a866,#cd7f32,#8b5a2b);color:#000;border-color:#cd7f32}
+.stat-photo{width:48px;height:48px;border-radius:50%;background:#1a2a44;border:2px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;font-size:20px;overflow:hidden;flex-shrink:0}
 .stat-photo img{width:100%;height:100%;object-fit:cover}
 .stat-info{flex:1;min-width:0}
 .stat-name{font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .stat-pos{font-size:11px;color:var(--blue-lt);font-weight:600;margin-top:2px;opacity:.85}
 .stat-progress{height:6px;background:rgba(59,130,246,.15);border-radius:3px;margin-top:8px;overflow:hidden}
-.stat-progress-bar{height:100%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:3px;transition:width .6s ease}
+.stat-progress-bar{height:100%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:3px}
 .rank-1 .stat-progress-bar{background:linear-gradient(90deg,#d4af37,#f5d76e)}
 .rank-2 .stat-progress-bar{background:linear-gradient(90deg,#a0a0a0,#e0e0e0)}
 .rank-3 .stat-progress-bar{background:linear-gradient(90deg,#a0622b,#e8a866)}
-.stat-value-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 12px;background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.35);border-radius:12px;min-width:70px;flex-shrink:0}
+.stat-value-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:8px 12px;background:rgba(59,130,246,.15);border:1px solid var(--border);border-radius:12px;min-width:70px;flex-shrink:0}
 .stat-value{font-size:24px;font-weight:900;color:var(--blue-lt);line-height:1}
 .stat-value-label{font-size:9px;color:var(--dim);margin-top:3px;font-weight:700;letter-spacing:.5px}
 
-/* Rules / Anns */
-.info-card{background:linear-gradient(135deg,var(--card),var(--card-2));border:1px solid rgba(59,130,246,.25);border-radius:14px;padding:14px;margin-bottom:10px}
+.info-card{background:linear-gradient(135deg,var(--card),var(--card-2));border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px}
 .info-card-title{font-weight:800;color:var(--blue-lt);font-size:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
 .info-card-body{font-size:13px;line-height:1.7;color:#ccc}
 .info-card-meta{font-size:11px;color:var(--dim);margin-bottom:6px}
 
-/* Forms */
-.form-label{display:block;color:var(--blue-lt);font-size:12px;font-weight:700;margin:12px 0 4px}
-.modal input,.modal select,.modal textarea{width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:10px;color:var(--text);font-size:14px}
-.modal input:focus,.modal select:focus,.modal textarea:focus{outline:none;border-color:var(--blue)}
-.modal textarea{resize:vertical;min-height:70px}
-.modal input[type=file]{cursor:pointer;padding:10px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
-.grid-2>div>input,.grid-3>div>input{margin-top:4px}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px}
-.modal-bg.show{display:flex}
-.modal{background:linear-gradient(135deg,#0d1728,#141e30);border:1px solid rgba(59,130,246,.4);border-radius:20px;padding:22px;width:100%;max-width:460px;max-height:85vh;overflow-y:auto}
-.modal h3{color:var(--blue-lt);font-size:18px;font-weight:800;text-align:center;margin-bottom:18px;padding-bottom:12px;border-bottom:1px solid rgba(59,130,246,.25)}
-
-/* PROFILE */
-.profile-view{position:fixed;inset:0;z-index:60;overflow-y:auto;background:linear-gradient(135deg,#050a15,#0d1728,#050a15);display:none}
-.profile-view.show{display:block}
-.profile-bg-img{position:fixed;inset:0;background-size:cover;background-position:center;filter:blur(40px) brightness(.25);transform:scale(1.2);z-index:0}
-.profile-overlay{position:fixed;inset:0;background:linear-gradient(180deg,rgba(5,10,21,.3),rgba(5,10,21,.7) 50%,rgba(5,10,21,.95));z-index:1}
-.profile-content{position:relative;z-index:2;min-height:100%;padding:60px 20px 40px;display:flex;flex-direction:column;align-items:center}
-.profile-back{position:fixed;top:16px;right:16px;background:rgba(0,0,0,.6);border:1px solid rgba(59,130,246,.5);color:var(--blue-lt);padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;z-index:3}
-.profile-avatar{width:140px;height:140px;border-radius:50%;border:4px solid var(--blue-mid);background:linear-gradient(135deg,#1a2a44,#050a15);display:flex;align-items:center;justify-content:center;font-size:60px;overflow:hidden;box-shadow:0 0 60px rgba(59,130,246,.6);margin-bottom:20px}
-.profile-avatar img{width:100%;height:100%;object-fit:cover}
-.profile-name{font-size:26px;font-weight:900;color:var(--blue-lt);text-align:center;margin-bottom:6px}
-.profile-pos{display:inline-block;background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff;padding:4px 16px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:24px}
-.profile-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:400px;margin-bottom:20px}
-.stat-box{background:rgba(12,20,37,.75);border:1px solid rgba(59,130,246,.35);border-radius:14px;padding:14px 8px;text-align:center}
-.stat-box b{display:block;font-size:22px;font-weight:900;color:var(--blue-lt);margin-bottom:2px}
-.stat-box span{font-size:11px;color:var(--dim);font-weight:600}
-.profile-details{width:100%;max-width:400px;background:rgba(12,20,37,.75);border:1px solid rgba(59,130,246,.3);border-radius:14px;padding:16px;font-size:14px;line-height:2;color:#ddd;text-align:center;margin-bottom:24px}
-.profile-delete-btn{width:100%;max-width:400px;padding:14px;background:rgba(231,76,60,.1);border:1px solid var(--red);color:var(--red);font-size:14px;font-weight:800;border-radius:14px;cursor:pointer;margin-top:8px}
-.profile-delete-btn:active{background:rgba(231,76,60,.25)}
-
-/* Admin redesign */
 .admin-section{margin-bottom:18px}
 .admin-section-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-.admin-section-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1e40af);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;box-shadow:0 3px 12px rgba(59,130,246,.35)}
+.admin-section-icon{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#3b82f6,#1e40af);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
 .admin-section-title{font-size:15px;font-weight:800;color:var(--blue-lt)}
-.admin-card{background:linear-gradient(135deg,var(--card),var(--card-2));border:1px solid rgba(59,130,246,.25);border-radius:16px;padding:16px}
+.admin-card{background:linear-gradient(135deg,var(--card),var(--card-2));border:1px solid var(--border);border-radius:16px;padding:16px}
 .admin-logo-row{display:flex;gap:14px;align-items:center;margin-bottom:12px}
-.admin-logo-preview{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#1a2a44,#050a15);border:2px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden;flex-shrink:0}
+.admin-logo-preview{width:70px;height:70px;border-radius:50%;background:#1a2a44;border:2px solid var(--blue-mid);display:flex;align-items:center;justify-content:center;font-size:30px;overflow:hidden;flex-shrink:0}
 .admin-logo-preview img{width:100%;height:100%;object-fit:cover}
 .admin-logo-info{flex:1;min-width:0}
-.admin-logo-info input{width:100%;padding:10px;background:rgba(0,0,0,.4);border:1px solid rgba(59,130,246,.25);border-radius:8px;color:#fff;margin-bottom:8px;font-size:13px}
-.admin-bg-preview{width:100%;height:140px;border-radius:12px;background:rgba(0,0,0,.4);border:1px dashed rgba(59,130,246,.3);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--dim);background-size:cover;background-position:center;margin-bottom:12px;overflow:hidden}
+.admin-logo-info input{width:100%;padding:10px;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:8px;color:#fff;margin-bottom:8px;font-size:13px}
+.admin-bg-preview{width:100%;height:140px;border-radius:12px;background:rgba(0,0,0,.4);border:1px dashed var(--border);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--dim);background-size:cover;background-position:center;margin-bottom:12px;overflow:hidden}
 .admin-bg-actions{display:flex;gap:8px;margin-bottom:8px}
 .admin-bg-actions button{flex:1;padding:10px;border-radius:10px;border:none;font-size:12px;font-weight:700;cursor:pointer}
-.firebase-status{padding:8px 10px;border-radius:8px;font-size:11px;font-weight:600;text-align:center}
-.firebase-status.ok{background:rgba(39,174,96,.15);color:#4ade80;border:1px solid rgba(39,174,96,.3)}
-.firebase-status.warn{background:rgba(230,126,34,.15);color:#fbbf24;border:1px solid rgba(230,126,34,.3)}
 
-.pending-request{display:flex;gap:12px;padding:12px;background:rgba(0,0,0,.35);border:1px solid rgba(59,130,246,.2);border-radius:12px;margin-bottom:10px}
+.pending-request{display:flex;gap:12px;padding:12px;background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:12px;margin-bottom:10px}
 .pr-info{flex:1}
 .pr-name{font-size:14px;font-weight:800;margin-bottom:4px}
 .pr-phone,.pr-date{font-size:11px;color:var(--dim);margin-top:2px}
@@ -353,21 +302,14 @@ input,select,button,textarea{font-family:inherit}
 .btn-approve{background:linear-gradient(135deg,#27ae60,#1e8449);color:#fff}
 .btn-reject{background:rgba(231,76,60,.15);border:1px solid var(--red);color:var(--red)}
 
-.perm-row{display:flex;align-items:center;gap:10px;padding:12px;background:rgba(0,0,0,.35);border:1px solid rgba(59,130,246,.2);border-radius:12px;margin-bottom:8px}
+.perm-row{display:flex;align-items:center;gap:10px;padding:12px;background:rgba(0,0,0,.35);border:1px solid var(--border);border-radius:12px;margin-bottom:8px}
 .perm-row.main{border-color:#d4af37;background:linear-gradient(135deg,rgba(212,175,55,.08),rgba(0,0,0,.35))}
 .perm-info{flex:1;min-width:0}
-.perm-name{font-size:13px;font-weight:800;color:#fff;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.perm-name{font-size:13px;font-weight:800;color:#fff;margin-bottom:3px}
 .perm-meta{font-size:10px;color:var(--dim);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .perm-role{padding:2px 7px;border-radius:6px;font-weight:700;font-size:10px}
 .perm-lock{font-size:14px;color:#d4af37;flex-shrink:0}
-.role-badge{display:inline-block;padding:2px 6px;border-radius:4px;font-size:10px;margin-right:4px}
-.role-admin{background:rgba(59,130,246,.22);color:var(--blue-lt)}
-.role-player{background:rgba(100,150,255,.15);color:#79a7ff}
-.role-coach{background:rgba(39,174,96,.2);color:var(--green)}
-.role-supervisor{background:rgba(230,126,34,.2);color:#e67e22}
-.role-main{background:linear-gradient(135deg,#f5d76e,#d4af37);color:#000}
 
-/* Match player row */
 .pm-row{background:#0a1424;border:1px solid #1a2a44;border-radius:10px;padding:10px;margin-bottom:8px}
 .pm-name{font-size:13px;font-weight:700;color:var(--blue-lt);margin-bottom:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .pm-controls{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
@@ -380,22 +322,54 @@ input,select,button,textarea{font-family:inherit}
 .pm-award.worst.active{background:rgba(231,76,60,.15);border-color:var(--red);color:var(--red)}
 .pm-award.bad.active{background:rgba(150,150,150,.25);border-color:#888;color:#ccc}
 
-.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;background:rgba(59,130,246,.18);color:var(--blue-lt);border:1px solid rgba(59,130,246,.35)}
+.pill{display:inline-block;padding:2px 8px;border-radius:10px;font-size:10px;background:rgba(59,130,246,.18);color:var(--blue-lt);border:1px solid var(--border)}
 .pill-gold{background:rgba(212,175,55,.2);color:#f5d76e;border-color:rgba(212,175,55,.5)}
 .pill-red{background:rgba(231,76,60,.15);color:var(--red);border-color:var(--red)}
 .pill-gray{background:rgba(150,150,150,.2);color:#ccc;border-color:#666}
 
-.photo-pick-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
-.photo-pick-cell{aspect-ratio:1;border-radius:10px;overflow:hidden;border:2px solid rgba(59,130,246,.3);cursor:pointer;background:#0a1424;display:flex;align-items:center;justify-content:center;font-size:20px}
-.photo-pick-cell img{width:100%;height:100%;object-fit:cover}
+.role-admin{background:rgba(59,130,246,.22);color:var(--blue-lt)}
+.role-player{background:rgba(100,150,255,.15);color:#79a7ff}
+.role-coach{background:rgba(39,174,96,.2);color:var(--green)}
+.role-supervisor{background:rgba(230,126,34,.2);color:#e67e22}
+.role-main{background:linear-gradient(135deg,#f5d76e,#d4af37);color:#000}
+
+.preview-overlay{position:fixed;inset:0;z-index:300;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,.96);backdrop-filter:blur(8px);animation:fadeIn .3s ease}
+.preview-overlay.show{display:flex}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.preview-content{max-width:300px;width:100%;position:relative;animation:packOpen .8s cubic-bezier(.2,.9,.3,1)}
+@keyframes packOpen{0%{opacity:0;transform:scale(.2) rotateY(180deg)}60%{transform:scale(1.05) rotateY(0)}100%{opacity:1;transform:scale(1) rotateY(0)}}
+.preview-close{position:absolute;top:-50px;right:0;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);color:#fff;width:40px;height:40px;border-radius:50%;font-size:22px;cursor:pointer;backdrop-filter:blur(6px)}
+.preview-content .fifa-card-wrap{width:100%;cursor:pointer}
+
+.profile-view{position:fixed;inset:0;z-index:60;overflow-y:auto;background:#050a15;display:none}
+.profile-view.show{display:block}
+.profile-bg-img{position:fixed;inset:0;background-size:cover;background-position:center;filter:blur(40px) brightness(.25);transform:scale(1.2);z-index:0}
+.profile-overlay{position:fixed;inset:0;background:linear-gradient(180deg,rgba(5,10,21,.3),rgba(5,10,21,.7) 50%,rgba(5,10,21,.95));z-index:1}
+.profile-content{position:relative;z-index:2;min-height:100%;padding:60px 20px 40px;display:flex;flex-direction:column;align-items:center}
+.profile-back{position:fixed;top:16px;right:16px;background:rgba(0,0,0,.6);border:1px solid var(--blue);color:var(--blue-lt);padding:10px 16px;border-radius:20px;font-size:13px;font-weight:700;cursor:pointer;z-index:3}
+.profile-avatar{width:140px;height:140px;border-radius:50%;border:4px solid var(--blue-mid);background:#1a2a44;display:flex;align-items:center;justify-content:center;font-size:60px;overflow:hidden;margin-bottom:20px}
+.profile-avatar img{width:100%;height:100%;object-fit:cover}
+.profile-name{font-size:26px;font-weight:900;color:var(--blue-lt);text-align:center;margin-bottom:6px}
+.profile-pos{display:inline-block;background:linear-gradient(135deg,#3b82f6,#1e40af);color:#fff;padding:4px 16px;border-radius:20px;font-size:12px;font-weight:800;margin-bottom:24px}
+.profile-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:100%;max-width:400px;margin-bottom:20px}
+.stat-box{background:rgba(12,20,37,.75);border:1px solid var(--border);border-radius:14px;padding:14px 8px;text-align:center}
+.stat-box b{display:block;font-size:22px;font-weight:900;color:var(--blue-lt);margin-bottom:2px}
+.stat-box span{font-size:11px;color:var(--dim);font-weight:600}
+.profile-details{width:100%;max-width:400px;background:rgba(12,20,37,.75);border:1px solid var(--border);border-radius:14px;padding:16px;font-size:14px;line-height:2;color:#ddd;text-align:center;margin-bottom:24px}
+.profile-delete-btn{width:100%;max-width:400px;padding:14px;background:rgba(231,76,60,.1);border:1px solid var(--red);color:var(--red);font-size:14px;font-weight:800;border-radius:14px;cursor:pointer;margin-top:8px}
 </style>
 </head>
 <body>
   <!-- شاشة الدخول -->
 <div id="authScreen" class="auth-screen" style="display:none;">
+  <div class="bg-anim">
+    <span class="ball ball-1">⚽</span><span class="ball ball-2">⚽</span>
+    <span class="ball ball-3">⚽</span><span class="ball ball-4">⚽</span>
+  </div>
   <div class="auth-bg-img" id="authBgImg"></div>
   <div class="auth-bg-overlay"></div>
-  <div class="auth-card">
+  
+  <div class="auth-card" id="authCard">
     <div class="auth-logo"><div class="logo-circle">⚽</div></div>
     <div class="auth-brand">فريق بني برزه</div>
     <div class="auth-sub">إدارة فريقك باحترافية</div>
@@ -489,7 +463,7 @@ input,select,button,textarea{font-family:inherit}
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, onSnapshot, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 // إعدادات Firebase الخاصة بك
 const firebaseConfig = {
@@ -521,16 +495,14 @@ let legendaryIndex = 0;
 let legendaryPaused = false;
 let legendaryPauseTimer = null;
 let currentProfileId = null;
-let matchLineupExpanded = false;
 
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
 
-// مساعدات
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,6); }
 function esc(s) { return String(s||'').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 function formatPhone(p) { return p.includes('@') ? p : p + "@futsal.com"; }
-async function save() { try { await setDoc(teamDocRef, state); } catch(e) { console.error(e); alert("خطأ في الحفظ: " + e.message); } }
+async function save() { try { await setDoc(teamDocRef, state); } catch(e) { console.error(e); } }
 
 // المصادقة
 window.showView = function(v) {
@@ -600,10 +572,9 @@ function checkUserStatus(uid) {
         await setDoc(userRef, { name: "المدير", phone: "admin", role: "admin", joinedAt: new Date().toISOString() }); 
         return; 
       } else { 
-        $('#authScreen').style.display = 'none'; 
-        $('#app').classList.remove('show');
         $('#authScreen').style.display = 'flex'; 
         window.showView('pending'); 
+        $('#app').classList.remove('show'); 
         return; 
       }
     }
@@ -640,15 +611,18 @@ function startAppSync() {
       state.coaches = state.coaches || []; 
       state.team = state.team || { name: "فريق بني برزه", logo: "", loginBg: "" };
     } else {
-      save(); // إنشاء الوثيقة لو مش موجودة
+      save();
     }
     if(currentUserPhone !== "admin") { 
       isAdmin = state.admins.includes(currentUserPhone); 
       isCoach = state.coaches.includes(currentUserPhone); 
     }
     updateUI();
-    renderAll();
     applyLoginBackground();
+    
+    // Fix: Don't re-render if user is typing to prevent keyboard closing
+    const isTyping = document.activeElement && (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA');
+    if(!isTyping) renderAll();
   });
 
   if (isAdmin) {
@@ -659,17 +633,22 @@ function startAppSync() {
         if (u.role === 'pending') pendingUsers.push({uid: d.id, ...u});
         else if (u.phone !== 'admin') approvedUsers.push({uid: d.id, ...u});
       });
+      updateUI();
       renderAdmin();
     });
   }
 }
 
 function applyLoginBackground() {
+  const bgImg = $('#authBgImg');
+  const card = $('#authCard');
   if (state.team.loginBg) {
-    $('#authBgImg').style.backgroundImage = `url(${state.team.loginBg})`;
-    $('#authBgImg').classList.add('has-image');
+    bgImg.style.backgroundImage = `url(${state.team.loginBg})`;
+    bgImg.classList.add('has-image');
+    card.classList.add('glass');
   } else {
-    $('#authBgImg').classList.remove('has-image');
+    bgImg.classList.remove('has-image');
+    card.classList.remove('glass');
   }
 }
 
@@ -814,16 +793,20 @@ window.deletePlayerComplete = async function(id) {
   const linkedUser = approvedUsers.find(u => u.name === p.name && u.phone === p.phone);
   if(linkedUser && linkedUser.phone === 'admin') return alert("❌ لا يمكن حذف الأدمن الرئيسي");
   if(!confirm("حذف اللاعب نهائياً وحذف أكونته (لو موجود)؟")) return;
+  
   state.players = state.players.filter(x => x.id !== id);
   await save();
-  // حذف الحساب من users (تحتاج Cloud Function في الواقع، لكن هنحاول نحدثها لـ rejected هنا)
+  
   if(linkedUser) {
-     await updateDoc(doc(db, "users", linkedUser.uid), { role: "rejected" });
+     try {
+       await deleteDoc(doc(db, "users", linkedUser.uid));
+     } catch(e) {
+       console.error("Error deleting user: ", e);
+     }
   }
   closeModal();
 };
 
-// رفع الصور
 window.uploadPhoto = function(id) {
   if(!isAdmin) return;
   const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*';
@@ -833,11 +816,11 @@ window.uploadPhoto = function(id) {
     reader.onload = (ev) => {
       const img = new Image();
       img.onload = async () => {
-        const canvas = document.createElement('canvas'); const MAX = 300; let w = img.width, h = img.height;
+        const canvas = document.createElement('canvas'); const MAX = 250; let w = img.width, h = img.height;
         if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } }
         canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
         const p = state.players.find(x => x.id === id);
-        if(p) { p.photo = canvas.toDataURL('image/jpeg', 0.8); await save(); }
+        if(p) { p.photo = canvas.toDataURL('image/jpeg', 0.7); await save(); }
       };
       img.src = ev.target.result;
     };
@@ -866,13 +849,15 @@ window.openProfile = function(id) {
   $('#profileView').classList.add('show');
 };
 window.closeProfile = function() { $('#profileView').classList.remove('show'); };
+window.deleteFromProfile = function() { if(currentProfileId) deletePlayerComplete(currentProfileId); };
 
 // 2. الكروت
 function buildCardHTML(p, ovr, tier, isLegend, forPreview) {
   const s = p.stats || { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 };
   const d = getPlayerData(p);
   const photo = p.photo ? `<img src="${p.photo}">` : '👤';
-  const expandBtn = forPreview ? '' : `<button class="fifa-expand-center" onclick="event.stopPropagation();previewCard('${p.id}','${isLegend}')">⤢</button>`;
+  
+  const expandBtn = forPreview ? '' : `<button class="fifa-expand-center" onclick="event.stopPropagation();previewCard('${p.id}', ${isLegend})">⤢</button>`;
   const editBtn = (isLegend && isAdmin && !forPreview) ? `<button class="fifa-edit" onclick="event.stopPropagation();editLegend('${p.id}')">✏️</button>` : '';
   const delBtn = (isLegend && isAdmin && !forPreview) ? `<button class="fifa-del" onclick="event.stopPropagation();deleteLegend('${p.id}')">🗑</button>` : '';
   
@@ -915,7 +900,7 @@ function renderCards() {
   
   if(cardsTab === 'normal') {
     if(!state.players.length) return view.innerHTML = '<div class="empty-state">مفيش لاعبين</div>';
-    let html = `<div class="cards-toolbar"><button onclick="toggleMotion()">🎮 الحركة</button></div><div class="cards-grid-2" id="cardsGrid">`;
+    let html = `<div class="cards-toolbar"><button id="motionBtn" onclick="toggleMotion()">🎮 الحركة</button></div><div class="cards-grid-2" id="cardsGrid">`;
     state.players.forEach(p => html += buildCardHTML(p, calculateOVR(p), getCardTier(calculateOVR(p)), false, false));
     html += '</div>';
     view.innerHTML = html;
@@ -936,7 +921,16 @@ function renderCards() {
 }
 
 window.switchCardsTab = function(t) { cardsTab = t; renderCards(); };
-window.toggleMotion = function() { $('#cardsGrid')?.classList.toggle('motion'); };
+window.toggleMotion = function() { 
+  const grid = $('#cardsGrid');
+  if(!grid) return;
+  grid.classList.toggle('motion'); 
+  const btn = $('#motionBtn');
+  if(btn) {
+    if(grid.classList.contains('motion')) { btn.classList.add('active'); btn.innerHTML = '⏸️ إيقاف'; }
+    else { btn.classList.remove('active'); btn.innerHTML = '🎮 الحركة'; }
+  }
+};
 
 function updateLegendaryPositions() {
   const stage = $('#legendaryStage'); if(!stage) return;
@@ -965,7 +959,63 @@ window.onLegendaryClick = function(e, i) {
   }
 };
 
-// عرض الكارت
+// إضافة وتعديل الكروت الأسطورية
+window.showAddLegend = function() {
+  openModal(`<h3>👑 كارت أسطوري جديد</h3>
+    <label class="form-label">الاسم *</label><input id="lg_name" placeholder="اسم اللاعب">
+    <label class="form-label">المركز</label><select id="lg_pos"><option>حارس</option><option>مدافع</option><option>وسط</option><option>مهاجم</option></select>
+    <div class="grid-3" style="margin-top:10px">
+      <div><label class="form-label">سرعة</label><input id="lg_pace" type="number" value="90"></div>
+      <div><label class="form-label">تسديد</label><input id="lg_sho" type="number" value="90"></div>
+      <div><label class="form-label">تمرير</label><input id="lg_pas" type="number" value="90"></div>
+      <div><label class="form-label">مراوغة</label><input id="lg_dri" type="number" value="90"></div>
+      <div><label class="form-label">دفاع</label><input id="lg_def" type="number" value="90"></div>
+      <div><label class="form-label">بدنية</label><input id="lg_phy" type="number" value="90"></div>
+    </div>
+    <button class="btn-purple" onclick="saveNewLegend()" style="margin-top:18px">حفظ</button>`);
+};
+
+window.saveNewLegend = async function() {
+  const name = $('#lg_name').value.trim();
+  if(!name) return alert("اكتب الاسم");
+  const newLegend = {
+    id: 'leg_' + uid(), name: name, position: $('#lg_pos').value, photo: '', 
+    stats: { pace: +$('#lg_pace').value, shooting: +$('#lg_sho').value, passing: +$('#lg_pas').value, dribbling: +$('#lg_dri').value, defending: +$('#lg_def').value, physical: +$('#lg_phy').value }
+  };
+  state.legendary.push(newLegend);
+  await save(); closeModal();
+};
+
+window.editLegend = function(id) {
+  const p = state.legendary.find(x => x.id === id); if(!p) return;
+  const s = p.stats || { pace:90, shooting:90, passing:90, dribbling:90, defending:90, physical:90 };
+  openModal(`<h3>✏️ تعديل أسطورة</h3>
+    <label class="form-label">الاسم</label><input id="lg_name" value="${esc(p.name)}">
+    <div class="grid-3" style="margin-top:10px">
+      <div><label class="form-label">سرعة</label><input id="lg_pace" type="number" value="${s.pace}"></div>
+      <div><label class="form-label">تسديد</label><input id="lg_sho" type="number" value="${s.shooting}"></div>
+      <div><label class="form-label">تمرير</label><input id="lg_pas" type="number" value="${s.passing}"></div>
+      <div><label class="form-label">مراوغة</label><input id="lg_dri" type="number" value="${s.dribbling}"></div>
+      <div><label class="form-label">دفاع</label><input id="lg_def" type="number" value="${s.defending}"></div>
+      <div><label class="form-label">بدنية</label><input id="lg_phy" type="number" value="${s.physical}"></div>
+    </div>
+    <button class="btn-purple" onclick="saveEditLegend('${id}')" style="margin-top:18px">حفظ التعديلات</button>`);
+};
+
+window.saveEditLegend = async function(id) {
+  const p = state.legendary.find(x => x.id === id); if(!p) return;
+  p.name = $('#lg_name').value;
+  p.stats = { pace: +$('#lg_pace').value, shooting: +$('#lg_sho').value, passing: +$('#lg_pas').value, dribbling: +$('#lg_dri').value, defending: +$('#lg_def').value, physical: +$('#lg_phy').value };
+  await save(); closeModal();
+};
+
+window.deleteLegend = async function(id) {
+  if(!confirm('حذف الكارت الأسطوري؟')) return;
+  state.legendary = state.legendary.filter(x => x.id !== id);
+  await save(); closeModal();
+};
+
+// العرض والمشاركة
 window.previewCard = function(id, isLegend) {
   const p = isLegend ? state.legendary.find(x => x.id === id) : state.players.find(x => x.id === id);
   if(!p) return;
@@ -974,7 +1024,6 @@ window.previewCard = function(id, isLegend) {
 };
 window.closePreview = function() { $('#previewOverlay').classList.remove('show'); };
 
-// مشاركة الكارت
 window.shareCard = async function(id) {
   const p = state.players.find(x => x.id === id); if(!p) return;
   const text = `⚽ ${p.name}\n⭐ التقييم: ${calculateOVR(p)}\n📊 إحصائيات: ${p.goals} هدف، ${p.assists} أسيست`;
@@ -989,25 +1038,25 @@ function renderMatches() {
   if(isAdmin) {
     html += `<div class="match-form">
       <h3 style="margin-bottom:10px;font-size:14px;color:var(--blue-lt)">➕ إضافة ماتش</h3>
-      <div class="grid-2">
-        <div><label class="form-label">التاريخ</label><input type="date" id="m_date"></div>
-        <div><label class="form-label">الملعب</label><input type="text" id="m_place"></div>
+      <label>التاريخ</label><input type="date" id="m_date">
+      <label>الملعب</label><input type="text" id="m_place">
+      <div class="row">
+        <div style="flex:1"><label>من ساعة</label><input type="time" id="m_from" value="20:00"></div>
+        <div style="flex:1"><label>إلى ساعة</label><input type="time" id="m_to" value="21:30"></div>
       </div>
-      <div class="grid-2">
-        <div><label class="form-label">من ساعة</label><input type="time" id="m_from" value="20:00"></div>
-        <div><label class="form-label">إلى ساعة</label><input type="time" id="m_to" value="21:30"></div>
-      </div>
-      <div class="match-form-row" style="margin-top:10px">
-        <div><label class="form-label">فريقنا</label><input type="text" id="m_t1" value="${esc(state.team.name)}"></div>
+      <label>الفريقين</label>
+      <div class="row">
+        <input type="text" id="m_t1" value="${esc(state.team.name)}">
         <div class="vs">VS</div>
-        <div><label class="form-label">الخصم</label><input type="text" id="m_t2" placeholder="اسم المنافس"></div>
+        <input type="text" id="m_t2" placeholder="الخصم">
       </div>
-      <div class="match-form-row">
-        <div><label class="form-label">أهدافنا</label><input type="number" id="m_s1" value="0"></div>
+      <label>النتيجة</label>
+      <div class="row">
+        <input type="number" id="m_s1" value="0" placeholder="أهدافنا">
         <div class="vs">-</div>
-        <div><label class="form-label">أهدافهم</label><input type="number" id="m_s2" value="0"></div>
+        <input type="number" id="m_s2" value="0" placeholder="أهدافهم">
       </div>
-      <button class="btn-purple" onclick="addMatch()">إضافة</button>
+      <button class="btn-purple" onclick="addMatch()" style="margin-top:10px">إضافة</button>
     </div>`;
   }
   const ms = state.matches.slice().sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -1045,8 +1094,8 @@ window.openMatchDetail = function(id) {
       <div style="flex:1;text-align:center;font-weight:800;color:var(--blue-lt);font-size:13px">${esc(m.opponentTeam)}</div>
     </div>
     <div class="lineup-section">
-      <div class="lineup-header" onclick="toggleMatchLineup()"><span class="lineup-title">${m.lineup.length ? `⚽ التشكيل (${m.lineup.length} لاعب)` : '⚽ لسه مفيش تشكيل'}</span><span class="lineup-toggle" id="lineupToggleIcon">${matchLineupExpanded?'▴':'▾'}</span></div>
-      <div class="lineup-body ${matchLineupExpanded?'open':''}" id="lineupBody">`;
+      <div class="lineup-header" onclick="toggleMatchLineup()"><span class="lineup-title">${m.lineup.length ? `⚽ التشكيل (${m.lineup.length} لاعب)` : '⚽ لسه مفيش تشكيل'}</span><span class="lineup-toggle" id="lineupToggleIcon">▾</span></div>
+      <div class="lineup-body" id="lineupBody">`;
   if(!state.players.length) html += `<div class="lineup-empty">ضيف لاعبين الأول</div>`;
   else {
     state.players.forEach(p => {
@@ -1060,6 +1109,7 @@ window.openMatchDetail = function(id) {
     if(canEdit) html += `<div class="lineup-actions"><button onclick="selectAllLineup('${m.id}')">الكل</button><button onclick="clearLineup('${m.id}')">إلغاء الكل</button></div>`;
   }
   html += `</div></div>`;
+  
   if(m.lineup.length === 0) html += `<div style="text-align:center;color:var(--dim);padding:20px">اختار التشكيل الأول</div>`;
   else {
     m.lineup.forEach(pid => {
@@ -1086,7 +1136,14 @@ window.openMatchDetail = function(id) {
   openModal(html);
 };
 
-window.toggleMatchLineup = function() { matchLineupExpanded = !matchLineupExpanded; openMatchDetail(state.matches.find(x=>x.id==currentMatchId).id); }; // slight bug here, fix inside openMatch
+window.toggleMatchLineup = function() { 
+  const body = document.getElementById('lineupBody');
+  const icon = document.getElementById('lineupToggleIcon');
+  if(body) {
+    body.classList.toggle('open');
+    icon.textContent = body.classList.contains('open') ? '▴' : '▾';
+  }
+};
 window.toggleLineup = async function(mid, pid, canEdit) {
   if(!canEdit) return;
   const m = state.matches.find(x => x.id === mid);
@@ -1174,6 +1231,17 @@ window.addAnn = async function() { const t = $('#annText').value; if(!t) return;
 window.delAnn = async function(id) { if(!confirm('حذف؟')) return; state.announcements = state.announcements.filter(x=>x.id!==id); await save(); };
 
 // 7. الإدارة
+window.showPendingModal = function() {
+  let html = `<h3>🔔 طلبات الانضمام (${pendingUsers.length})</h3>`;
+  if(!pendingUsers.length) html += `<div class="empty-state">مفيش طلبات جديدة</div>`;
+  else {
+    pendingUsers.forEach(u => {
+      html += `<div class="pending-request"><div class="pr-info"><div class="pr-name">${esc(u.name)}</div><div class="pr-phone">📱 ${esc(u.phone)}</div><div class="pr-date">🎂 ${esc(u.dob)}</div></div><div class="pr-actions"><button class="btn-approve" onclick="approveUser('${u.uid}')">✓</button><button class="btn-reject" onclick="rejectUser('${u.uid}')">✗</button></div></div>`;
+    });
+  }
+  openModal(html);
+};
+
 function renderAdmin() {
   if(!isAdmin) return;
   const el = $('#panel-6');
@@ -1188,7 +1256,6 @@ function renderAdmin() {
     <div class="admin-section"><div class="admin-section-header"><div class="admin-section-icon">🖼️</div><div class="admin-section-title">خلفية شاشة الدخول</div></div>
     <div class="admin-card"><div class="admin-bg-preview" style="${state.team.loginBg?`background-image:url(${state.team.loginBg})`:''}">${!state.team.loginBg?'مفيش خلفية':''}</div>
     <div class="admin-bg-actions"><button class="btn-purple" onclick="uploadLoginBg()">📤 تغيير</button><button class="btn-purple btn-danger" onclick="removeLoginBg()">🗑 إزالة</button></div>
-    <div class="firebase-status ok">✓ متصل بـ Firebase</div>
     </div></div>
 
     <div class="admin-section"><div class="admin-section-header"><div class="admin-section-icon">🔔</div><div class="admin-section-title">إشعارات الفريق</div></div>
@@ -1206,9 +1273,9 @@ function renderAdmin() {
     <div class="admin-card">`;
   approvedUsers.forEach(u => {
     const isMain = u.phone === 'admin';
-    html += `<div class="perm-row ${isMain?'main':''}"><div class="perm-info"><div class="perm-name">${esc(u.name)} ${isMain?'👑':''}</div><div class="perm-meta"><span class="perm-role ${isMain?'role-main':'role-'+u.role}">${isMain?'الأدمن الرئيسي':u.role}</span><span>${esc(u.phone)}</span></div></div>`;
+    html += `<div class="perm-row ${isMain?'main':''}"><div class="perm-info"><div class="perm-name">${esc(u.name)} ${isMain?'👑':''}</div><div class="perm-meta"><span class="perm-role ${isMain?'role-main':'role-'+u.role}">${isMain?'الأدمن الرئيسي':(u.role==='coach'?'مدير فني':(u.role==='supervisor'?'مشرف':'لاعب'))}</span><span>${esc(u.phone)}</span></div></div>`;
     if(isMain) html += `<div class="perm-lock">🔒</div>`;
-    else html += `<select onchange="changeRole('${u.uid}', this.value)" style="width:auto;padding:6px;font-size:11px;background:rgba(0,0,0,.5);border:1px solid rgba(59,130,246,.35);border-radius:8px;color:#fff"><option value="player" ${u.role==='player'?'selected':''}>لاعب</option><option value="coach" ${u.role==='coach'?'selected':''}>مدير فني</option></select>`;
+    else html += `<select onchange="changeRole('${u.uid}', this.value)" style="width:auto;padding:6px;font-size:11px;background:rgba(0,0,0,.5);border:1px solid rgba(59,130,246,.35);border-radius:8px;color:#fff"><option value="player" ${u.role==='player'?'selected':''}>لاعب</option><option value="coach" ${u.role==='coach'?'selected':''}>مدير فني</option><option value="supervisor" ${u.role==='supervisor'?'selected':''}>مشرف</option></select>`;
     html += `</div>`;
   });
   html += `</div></div>`;
@@ -1246,7 +1313,7 @@ window.uploadLoginBg = function() {
         const canvas = document.createElement('canvas'); const MAX = 800; let w = img.width, h = img.height;
         if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } }
         canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        state.team.loginBg = canvas.toDataURL('image/jpeg', 0.7); await save();
+        state.team.loginBg = canvas.toDataURL('image/jpeg', 0.6); await save();
       };
       img.src = ev.target.result;
     };
@@ -1269,8 +1336,9 @@ window.approveUser = async function(uid) {
     }
   }
   await updateDoc(doc(db, "users", uid), { role: 'player' });
+  closeModal();
 };
-window.rejectUser = async function(uid) { await updateDoc(doc(db, "users", uid), { role: 'rejected' }); };
+window.rejectUser = async function(uid) { await updateDoc(doc(db, "users", uid), { role: 'rejected' }); closeModal(); };
 window.changeRole = async function(uid, role) { await updateDoc(doc(db, "users", uid), { role: role }); };
 
 // المودال
