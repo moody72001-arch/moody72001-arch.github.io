@@ -15,7 +15,7 @@
 html,body{height:100vh;overflow:hidden;font-family:'Cairo', sans-serif;background:var(--bg);color:var(--text)}
 input,select,button,textarea{font-family:inherit}
 
-/* AUTH */
+/* AUTH - Performance optimized (no blur) */
 .bg-anim{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 20% 20%,rgba(212,175,55,.18),transparent 45%),radial-gradient(ellipse at 80% 80%,rgba(212,175,55,.12),transparent 45%),linear-gradient(135deg,#000,#0a0805 50%,#000);overflow:hidden}
 .ball{position:absolute;font-size:44px;opacity:.07;animation:drift 30s linear infinite}
 .ball-1{top:10%;left:15%}.ball-2{top:70%;left:80%;animation-delay:-5s}.ball-3{top:30%;left:70%;animation-delay:-10s}.ball-4{top:80%;left:20%;animation-delay:-15s}
@@ -27,7 +27,7 @@ input,select,button,textarea{font-family:inherit}
 .auth-bg-overlay{position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,0,0,.5),rgba(0,0,0,.85));z-index:1;display:none}
 .auth-bg-img.has-image ~ .auth-bg-overlay{display:block}
 .auth-card{position:relative;z-index:2;width:100%;max-width:400px;background:rgba(15,12,8,.95);border:1px solid rgba(212,175,55,.35);border-radius:24px;padding:28px 22px;box-shadow:0 0 100px rgba(212,175,55,.12),0 20px 60px rgba(0,0,0,.8);transition:all .4s ease}
-.auth-card.glass{background:rgba(10,10,15,.85);border-color:rgba(212,175,55,.5);box-shadow:0 0 50px rgba(0,0,0,.5)}
+.auth-card.glass{background:rgba(10,10,15,.95);border-color:rgba(212,175,55,.5);box-shadow:0 0 50px rgba(0,0,0,.5)}
 .auth-logo{display:flex;justify-content:center;margin-bottom:8px}
 .logo-circle{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,#f5d76e,#d4af37,#8a6d1f);display:flex;align-items:center;justify-content:center;font-size:40px;box-shadow:0 0 40px rgba(212,175,55,.6)}
 .auth-brand{text-align:center;font-size:24px;font-weight:900;letter-spacing:2px;background:linear-gradient(135deg,#f5d76e,#d4af37,#8a6d1f);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:4px}
@@ -90,6 +90,9 @@ input,select,button,textarea{font-family:inherit}
 .cd-item{background:rgba(0,0,0,0.5);border:1px solid var(--border);padding:8px 12px;border-radius:10px;min-width:60px;}
 .cd-val{font-size:22px;font-weight:900;color:#fff;line-height:1;}
 .cd-label{font-size:10px;color:var(--dim);margin-top:4px;font-weight:700;}
+
+/* Motivation Banner */
+.motivation-banner{background:linear-gradient(135deg, rgba(212,175,55,0.2), rgba(0,0,0,0.6));border:1px solid var(--gold);border-radius:12px;padding:12px;margin-bottom:16px;text-align:center;font-size:14px;font-weight:800;color:var(--gold-lt);box-shadow:0 0 15px rgba(212,175,55,0.2);}
 
 /* Players List */
 .player-list{display:flex;flex-direction:column;gap:10px}
@@ -647,7 +650,7 @@ const db = getFirestore(app);
 const TEAM_ID = "my-team";
 const teamDocRef = doc(db, "teams", TEAM_ID);
 
-let state = { players: [], matches: [], legendary: [], rules: "", announcements: [], notifs: [], team: { name: "فريق بني برزه", logo: "", loginBg: "" }, admins: [], coaches: [], board: [], moments: [] };
+let state = { players: [], matches: [], legendary: [], rules: "", announcements: [], notifs: [], team: { name: "فريق بني برزه", logo: "", loginBg: "", motivation: "" }, admins: [], coaches: [], board: [], moments: [] };
 let pendingUsers = [];
 let approvedUsers = [];
 let unsubscribeTeam = null;
@@ -658,11 +661,13 @@ let currentUserPhone = "";
 let currentTab = 0;
 let cardsTab = 'normal';
 let communityTab = 'moments';
+let matchesSubTab = 'active'; // 'active' | 'archived'
 let legendaryIndex = 0;
 let legendaryPaused = false;
 let currentProfileId = null;
 let tempLegendPhoto = '';
 let hallAnimated = false;
+let autoRotateInterval = null;
 
 const $ = s => document.querySelector(s);
 const $$ = s => document.querySelectorAll(s);
@@ -671,6 +676,22 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
 function esc(s) { return String(s||'').replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
 function formatPhone(p) { return p.includes('@') ? p : p + "@futsal.com"; }
 async function save() { try { await setDoc(teamDocRef, state); } catch(e) { console.error(e); } }
+
+const DAILY_MOTIVATIONS = [
+  "⚽ الفريق مش لاعب واحد، الفريق كلنا!",
+  "🔥 اجتهد النهاردة عشان تلعب بكرة!",
+  "💪 التعب دلوقتي، فخر بعدين!",
+  "🏆 الفوز بيبدأ من التدريب!",
+  "❤️ إحنا عيلة واحدة على الملعب!",
+  "🌟 النجم الحقيقي هو اللي بيساعد فريقه!",
+  "🚀 كمل، إنت قريب جداً!"
+];
+
+function getDailyMotivation() {
+  if(state.team.motivation) return state.team.motivation;
+  const day = new Date().getDate();
+  return DAILY_MOTIVATIONS[day % DAILY_MOTIVATIONS.length];
+}
 
 window.showView = function(v) {
   $('#loginView').style.display = v === 'login' ? 'block' : 'none';
@@ -733,10 +754,12 @@ function startAppSync() {
       state.players = state.players || []; state.matches = state.matches || []; state.legendary = state.legendary || [];
       state.rules = state.rules || ""; state.announcements = state.announcements || []; state.notifs = state.notifs || [];
       state.admins = state.admins || []; state.coaches = state.coaches || []; state.board = state.board || []; state.moments = state.moments || [];
-      state.team = state.team || { name: "فريق بني برزه", logo: "", loginBg: "" };
+      state.team = state.team || { name: "فريق بني برزه", logo: "", loginBg: "", motivation: "" };
     } else { save(); }
     if(currentUserPhone !== "admin") { isAdmin = state.admins.includes(currentUserPhone); isCoach = state.coaches.includes(currentUserPhone); }
     updateUI(); applyLoginBackground();
+    
+    // التحديث الذكي (يحل مشكلة البطء والتهنيج)
     const activeEl = document.activeElement;
     const isTyping = activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA' || activeEl.tagName === 'SELECT');
     if(!isTyping) renderTab(currentTab);
@@ -793,26 +816,30 @@ function renderTab(idx) {
     if(idx === 7) renderAdmin();
 }
 
+// ============ الأنظمة ============
 function getPlayerXP(p, data) {
     return (data.matches * 10) + (data.goals * 5) + (data.assists * 3) + (data.motm * 20);
 }
 
 function getPlayerData(p) {
+  let searchId = p.id;
+  if(searchId && searchId.startsWith('leg_auto_')) searchId = searchId.substring(9); // Fix 1
+  
   let goals=0, assists=0, matches=0, motm=0, worst=0, bad=0, ratingSum=0, ratingCount=0, trophies=[], recentMatches=[];
   state.matches.forEach(m => {
     if(m.archived) {
-      if((m.lineup||[]).includes(p.id)) {
-        matches++; goals += (m.goals||{})[p.id] || 0; assists += (m.assists||{})[p.id] || 0;
-        if (m.ratings && m.ratings[p.id]) { ratingSum += m.ratings[p.id]; ratingCount++; recentMatches.push({ opponent: m.opponentTeam, rating: m.ratings[p.id], date: m.date, goals: (m.goals||{})[p.id] || 0 }); }
+      if((m.lineup||[]).includes(searchId)) {
+        matches++; goals += (m.goals||{})[searchId] || 0; assists += (m.assists||{})[searchId] || 0;
+        if (m.ratings && m.ratings[searchId]) { ratingSum += m.ratings[searchId]; ratingCount++; recentMatches.push({ opponent: m.opponentTeam, rating: m.ratings[searchId], date: m.date, goals: (m.goals||{})[searchId] || 0 }); }
       }
-      if (m.motm === p.id) { motm++; trophies.push(m); }
-      if (m.worst === p.id) worst++;
-      if ((m.bad||[]).includes(p.id)) bad++;
+      if (m.motm === searchId) { motm++; trophies.push(m); }
+      if (m.worst === searchId) worst++;
+      if ((m.bad||[]).includes(searchId)) bad++;
     }
   });
   const avgRating = ratingCount > 0 ? (ratingSum / ratingCount) : 0;
   recentMatches.sort((a,b) => new Date(b.date) - new Date(a.date));
-  return { ...p, goals, assists, matches, motm, worst, bad, avgRating, trophies, recentMatches };
+  return { ...p, id: searchId, goals, assists, matches, motm, worst, bad, avgRating, trophies, recentMatches };
 }
 
 function calculateOVR(p) {
@@ -825,9 +852,10 @@ function calculateOVR(p) {
 
 function getCardTier(ovr) { if(ovr >= 99) return 'legendary'; if(ovr >= 90) return 'icon'; if(ovr >= 80) return 'gold'; if(ovr >= 70) return 'silver'; return 'bronze'; }
 
+// ============ 1. اللاعبين ============
 function renderPlayers() {
   const el = $('#panel-0');
-  let html = '';
+  let html = `<div class="motivation-banner">${esc(getDailyMotivation())}</div>`;
   if(isAdmin) html += `<button class="btn-purple" onclick="showAddPlayer()" style="margin-bottom:16px">➕ إضافة لاعب جديد</button>`;
   html += `<div class="section-header">👥 اللاعبين <span class="count">${state.players.length}</span></div>`;
   if(!state.players.length) html += `<div class="empty-state"><div class="empty-icon">⚽</div><div>مفيش لاعبين لسه</div></div>`;
@@ -919,7 +947,7 @@ window.uploadPhoto = function(id) {
         if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } }
         canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
         const p = state.players.find(x => x.id === id);
-        if(p) { p.photo = canvas.toDataURL('image/jpeg', 0.7); await save(); }
+        if(p) { p.photo = canvas.toDataURL('image/jpeg', 0.6); await save(); } // Fix 4: lower quality
       };
       img.src = ev.target.result;
     };
@@ -941,7 +969,7 @@ window.uploadProfileBg = function(id) {
         if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } }
         canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h);
         const p = state.players.find(x => x.id === id);
-        if(p) { p.profileBg = canvas.toDataURL('image/jpeg', 0.6); await save(); alert('تم حفظ الخلفية!'); }
+        if(p) { p.profileBg = canvas.toDataURL('image/jpeg', 0.5); await save(); alert('تم حفظ الخلفية!'); } // Fix 4
       };
       img.src = ev.target.result;
     };
@@ -1080,6 +1108,7 @@ window.shareProfile = async function(id) {
     } catch(e) { alert("حدث خطأ: " + e.message); btnShare.style.display = 'block'; btnDel.style.display = 'block'; }
 }
 
+// ============ 2. الكروت ============
 function buildCardHTML(p, ovr, tier, isLegend, forPreview, isCleanCapture = false) {
   const s = p.stats || { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 };
   const d = getPlayerData(p); const photo = p.photo ? `<img src="${p.photo}">` : '👤';
@@ -1131,43 +1160,121 @@ function renderCards() {
     }
   }
   el.innerHTML = tabsHtml + `<div id="cardsView">${contentHtml}</div>`;
-  if(cardsTab === 'legendary') setTimeout(updateLegendaryPositions, 50);
+  if(cardsTab === 'legendary') {
+    setTimeout(updateLegendaryPositions, 50);
+    startLegendaryAuto();
+    setupLegendarySwipe();
+  } else {
+    stopLegendaryAuto();
+  }
 }
 window.switchCardsTab = function(t) { cardsTab = t; renderCards(); };
 window.toggleMotion = function() { const grid = $('#cardsGrid'); if(!grid) return; grid.classList.toggle('motion'); const btn = $('#motionBtn'); if(btn) { if(grid.classList.contains('motion')) { btn.classList.add('active'); btn.innerHTML = '⏸️ إيقاف'; } else { btn.classList.remove('active'); btn.innerHTML = '🎮 الحركة'; } } };
-function updateLegendaryPositions() { const stage = $('#legendaryStage'); if(!stage) return; const cards = stage.querySelectorAll('.legendary-card'); const total = cards.length; cards.forEach((card, i) => { let offset = i - legendaryIndex; if(offset > total/2) offset -= total; if(offset < -total/2) offset += total; const abs = Math.abs(offset); if(abs > 3) { card.style.opacity = '0'; card.style.pointerEvents = 'none'; return; } card.style.opacity = abs === 0 ? 1 : (abs === 1 ? 0.85 : 0.4); card.style.pointerEvents = 'auto'; card.style.zIndex = 100 - abs; card.style.transform = `translateX(${offset*90}px) translateZ(${-abs*80}px) scale(${1-abs*0.12}) rotateY(${offset*-15}deg)`; card.classList.toggle('active', abs === 0); }); const ind = $('#legendaryIndicator'); if(ind) ind.textContent = `${legendaryIndex+1} / ${total}`; }
-window.onLegendaryClick = function(e, i) { if(i === legendaryIndex) { const card = e.currentTarget.querySelector('.fifa-card'); if(card) card.classList.toggle('flipped'); legendaryPaused = true; setTimeout(() => legendaryPaused = false, 8000); } else { legendaryIndex = i; updateLegendaryPositions(); } };
+
+function updateLegendaryPositions() { 
+  const stage = $('#legendaryStage'); if(!stage) return; 
+  const cards = stage.querySelectorAll('.legendary-card'); const total = cards.length; 
+  cards.forEach((card, i) => { 
+    let offset = i - legendaryIndex; 
+    if(offset > total/2) offset -= total; 
+    if(offset < -total/2) offset += total; 
+    const abs = Math.abs(offset); 
+    if(abs > 3) { card.style.opacity = '0'; card.style.pointerEvents = 'none'; return; } 
+    card.style.opacity = abs === 0 ? 1 : (abs === 1 ? 0.85 : 0.4); 
+    card.style.pointerEvents = 'auto'; card.style.zIndex = 100 - abs; 
+    card.style.transform = `translateX(${offset*90}px) translateZ(${-abs*80}px) scale(${1-abs*0.12}) rotateY(${offset*-15}deg)`; 
+    card.classList.toggle('active', abs === 0); 
+  }); 
+  const ind = $('#legendaryIndicator'); if(ind) ind.textContent = `${legendaryIndex+1} / ${total}`; 
+}
+
+window.onLegendaryClick = function(e, i) { 
+  if(i === legendaryIndex) { 
+    const card = e.currentTarget.querySelector('.fifa-card'); 
+    if(card) card.classList.toggle('flipped'); 
+    legendaryPaused = true; 
+    setTimeout(() => legendaryPaused = false, 5000); 
+  } else { 
+    legendaryIndex = i; 
+    updateLegendaryPositions(); 
+  } 
+};
+
+function startLegendaryAuto() {
+  stopLegendaryAuto();
+  autoRotateInterval = setInterval(() => {
+    if(currentTab !== 1 || cardsTab !== 'legendary' || legendaryPaused) return;
+    const total = state.legendary.length + state.players.filter(p => getPlayerData(p).motm >= 10).length;
+    if(total <= 1) return;
+    legendaryIndex = (legendaryIndex + 1) % total;
+    updateLegendaryPositions();
+  }, 4000);
+}
+function stopLegendaryAuto() { if(autoRotateInterval) { clearInterval(autoRotateInterval); autoRotateInterval = null; } }
+
+function setupLegendarySwipe() {
+  const stage = $('#legendaryStage'); if(!stage) return;
+  let startX = 0, startY = 0;
+  stage.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX; startY = e.touches[0].clientY;
+    legendaryPaused = true;
+  }, { passive: true });
+  stage.addEventListener('touchend', (e) => {
+    const endX = e.changedTouches[0].clientX;
+    const endY = e.changedTouches[0].clientY;
+    const diffX = endX - startX;
+    const diffY = endY - startY;
+    if(Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+      const total = state.legendary.length + state.players.filter(p => getPlayerData(p).motm >= 10).length;
+      if(diffX < 0) { legendaryIndex = (legendaryIndex + 1) % total; }
+      else { legendaryIndex = (legendaryIndex - 1 + total) % total; }
+      updateLegendaryPositions();
+    }
+    setTimeout(() => legendaryPaused = false, 5000);
+  }, { passive: true });
+}
 
 window.showAddLegend = function() {
   tempLegendPhoto = '';
   openModal(`<h3>👑 كارت أسطوري جديد</h3><label class="form-label">الاسم *</label><input id="lg_name" placeholder="اسم اللاعب"><label class="form-label">المركز</label><select id="lg_pos"><option>حارس</option><option>مدافع</option><option>وسط</option><option>مهاجم</option></select><label class="form-label">صورة اللاعب</label><div id="lg_photo_preview" style="text-align:center; margin-bottom:10px; font-size:40px; color:var(--dim);">👤</div><button class="btn-purple btn-ghost" onclick="uploadLegendPhoto()" style="margin-bottom:10px">📷 اختيار صورة</button><div class="grid-3" style="margin-top:10px"><div><label class="form-label">سرعة</label><input id="lg_pace" type="number" value="90"></div><div><label class="form-label">تسديد</label><input id="lg_sho" type="number" value="90"></div><div><label class="form-label">تمرير</label><input id="lg_pas" type="number" value="90"></div><div><label class="form-label">مراوغة</label><input id="lg_dri" type="number" value="90"></div><div><label class="form-label">دفاع</label><input id="lg_def" type="number" value="90"></div><div><label class="form-label">بدنية</label><input id="lg_phy" type="number" value="90"></div></div><button class="btn-purple" onclick="saveNewLegend()" style="margin-top:18px">حفظ</button>`);
 };
-window.uploadLegendPhoto = function() { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX = 250; let w = img.width, h = img.height; if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); tempLegendPhoto = canvas.toDataURL('image/jpeg', 0.7); const prev = document.getElementById('lg_photo_preview'); if(prev) prev.innerHTML = `<img src="${tempLegendPhoto}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid var(--blue);">`; }; img.src = ev.target.result; }; reader.readAsDataURL(file); }; input.click(); };
+window.uploadLegendPhoto = function() { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const img = new Image(); img.onload = () => { const canvas = document.createElement('canvas'); const MAX = 250; let w = img.width, h = img.height; if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); tempLegendPhoto = canvas.toDataURL('image/jpeg', 0.6); const prev = document.getElementById('lg_photo_preview'); if(prev) prev.innerHTML = `<img src="${tempLegendPhoto}" style="width:80px; height:80px; border-radius:50%; object-fit:cover; border:2px solid var(--blue);">`; }; img.src = ev.target.result; }; reader.readAsDataURL(file); }; input.click(); };
 window.saveNewLegend = async function() { const name = $('#lg_name').value.trim(); if(!name) return alert("اكتب الاسم"); const newLegend = { id: 'leg_' + uid(), name: name, position: $('#lg_pos').value, photo: tempLegendPhoto, stats: { pace: +$('#lg_pace').value, shooting: +$('#lg_sho').value, passing: +$('#lg_pas').value, dribbling: +$('#lg_dri').value, defending: +$('#lg_def').value, physical: +$('#lg_phy').value } }; state.legendary.push(newLegend); await save(); closeModal(); };
 window.editLegend = function(id) { if(id.startsWith('leg_auto_')) return; const p = state.legendary.find(x => x.id === id); if(!p) return; const s = p.stats || { pace:90, shooting:90, passing:90, dribbling:90, defending:90, physical:90 }; openModal(`<h3>✏️ تعديل أسطورة</h3><label class="form-label">الاسم</label><input id="lg_name" value="${esc(p.name)}"><div class="grid-3" style="margin-top:10px"><div><label class="form-label">سرعة</label><input id="lg_pace" type="number" value="${s.pace}"></div><div><label class="form-label">تسديد</label><input id="lg_sho" type="number" value="${s.shooting}"></div><div><label class="form-label">تمرير</label><input id="lg_pas" type="number" value="${s.passing}"></div><div><label class="form-label">مراوغة</label><input id="lg_dri" type="number" value="${s.dribbling}"></div><div><label class="form-label">دفاع</label><input id="lg_def" type="number" value="${s.defending}"></div><div><label class="form-label">بدنية</label><input id="lg_phy" type="number" value="${s.physical}"></div></div><button class="btn-purple" onclick="saveEditLegend('${id}')" style="margin-top:18px">حفظ التعديلات</button>`); };
 window.saveEditLegend = async function(id) { const p = state.legendary.find(x => x.id === id); if(!p) return; p.name = $('#lg_name').value; p.stats = { pace: +$('#lg_pace').value, shooting: +$('#lg_sho').value, passing: +$('#lg_pas').value, dribbling: +$('#lg_dri').value, defending: +$('#lg_def').value, physical: +$('#lg_phy').value }; await save(); closeModal(); };
 window.deleteLegend = async function(id) { if(id.startsWith('leg_auto_')) return alert("هذا الكارت تلقائي."); if(!confirm('حذف الكارت؟')) return; state.legendary = state.legendary.filter(x => x.id !== id); await save(); closeModal(); };
 window.previewCard = function(id, isLegend) { let p = isLegend ? state.legendary.find(x => x.id === id) : state.players.find(x => x.id === id); if(id.startsWith('leg_auto_')) p = state.players.find(x => 'leg_auto_' + x.id === id); if(!p) return; $('#previewContent').innerHTML = `<button class="preview-close" onclick="closePreview()">×</button>` + buildCardHTML(p, calculateOVR(p), isLegend?'legendary':getCardTier(calculateOVR(p)), isLegend, true, false); $('#previewOverlay').classList.add('show'); };
 window.closePreview = function() { $('#previewOverlay').classList.remove('show'); };
-window.shareCard = async function(id) { const p = state.players.find(x => x.id === id) || state.legendary.find(x => x.id === id); if(!p) return; const captureDiv = document.getElementById('capture-container'); captureDiv.innerHTML = buildCardHTML(p, calculateOVR(p), getCardTier(calculateOVR(p)), false, false, true); const cardEl = captureDiv.firstElementChild; try { const canvas = await html2canvas(cardEl, { scale: 3, backgroundColor: null, useCORS: true }); const link = document.createElement('a'); link.download = `Card_${id}.png`; link.href = canvas.toDataURL("image/png"); link.click(); captureDiv.innerHTML = ''; } catch(e) { alert("حدث خطأ: " + e.message); captureDiv.innerHTML = ''; } };
+window.shareCard = async function(id) { const realId = id.startsWith('leg_auto_') ? id.substring(9) : id; const p = state.players.find(x => x.id === realId) || state.legendary.find(x => x.id === realId); if(!p) return; const captureDiv = document.getElementById('capture-container'); captureDiv.innerHTML = buildCardHTML(p, calculateOVR(p), getCardTier(calculateOVR(p)), false, false, true); const cardEl = captureDiv.firstElementChild; try { const canvas = await html2canvas(cardEl, { scale: 3, backgroundColor: null, useCORS: true }); const link = document.createElement('a'); link.download = `Card_${realId}.png`; link.href = canvas.toDataURL("image/png"); link.click(); captureDiv.innerHTML = ''; } catch(e) { alert("حدث خطأ: " + e.message); captureDiv.innerHTML = ''; } };
 
+// ============ 3. الماتشات ============
 let countdownInterval;
+window.switchMatchesTab = function(tab) { matchesSubTab = tab; renderMatches(); };
+
 function renderMatches() {
   const el = $('#panel-2');
-  let html = '';
-  if(isAdmin) {
+  let html = `<div class="cards-subtabs"><button class="subtabs-btn ${matchesSubTab==='active'?'active':''}" onclick="switchMatchesTab('active')">⚽ الحالية</button><button class="subtabs-btn ${matchesSubTab==='archived'?'active':''}" onclick="switchMatchesTab('archived')">📂 الأرشيف</button></div>`;
+  
+  if(isAdmin && matchesSubTab === 'active') {
     html += `<div class="match-form"><h3 style="margin-bottom:10px;font-size:14px;color:var(--blue-lt)">➕ إضافة ماتش</h3><label>التاريخ</label><input type="date" id="m_date"><label>الملعب</label><input type="text" id="m_place"><div class="row"><div style="flex:1"><label>من ساعة</label><input type="time" id="m_from" value="20:00"></div><div style="flex:1"><label>إلى ساعة</label><input type="time" id="m_to" value="21:30"></div></div><label>الفريقين</label><div class="row"><input type="text" id="m_t1" value="${esc(state.team.name)}"><div class="vs">VS</div><input type="text" id="m_t2" placeholder="الخصم"></div><button class="btn-purple" onclick="addMatch()" style="margin-top:10px">إضافة</button></div>`;
   }
+
   const today = new Date(); today.setHours(0,0,0,0);
   const upcomingMatches = state.matches.filter(m => !m.archived && new Date(m.date) >= today).sort((a,b) => new Date(a.date) - new Date(b.date));
-  if(upcomingMatches.length > 0) {
+  
+  if(matchesSubTab === 'active' && upcomingMatches.length > 0) {
       const next = upcomingMatches[0];
       html += `<div class="countdown-box" id="countdownBox"><div class="countdown-title">⏳ الماتش الجاي ضد ${esc(next.opponentTeam)}</div><div class="countdown-timer" id="countdownTimer"><div class="cd-item"><div class="cd-val" id="cd-days">0</div><div class="cd-label">يوم</div></div><div class="cd-item"><div class="cd-val" id="cd-hours">0</div><div class="cd-label">ساعة</div></div><div class="cd-item"><div class="cd-val" id="cd-mins">0</div><div class="cd-label">دقيقة</div></div><div class="cd-item"><div class="cd-val" id="cd-secs">0</div><div class="cd-label">ثانية</div></div></div></div>`;
       if(countdownInterval) clearInterval(countdownInterval); setTimeout(() => startCountdown(next.date, next.timeFrom), 100);
   }
-  const ms = state.matches.slice().sort((a,b) => new Date(b.date) - new Date(a.date));
-  html += `<div class="section-header">⚽ الماتشات <span class="count">${ms.length}</span></div>`;
-  if(!ms.length) html += `<div class="empty-state">مفيش ماتشات</div>`;
+
+  let ms = state.matches.slice();
+  if(matchesSubTab === 'active') ms = ms.filter(m => !m.archived);
+  else ms = ms.filter(m => m.archived);
+  ms.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  html += `<div class="section-header">${matchesSubTab === 'active' ? '⚽ الماتشات الحالية' : '📂 الماتشات المؤرشفة'} <span class="count">${ms.length}</span></div>`;
+  if(!ms.length) html += `<div class="empty-state">${matchesSubTab === 'active' ? 'مفيش ماتشات حالية' : 'الأرشيف فاضي'}</div>`;
   else ms.forEach(m => {
     const hasResult = m.ourScore !== null && m.theirScore !== null;
     let myRsvp = m.rsvp && m.rsvp[currentUserPhone] ? (m.rsvp[currentUserPhone] === 'yes' ? '✅ أنت جاي' : '❌ أنت مش جاي') : '';
@@ -1192,13 +1299,24 @@ window.openMatchDetail = function(id) {
 
   if(!m.archived) {
       const myRsvp = m.rsvp && m.rsvp[currentUserPhone] ? m.rsvp[currentUserPhone] : '';
-      html += `<div class="rsvp-box"><span style="font-size:13px;font-weight:800;color:#fff;">حضورك:</span><button class="rsvp-btn yes ${myRsvp==='yes'?'active':''}" onclick="setRsvp('${m.id}', 'yes')">✅ أنا جاي</button><button class="rsvp-btn no ${myRsvp==='no'?'active':''}" onclick="setRsvp('${m.id}', 'no')">❌ مش هقدر</button></div>`;
+      if(!isAdmin && !isCoach) {
+          if(myRsvp) {
+              html += `<div class="rsvp-box" style="background:${myRsvp==='yes'?'rgba(39,174,96,.2)':'rgba(231,76,60,.2)'};border:1px solid ${myRsvp==='yes'?'var(--green)':'var(--red)'};"><span style="font-size:14px;font-weight:900;color:#fff;">${myRsvp==='yes'?'✅ أنت أكدت حضورك':'❌ أنت اعتذرت عن الحضور'}</span></div>`;
+          } else {
+              html += `<div class="rsvp-box"><span style="font-size:13px;font-weight:800;color:#fff;">حضورك:</span><button class="rsvp-btn yes" onclick="setRsvp('${m.id}', 'yes')">✅ أنا جاي</button><button class="rsvp-btn no" onclick="setRsvp('${m.id}', 'no')">❌ مش هقدر</button></div>`;
+          }
+      }
 
       if(!m.predictions) m.predictions = {};
       let myPrediction = m.predictions[currentUserPhone] || '';
       if(!canEdit) {
-          let predOptions = state.players.map(p => `<option value="${p.id}" ${myPrediction===p.id?'selected':''}>${esc(p.name)}</option>`).join('');
-          html += `<div style="background:rgba(212,175,55,.1);border:1px solid var(--gold);padding:10px;border-radius:10px;margin-bottom:14px;text-align:center;"><div style="font-size:12px;color:var(--gold-lt);font-weight:800;margin-bottom:5px;">🔮 توقع مين هيكون نجم الماتش؟</div><div style="display:flex;gap:5px;"><select onchange="setPrediction('${m.id}', this.value)" style="flex:1;padding:8px;background:#000;border:1px solid #333;border-radius:6px;color:#fff;"><option value="">-- اختار --</option>${predOptions}</select></div></div>`;
+          if(myPrediction) {
+              let predName = state.players.find(p => p.id === myPrediction)?.name || 'لاعب';
+              html += `<div style="background:rgba(212,175,55,.1);border:1px solid var(--gold);padding:10px;border-radius:10px;margin-bottom:14px;text-align:center;"><div style="font-size:12px;color:var(--gold-lt);font-weight:800;">🔮 توقعت أفضل لاعب: ${esc(predName)}</div></div>`;
+          } else {
+              let predOptions = state.players.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+              html += `<div style="background:rgba(212,175,55,.1);border:1px solid var(--gold);padding:10px;border-radius:10px;margin-bottom:14px;text-align:center;"><div style="font-size:12px;color:var(--gold-lt);font-weight:800;margin-bottom:5px;">🔮 توقع مين هيكون نجم الماتش؟</div><div style="display:flex;gap:5px;"><select id="predictionSelect" style="flex:1;padding:8px;background:#000;border:1px solid #333;border-radius:6px;color:#fff;"><option value="">-- اختار --</option>${predOptions}</select><button class="btn-purple" style="width:auto;margin:0;padding:0 15px;" onclick="confirmPrediction('${m.id}')">تأكيد</button></div></div>`;
+          }
       }
   }
 
@@ -1209,7 +1327,19 @@ window.openMatchDetail = function(id) {
   html += `<div class="lineup-section"><div class="lineup-header" onclick="toggleMatchLineup()"><span class="lineup-title">${m.lineup.length ? `⚽ التشكيل (${m.lineup.length} لاعب)` : '⚽ لسه مفيش تشكيل'}</span><span class="lineup-toggle" id="lineupToggleIcon">▾</span></div><div class="lineup-body" id="lineupBody">`;
   if(!state.players.length) html += `<div class="lineup-empty">ضيف لاعبين الأول</div>`;
   else {
-    state.players.forEach(p => { const sel = m.lineup.includes(p.id); html += `<div class="lineup-player ${sel?'selected':''}" onclick="toggleLineup('${m.id}', '${p.id}', ${canEdit})">${canEdit ? `<input type="checkbox" class="lineup-checkbox" ${sel?'checked':''} style="pointer-events:none;">` : ''}<div class="lineup-avatar">${p.photo?`<img src="${p.photo}">`:'👤'}</div><div class="lineup-name">${esc(p.name)}<div class="lineup-pos">${esc(p.position||'')}</div></div></div>`; });
+    state.players.forEach(p => { 
+      const sel = m.lineup.includes(p.id); 
+      let statusColor = '#7a8499', statusText = '؟';
+      if(m.rsvp && m.rsvp[p.id] === 'yes') { statusColor = 'var(--green)'; statusText = 'حاضر'; }
+      else if(m.rsvp && m.rsvp[p.id] === 'no') { statusColor = 'var(--red)'; statusText = 'غايب'; }
+      
+      html += `<div class="lineup-player ${sel?'selected':''}" onclick="toggleLineup('${m.id}', '${p.id}', ${canEdit})">
+        ${canEdit ? `<input type="checkbox" class="lineup-checkbox" ${sel?'checked':''} style="pointer-events:none;">` : ''}
+        <div class="lineup-avatar">${p.photo?`<img src="${p.photo}">`:'👤'}</div>
+        <div class="lineup-name">${esc(p.name)}<div class="lineup-pos">${esc(p.position||'')}</div></div>
+        <div style="font-size:11px;font-weight:800;color:${statusColor};border:1px solid ${statusColor};padding:2px 8px;border-radius:10px;">${statusText}</div>
+      </div>`; 
+    });
     if(canEdit) html += `<div class="lineup-actions"><button onclick="selectAllLineup('${m.id}')">الكل</button><button onclick="clearLineup('${m.id}')">إلغاء الكل</button></div>`;
   }
   html += `</div></div>`;
@@ -1234,8 +1364,16 @@ window.openMatchDetail = function(id) {
   openModal(html);
 };
 
+window.confirmPrediction = function(mid) {
+    const sel = document.getElementById('predictionSelect');
+    if(!sel || !sel.value) return alert("اختار لاعب الأول");
+    const m = state.matches.find(x => x.id === mid); if(!m) return;
+    if(!m.predictions) m.predictions = {};
+    m.predictions[currentUserPhone] = sel.value;
+    save(); openMatchDetail(mid);
+};
+
 window.setRsvp = async function(mid, status) { const m = state.matches.find(x => x.id === mid); if(!m) return; if(!m.rsvp) m.rsvp = {}; m.rsvp[currentUserPhone] = status; await save(); openMatchDetail(mid); };
-window.setPrediction = async function(mid, pid) { const m = state.matches.find(x => x.id === mid); if(!m) return; if(!m.predictions) m.predictions = {}; m.predictions[currentUserPhone] = pid; await save(); };
 window.setMatchResult = async function(mid, field, val) { const m = state.matches.find(x => x.id === mid); if(m) { m[field] = val !== '' ? +val : null; await save(); } };
 window.addMatchComment = async function(mid) { const inp = document.getElementById('matchCommentInput'); if(!inp || !inp.value.trim()) return; const m = state.matches.find(x => x.id === mid); if(!m.comments) m.comments = []; m.comments.push({ author: currentUserPhone !== 'admin' ? currentUserPhone : 'المدير', text: inp.value.trim() }); await save(); openMatchDetail(mid); };
 window.toggleMatchLineup = function() { const body = document.getElementById('lineupBody'); const icon = document.getElementById('lineupToggleIcon'); if(body && icon) { const isOpen = body.style.display === 'block' || body.classList.contains('open'); if(isOpen) { body.classList.remove('open'); body.style.display = 'none'; icon.textContent = '▾'; } else { body.classList.add('open'); body.style.display = 'block'; icon.textContent = '▴'; } } };
@@ -1248,6 +1386,7 @@ window.toggleBad = async function(mid, pid) { const m = state.matches.find(x=>x.
 window.archiveMatch = async function(id) { if(!confirm("أرشفة الماتش؟ مش هينفع تعدل تاني")) return; const m = state.matches.find(x=>x.id===id); m.archived=true; await save(); closeModal(); };
 window.deleteMatch = async function(id) { if(!confirm("حذف الماتش؟")) return; state.matches = state.matches.filter(x=>x.id!==id); await save(); closeModal(); };
 
+// ============ 4. الإحصائيات ============
 function renderStats() {
   const el = $('#panel-3');
   if(!state.players.length) return el.innerHTML = '<div class="empty-state">ضيف لاعبين الأول</div>';
@@ -1339,6 +1478,7 @@ window.updateDuel = function() {
         row('تسديد', (p1.stats?.shooting||70), (p2.stats?.shooting||70));
 };
 
+// ============ 5. عرش النجوم ============
 function renderHallOfFame() {
   const el = $('#panel-4');
   const data = state.players.map(p => getPlayerData(p)).filter(p => p.motm > 0).sort((a,b) => b.motm - a.motm);
@@ -1365,6 +1505,7 @@ function renderHallOfFame() {
 }
 window.triggerSparkles = function(e) { const emojis = ['✨', '⭐', '🌟', '👑']; for(let i=0; i<6; i++) { let sparkle = document.createElement('div'); sparkle.className = 'sparkle'; sparkle.innerText = emojis[Math.floor(Math.random() * emojis.length)]; sparkle.style.left = e.pageX + 'px'; sparkle.style.top = e.pageY + 'px'; let tx = (Math.random() - 0.5) * 200; let ty = (Math.random() - 0.5) * 200 - 50; sparkle.style.setProperty('--tx', tx + 'px'); sparkle.style.setProperty('--ty', ty + 'px'); document.body.appendChild(sparkle); setTimeout(() => sparkle.remove(), 800); } };
 
+// ============ 6. المجتمع ============
 window.switchCommunityTab = function(t) { communityTab = t; renderCommunity(); };
 function renderCommunity() {
   const el = $('#panel-5');
@@ -1376,9 +1517,14 @@ function renderCommunity() {
       else {
           html += `<div class="moments-grid">`;
           state.moments.slice().reverse().forEach(m => {
-              html += `<div class="moment-card"><img src="${m.photo}" class="moment-img"><div class="moment-body"><div class="moment-author">${esc(m.author)}</div><div class="moment-text">${esc(m.text)}</div><div class="reaction-row">`;
+              let authorName = 'لاعب'; // Fix 12
+              const u = approvedUsers.find(x => x.phone === m.authorPhone);
+              if(u) authorName = u.name;
+              else if (m.authorPhone === 'admin') authorName = 'المدير';
+              
+              html += `<div class="moment-card"><img src="${m.photo}" class="moment-img"><div class="moment-body"><div class="moment-author">${esc(authorName)}</div><div class="moment-text">${esc(m.text)}</div><div class="reaction-row">`;
               let reacts = m.reactions || {};
-              ['🔥','❤️','😂'].forEach(emo => { let users = reacts[emo] || []; let active = users.includes(currentUserPhone) ? 'active' : ''; html += `<button class="reaction-btn ${active}" onclick="toggleReaction('${m.id}', '${emo}')">${emo} <span>${users.length}</span></button>`; });
+              ['🔥','❤️','😂'].forEach(emo => { let users = reacts[emo] || []; let active = users.includes(currentUserPhone) ? 'active' : ''; html += `<button class="reaction-btn ${active}" onclick="toggleReaction('${m.id}', '${emo}')" ondblclick="showReactors('${m.id}', '${emo}')">${emo} <span>${users.length}</span></button>`; });
               html += `</div>`;
               if(isAdmin || currentUserPhone === m.authorPhone) { html += `<button onclick="deleteMoment('${m.id}')" style="background:none;border:none;color:var(--red);font-size:12px;margin-top:5px;cursor:pointer;">🗑 حذف</button>`; }
               html += `</div></div>`;
@@ -1392,15 +1538,31 @@ function renderCommunity() {
         html += `<div class="info-card" style="padding:10px 14px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;"><span style="font-size:11px;font-weight:800;color:var(--blue-lt);">${esc(b.author)}</span><span style="font-size:10px;color:var(--dim);">${new Date(b.date).toLocaleTimeString('ar-EG', {hour: '2-digit', minute:'2-digit'})}</span></div><div style="font-size:13px;color:#eee;margin-bottom:8px;">${esc(b.text)}</div><div class="reaction-row">`;
         let reacts = b.reactions || {};
         ['👍','👏','😂'].forEach(emo => { let users = reacts[emo] || []; let active = users.includes(currentUserPhone) ? 'active' : ''; html += `<button class="reaction-btn ${active}" onclick="toggleBoardReaction('${b.id}', '${emo}')">${emo} <span>${users.length}</span></button>`; });
-        html += `</div></div>`;
+        html += `</div>`;
+        if(isAdmin) html += `<button onclick="delBoardMsg('${b.id}')" style="background:none;border:none;color:var(--red);font-size:12px;margin-top:5px;cursor:pointer;">🗑 حذف الرسالة</button>`;
+        html += `</div>`;
       });
   }
   el.innerHTML = html;
 }
 
-window.uploadMoment = function() {
-    openModal(`<h3>📸 لقطة جديدة</h3><input type="file" id="moment_file" accept="image/*" style="margin-bottom:10px;"><textarea id="moment_text" placeholder="اكتب تعليقك..." style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:10px;color:#fff;min-height:70px;margin-bottom:10px;"></textarea><button class="btn-purple" onclick="saveMoment()">نشر اللقطة</button>`);
+window.showReactors = function(mid, emo) {
+    const m = state.moments.find(x => x.id === mid); if(!m) return;
+    const users = (m.reactions && m.reactions[emo]) || [];
+    let names = [];
+    users.forEach(phone => {
+        if(phone === 'admin') names.push('المدير');
+        else {
+            const u = approvedUsers.find(x => x.phone === phone);
+            names.push(u ? u.name : phone);
+        }
+    });
+    if(!names.length) return alert("مفيش حد عمل رياكشن ده");
+    openModal(`<h3>${emo} المتفاعلين (${names.length})</h3><div style="font-size:14px;line-height:1.8;color:#fff">${names.map(n => '• ' + esc(n)).join('<br>')}</div>`);
 };
+
+window.delBoardMsg = async function(id) { if(!confirm('حذف الرسالة؟')) return; state.board = state.board.filter(b => b.id !== id); await save(); };
+window.uploadMoment = function() { openModal(`<h3>📸 لقطة جديدة</h3><input type="file" id="moment_file" accept="image/*" style="margin-bottom:10px;"><textarea id="moment_text" placeholder="اكتب تعليقك..." style="width:100%;padding:12px;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:10px;color:#fff;min-height:70px;margin-bottom:10px;"></textarea><button class="btn-purple" onclick="saveMoment()">نشر اللقطة</button>`); };
 window.saveMoment = async function() {
     const fileInp = document.getElementById('moment_file'); const text = document.getElementById('moment_text').value;
     if(!fileInp.files || !fileInp.files[0]) return alert("اختار صورة!");
@@ -1425,6 +1587,7 @@ window.toggleReaction = async function(mid, emo) { const m = state.moments.find(
 window.toggleBoardReaction = async function(bid, emo) { const b = state.board.find(x => x.id === bid); if(!b) return; if(!b.reactions) b.reactions = {}; if(!b.reactions[emo]) b.reactions[emo] = []; const idx = b.reactions[emo].indexOf(currentUserPhone); if(idx > -1) b.reactions[emo].splice(idx, 1); else b.reactions[emo].push(currentUserPhone); await save(); };
 window.addBoardMsg = async function() { const inp = $('#boardMsgInput'); if(!inp || !inp.value.trim()) return; if(!state.board) state.board = []; state.board.push({ id: uid(), author: currentUserPhone !== 'admin' ? currentUserPhone : 'المدير', text: inp.value.trim(), date: new Date().toISOString(), reactions: {} }); await save(); };
 
+// ============ 7. الإعلانات ============
 function renderAnns() {
   const el = $('#panel-6');
   let html = `<div class="section-header">📢 الإعلانات الرسمية</div>`;
@@ -1436,6 +1599,7 @@ function renderAnns() {
 window.addAnn = async function() { const t = $('#annText').value; if(!t) return; state.announcements.push({id:uid(), text:t, date:new Date().toISOString()}); await save(); };
 window.delAnn = async function(id) { if(!confirm('حذف؟')) return; state.announcements = state.announcements.filter(x=>x.id!==id); await save(); };
 
+// ============ 8. الإدارة ============
 window.showPendingModal = function() {
   let html = `<h3>🔔 طلبات الانضمام (${pendingUsers.length})</h3>`;
   if(!pendingUsers.length) html += `<div class="empty-state">مفيش طلبات جديدة</div>`;
@@ -1447,6 +1611,7 @@ function renderAdmin() {
   const el = $('#panel-7');
   let html = `<div class="admin-section"><div class="admin-section-header"><div class="admin-section-icon">🛡️</div><div class="admin-section-title">شعار الفريق واسمه</div></div><div class="admin-card"><div class="admin-logo-row"><div class="admin-logo-preview">${state.team.logo?`<img src="${state.team.logo}">`:'⚽'}</div><div class="admin-logo-info"><input id="teamNameInput" value="${esc(state.team.name)}"><button class="btn-purple btn-sm" onclick="saveTeamName()">حفظ الاسم</button><button class="btn-purple btn-sm btn-ghost" onclick="uploadLogo()">📤 رفع شعار</button></div></div></div></div>
     <div class="admin-section"><div class="admin-section-header"><div class="admin-section-icon">🖼️</div><div class="admin-section-title">خلفية شاشة الدخول</div></div><div class="admin-card"><div class="admin-bg-preview" style="${state.team.loginBg?`background-image:url(${state.team.loginBg})`:''}">${!state.team.loginBg?'مفيش خلفية':''}</div><div class="admin-bg-actions"><button class="btn-purple" onclick="uploadLoginBg()">📤 تغيير</button><button class="btn-purple btn-danger" onclick="removeLoginBg()">🗑 إزالة</button></div></div></div>
+    <div class="admin-section"><div class="admin-section-header"><div class="admin-section-icon">🔥</div><div class="admin-section-title">رسالة التحفيز الأسبوعية</div></div><div class="admin-card"><input id="motivationInput" value="${esc(state.team.motivation||'')}" placeholder="سيبها فاضية لرسائل تلقائية" style="width:100%;padding:10px;background:rgba(0,0,0,.4);border:1px solid var(--border);border-radius:8px;color:#fff;margin-bottom:8px"><button class="btn-purple btn-sm" onclick="saveMotivation()">حفظ</button></div></div>
     <div class="admin-section"><div class="admin-section-header"><div class="admin-section-icon">📨</div><div class="admin-section-title">طلبات الانضمام (${pendingUsers.length})</div></div><div class="admin-card">`;
   if(!pendingUsers.length) html += `<div style="text-align:center;color:var(--dim);font-size:12px;padding:12px">مفيش طلبات</div>`;
   else pendingUsers.forEach(u => { html += `<div class="pending-request"><div class="pr-info"><div class="pr-name">${esc(u.name)}</div><div class="pr-phone">📱 ${esc(u.phone)}</div><div class="pr-date">🎂 ${esc(u.dob)}</div></div><div class="pr-actions"><button class="btn-approve" onclick="approveUser('${u.uid}')">✓</button><button class="btn-reject" onclick="rejectUser('${u.uid}')">✗</button></div></div>`; });
@@ -1462,9 +1627,10 @@ function renderAdmin() {
   html += `</div></div>`;
   el.innerHTML = html;
 }
+window.saveMotivation = async function() { state.team.motivation = $('#motivationInput').value; await save(); alert('تم الحفظ'); };
 window.saveTeamName = async function() { state.team.name = $('#teamNameInput').value || 'فريق بني برزه'; await save(); updateUI(); };
-window.uploadLogo = function() { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const img = new Image(); img.onload = async () => { const canvas = document.createElement('canvas'); const MAX = 200; let w = img.width, h = img.height; if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); state.team.logo = canvas.toDataURL('image/jpeg', 0.8); await save(); updateUI(); }; img.src = ev.target.result; }; reader.readAsDataURL(file); }; input.click(); };
-window.uploadLoginBg = function() { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const img = new Image(); img.onload = async () => { const canvas = document.createElement('canvas'); const MAX = 800; let w = img.width, h = img.height; if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); state.team.loginBg = canvas.toDataURL('image/jpeg', 0.6); await save(); }; img.src = ev.target.result; }; reader.readAsDataURL(file); }; input.click(); };
+window.uploadLogo = function() { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const img = new Image(); img.onload = async () => { const canvas = document.createElement('canvas'); const MAX = 200; let w = img.width, h = img.height; if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); state.team.logo = canvas.toDataURL('image/jpeg', 0.7); await save(); updateUI(); }; img.src = ev.target.result; }; reader.readAsDataURL(file); }; input.click(); };
+window.uploadLoginBg = function() { const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/*'; input.onchange = (e) => { const file = e.target.files[0]; if (!file) return; const reader = new FileReader(); reader.onload = (ev) => { const img = new Image(); img.onload = async () => { const canvas = document.createElement('canvas'); const MAX = 800; let w = img.width, h = img.height; if(w > h) { if(w > MAX) { h *= MAX/w; w = MAX; } } else { if(h > MAX) { w *= MAX/h; h = MAX; } } canvas.width = w; canvas.height = h; canvas.getContext('2d').drawImage(img, 0, 0, w, h); state.team.loginBg = canvas.toDataURL('image/jpeg', 0.5); await save(); }; img.src = ev.target.result; }; reader.readAsDataURL(file); }; input.click(); };
 window.removeLoginBg = async function() { state.team.loginBg = ""; await save(); };
 window.approveUser = async function(uid) { if(!isAdmin) return; const snap = await getDoc(doc(db, "users", uid)); if(snap.exists()) { const data = snap.data(); const exists = state.players.find(p => p.name === data.name && p.phone === data.phone); if(!exists) { state.players.push({ id: uid, name: data.name, phone: data.phone, position: 'لاعب', photo: '', profileBg: '', challenge: null, stats: { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 } }); await save(); } } await updateDoc(doc(db, "users", uid), { role: 'player' }); closeModal(); };
 window.rejectUser = async function(uid) { await updateDoc(doc(db, "users", uid), { role: 'rejected' }); closeModal(); };
