@@ -922,6 +922,8 @@ window.editPlayerStats = function(id) {
 window.savePlayerStats = async function(id) {
   if(!isAdmin && !isCoach) return;
   const p = state.players.find(x => x.id === id); if(!p) return;
+  p.position = $('#ep_pos').value;
+p.isJoker = $('#ep_joker').checked;
   p.stats = { pace: +$('#ep_pace').value, shooting: +$('#ep_sho').value, passing: +$('#ep_pas').value, dribbling: +$('#ep_dri').value, defending: +$('#ep_def').value, physical: +$('#ep_phy').value };
   await save(); closeModal();
 };
