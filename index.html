@@ -1318,36 +1318,19 @@ window.openMatchDetail = function(id) {
               html += `<div class="rsvp-box"><span style="font-size:13px;font-weight:800;color:#fff;">حضورك:</span><button class="rsvp-btn yes" onclick="setRsvp('${m.id}', 'yes')">✅ أنا جاي</button><button class="rsvp-btn no" onclick="setRsvp('${m.id}', 'no')">❌ مش هقدر</button></div>`;
           }
       }
-if(!m.predictions) m.predictions = {};
-let myPrediction = m.predictions[currentUserPhone] || '';
-let predOptions = state.players.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
 
-if(!myPrediction && !m.archived) {
-    html += `<div style="background:rgba(212,175,55,.1);border:1px solid var(--gold);padding:10px;border-radius:10px;margin-bottom:14px;text-align:center;"><div style="font-size:12px;color:var(--gold-lt);font-weight:800;margin-bottom:5px;">🔮 توقع مين هيكون نجم الماتش؟</div><div style="display:flex;gap:5px;"><select id="predictionSelect" style="flex:1;padding:8px;background:#000;border:1px solid #333;border-radius:6px;color:#fff;"><option value="">-- اختار --</option>${predOptions}</select><button class="btn-purple" style="width:auto;margin:0;padding:0 15px;" onclick="confirmPrediction('${m.id}')">تأكيد</button></div></div>`;
-} else if (myPrediction) {
-    let predName = state.players.find(p => p.id === myPrediction)?.name || 'لاعب';
-    html += `<div style="background:rgba(212,175,55,.1);border:1px solid var(--gold);padding:10px;border-radius:10px;margin-bottom:14px;text-align:center;"><div style="font-size:12px;color:var(--gold-lt);font-weight:800;">🔮 توقعت أفضل لاعب: ${esc(predName)}</div></div>`;
-}
-
-let allPredsHTML = '';
-for (let phone in m.predictions) {
-    let pName = state.players.find(p => p.id === m.predictions[phone])?.name || 'لاعب';
-    let vName = approvedUsers.find(u => u.phone === phone)?.name || (phone === 'admin' ? 'المدير' : phone);
-    
-    allPredsHTML += `<div style="display:inline-flex; align-items:center; background:rgba(255,255,255,0.05); border:1px solid rgba(212,175,55,0.4); border-radius:20px; padding:5px 10px; font-size:11px; margin:3px;">
-        <span style="color:#93c5fd; font-weight:700;">👤 ${esc(vName)}</span>
-        <span style="margin:0 5px; color:#666;">⬅️</span>
-        <span style="color:var(--gold-lt); font-weight:800;">${esc(pName)}</span>
-    </div>`;
-}
-
-if(allPredsHTML) {
-    html += `<div style="background:rgba(0,0,0,0.2); border-radius:12px; padding:12px; margin-bottom:14px; border:1px solid var(--border);">
-        <div style="font-size:12px; color:var(--blue-lt); font-weight:800; margin-bottom:8px;">👀 توقعات الفريق:</div>
-        <div style="display:flex; flex-wrap:wrap;">${allPredsHTML}</div>
-    </div>`;
-}
-      
+      if(!m.predictions) m.predictions = {};
+      let myPrediction = m.predictions[currentUserPhone] || '';
+      if(!canEdit) {
+          if(myPrediction) {
+              let predName = state.players.find(p => p.id === myPrediction)?.name || 'لاعب';
+              html += `<div style="background:rgba(212,175,55,.1);border:1px solid var(--gold);padding:10px;border-radius:10px;margin-bottom:14px;text-align:center;"><div style="font-size:12px;color:var(--gold-lt);font-weight:800;">🔮 توقعت أفضل لاعب: ${esc(predName)}</div></div>`;
+          } else {
+              let predOptions = state.players.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+              html += `<div style="background:rgba(212,175,55,.1);border:1px solid var(--gold);padding:10px;border-radius:10px;margin-bottom:14px;text-align:center;"><div style="font-size:12px;color:var(--gold-lt);font-weight:800;margin-bottom:5px;">🔮 توقع مين هيكون نجم الماتش؟</div><div style="display:flex;gap:5px;"><select id="predictionSelect" style="flex:1;padding:8px;background:#000;border:1px solid #333;border-radius:6px;color:#fff;"><option value="">-- اختار --</option>${predOptions}</select><button class="btn-purple" style="width:auto;margin:0;padding:0 15px;" onclick="confirmPrediction('${m.id}')">تأكيد</button></div></div>`;
+          }
+      }
+  }
 
   if(isAdmin && !m.archived) {
       html += `<div style="display:flex;gap:10px;margin-bottom:14px;background:rgba(0,0,0,.2);padding:10px;border-radius:10px;"><div style="flex:1"><label class="form-label" style="margin:0 0 5px;">أهدافنا</label><input type="number" value="${m.ourScore !== null ? m.ourScore : ''}" onchange="setMatchResult('${m.id}', 'ourScore', this.value)" style="width:100%;padding:8px;text-align:center;background:#000;border:1px solid #333;border-radius:6px;color:#fff;"></div><div style="flex:1"><label class="form-label" style="margin:0 0 5px;">أهدافهم</label><input type="number" value="${m.theirScore !== null ? m.theirScore : ''}" onchange="setMatchResult('${m.id}', 'theirScore', this.value)" style="width:100%;padding:8px;text-align:center;background:#000;border:1px solid #333;border-radius:6px;color:#fff;"></div></div>`;
