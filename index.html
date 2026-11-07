@@ -1320,69 +1320,17 @@ window.openMatchDetail = function(id) {
       }
 
       if(!m.predictions) m.predictions = {};
-let myPrediction = m.predictions[currentUserPhone] || '';
-
-if(!m.archived && !canEdit) {
-    if(myPrediction) {
-        let predName = state.players.find(p => p.id === myPrediction)?.name || 'لاعب';
-        html += `<div style="background:rgba(212,175,55,.1);border:1px solid var(--gold);padding:10px;border-radius:10px;margin-bottom:14px;text-align:center;"><div style="font-size:12px;color:var(--gold-lt);font-weight:800;">🔮 توقعت أفضل لاعب: ${esc(predName)}</div></div>`;
-    } else {
-        let predOptions = state.players.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
-        html += `<div style="background:rgba(212,175,55,.1);border:1px solid var(--gold);padding:10px;border-radius:10px;margin-bottom:14px;text-align:center;"><div style="font-size:12px;color:var(--gold-lt);font-weight:800;margin-bottom:5px;">🔮 توقع مين هيكون نجم الماتش؟</div><div style="display:flex;gap:5px;"><select id="predictionSelect" style="flex:1;padding:8px;background:#000;border:1px solid #333;border-radius:6px;color:#fff;"><option value="">-- اختار --</option>${predOptions}</select><button class="btn-purple" style="width:auto;margin:0;padding:0 15px;" onclick="confirmPrediction('${m.id}')">تأكيد</button></div></div>`;
-    }
-}
-
-let allPredsHTML = '';
-let hasPreds = false;
-let predictedPlayers = {};
-
-for (let phone in m.predictions) {
-    let pId = m.predictions[phone];
-    if(!predictedPlayers[pId]) predictedPlayers[pId] = [];
-    predictedPlayers[pId].push(phone);
-}
-
-if (Object.keys(predictedPlayers).length > 0) {
-    allPredsHTML += `<div style="display:flex; overflow-x:auto; gap:10px; padding-bottom:10px; scrollbar-width:none; -webkit-overflow-scrolling:touch; margin-bottom:10px;">`;
-    for (let pId in predictedPlayers) {
-        let player = state.players.find(pl => pl.id === pId);
-        let pName = player?.name || 'لاعب';
-        let pPhoto = player?.photo;
-        let phones = predictedPlayers[pId];
-        let count = phones.length;
-        let isActualMotm = m.archived && m.motm === pId;
-        let cardBorder = isActualMotm ? '2px solid var(--gold)' : '1px solid var(--border)';
-        let cardBg = isActualMotm ? 'rgba(212,175,55,0.15)' : 'rgba(0,0,0,0.4)';
-        let motmBadge = isActualMotm ? '<div style="font-size:9px; background:var(--gold); color:#000; padding:2px 6px; border-radius:10px; margin-top:4px; font-weight:900; white-space:nowrap;">👑 النجم الحقيقي</div>' : '';
-        let avatarsHTML = '';
-        phones.forEach(phone => {
-            let voterName = approvedUsers.find(u => u.phone === phone)?.name || (phone === 'admin' ? 'المدير' : phone);
-            let voterPhoto = state.players.find(pl => pl.phone === phone)?.photo;
-            let isCorrect = m.archived && m.motm === m.predictions[phone];
-            let checkMark = isCorrect ? '<span style="color:var(--green); font-size:12px; margin-right:2px; text-shadow:0 0 5px rgba(39,174,96,0.8);">✅</span>' : '';
-            let avatarContent = voterPhoto ? `<img src="${voterPhoto}" title="${esc(voterName)}" style="width:24px; height:24px; border-radius:50%; border:${isCorrect?'2px solid var(--green)':'1px solid var(--gold)'}; object-fit:cover;">` : `<div title="${esc(voterName)}" style="width:24px; height:24px; border-radius:50%; border:${isCorrect?'2px solid var(--green)':'1px solid var(--gold)'}; background:#1a2a44; display:flex; align-items:center; justify-content:center; font-size:10px;">👤</div>`;
-            avatarsHTML += `<div style="position:relative; display:flex; align-items:center;">${checkMark}${avatarContent}</div>`;
-        });
-        allPredsHTML += `<details style="min-width:100px; background:${cardBg}; border:${cardBorder}; border-radius:12px; cursor:pointer; box-shadow:${isActualMotm ? '0 0 10px rgba(212,175,55,0.4)' : 'none'};">
-            <summary style="list-style:none; padding:10px; display:flex; flex-direction:column; align-items:center;">
-                <div style="width:45px; height:45px; border-radius:50%; border:${isActualMotm ? '2px solid var(--gold)' : '2px solid var(--blue-mid)'}; overflow:hidden; margin-bottom:5px; background:#1a2a44; display:flex; align-items:center; justify-content:center;">${pPhoto ? `<img src="${pPhoto}" style="width:100%; height:100%; object-fit:cover;">` : '👤'}</div>
-                <div style="font-size:11px; font-weight:800; color:${isActualMotm ? 'var(--gold)' : '#fff'}; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:80px;">${esc(pName)}</div>
-                <div style="font-size:9px; color:var(--gold); margin-top:2px; background:rgba(212,175,55,0.2); padding:2px 6px; border-radius:10px;">${count} توقع</div>
-                ${motmBadge}
-            </summary>
-            <div style="padding:5px 10px 10px; border-top:1px solid rgba(255,255,255,0.1);">
-                <div style="font-size:10px; color:var(--dim); margin-bottom:5px; text-align:center;">توقعوه:</div>
-                <div style="display:flex; flex-wrap:wrap; gap:4px; justify-content:center; align-items:center;">${avatarsHTML}</div>
-            </div>
-        </details>`;
-    }
-    allPredsHTML += `</div>`;
-    hasPreds = true;
-}
-
-if (hasPreds) {
-    html += `<div style="background:rgba(0,0,0,0.2); border-radius:12px; padding:10px; margin-bottom:14px; border:1px solid var(--border);"><div style="font-size:12px; color:var(--blue-lt); font-weight:800; margin-bottom:10px;">👀 توقعات نجم الماتش (اضغط على الكارت):</div>${allPredsHTML}</div>`;
-}
+      let myPrediction = m.predictions[currentUserPhone] || '';
+      if(!canEdit) {
+          if(myPrediction) {
+              let predName = state.players.find(p => p.id === myPrediction)?.name || 'لاعب';
+              html += `<div style="background:rgba(212,175,55,.1);border:1px solid var(--gold);padding:10px;border-radius:10px;margin-bottom:14px;text-align:center;"><div style="font-size:12px;color:var(--gold-lt);font-weight:800;">🔮 توقعت أفضل لاعب: ${esc(predName)}</div></div>`;
+          } else {
+              let predOptions = state.players.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
+              html += `<div style="background:rgba(212,175,55,.1);border:1px solid var(--gold);padding:10px;border-radius:10px;margin-bottom:14px;text-align:center;"><div style="font-size:12px;color:var(--gold-lt);font-weight:800;margin-bottom:5px;">🔮 توقع مين هيكون نجم الماتش؟</div><div style="display:flex;gap:5px;"><select id="predictionSelect" style="flex:1;padding:8px;background:#000;border:1px solid #333;border-radius:6px;color:#fff;"><option value="">-- اختار --</option>${predOptions}</select><button class="btn-purple" style="width:auto;margin:0;padding:0 15px;" onclick="confirmPrediction('${m.id}')">تأكيد</button></div></div>`;
+          }
+      }
+  }
 
   if(isAdmin && !m.archived) {
       html += `<div style="display:flex;gap:10px;margin-bottom:14px;background:rgba(0,0,0,.2);padding:10px;border-radius:10px;"><div style="flex:1"><label class="form-label" style="margin:0 0 5px;">أهدافنا</label><input type="number" value="${m.ourScore !== null ? m.ourScore : ''}" onchange="setMatchResult('${m.id}', 'ourScore', this.value)" style="width:100%;padding:8px;text-align:center;background:#000;border:1px solid #333;border-radius:6px;color:#fff;"></div><div style="flex:1"><label class="form-label" style="margin:0 0 5px;">أهدافهم</label><input type="number" value="${m.theirScore !== null ? m.theirScore : ''}" onchange="setMatchResult('${m.id}', 'theirScore', this.value)" style="width:100%;padding:8px;text-align:center;background:#000;border:1px solid #333;border-radius:6px;color:#fff;"></div></div>`;
