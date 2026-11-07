@@ -109,7 +109,32 @@ input,select,button,textarea{font-family:inherit}
 /* Stars */
 .star-badge{position:absolute; top:-8px; right:-8px; font-size:16px; filter:drop-shadow(0 0 5px rgba(212,175,55,0.8)); z-index:5;}
 .star-aura{border-color: #d4af37 !important; box-shadow: 0 0 20px rgba(212,175,55,0.6) !important;}
-.joker-badge-card{position:absolute;top:-9px;left:4px;font-size:9px;background:linear-gradient(135deg,#f5d76e,#d4af37);color:#000;border-radius:6px;padding:2px 6px;font-weight:900;z-index:3;box-shadow:0 0 10px rgba(212,175,55,.7);letter-spacing:.5px;}
+@keyframes jokerPulse {
+  0% { box-shadow: 0 0 5px rgba(212,175,55,0.5); transform: scale(1); }
+  50% { box-shadow: 0 0 15px rgba(245,215,110,1), 0 0 5px #fff; transform: scale(1.1); }
+  100% { box-shadow: 0 0 5px rgba(212,175,55,0.5); transform: scale(1); }
+}
+@keyframes jokerShine {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.joker-badge-card {
+  position: absolute;
+  top: -9px;
+  left: 4px;
+  font-size: 9px;
+  background: linear-gradient(90deg, #d4af37, #f5d76e, #fff, #f5d76e, #d4af37);
+  background-size: 200% auto;
+  color: #000;
+  border-radius: 6px;
+  padding: 2px 6px;
+  font-weight: 900;
+  z-index: 3;
+  letter-spacing: .5px;
+  border: 1px solid #fff;
+  animation: jokerPulse 1.5s infinite, jokerShine 3s linear infinite;
+  display: inline-block;
+}
 /* Cards */
 .cards-subtabs{display:flex;gap:6px;margin-bottom:14px;background:rgba(59,130,246,.06);padding:4px;border-radius:14px;border:1px solid rgba(59,130,246,.2)}
 .subtabs-btn{flex:1;padding:10px;background:transparent;border:none;color:var(--dim);border-radius:10px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
