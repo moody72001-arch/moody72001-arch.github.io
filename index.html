@@ -1359,18 +1359,18 @@ window.openMatchDetail = function(id) {
   if(!state.players.length) html += `<div class="lineup-empty">ضيف لاعبين الأول</div>`;
   else {
     state.players.forEach(p => { 
-      const sel = m.lineup.includes(p.id); 
-      let statusColor = '#7a8499', statusText = '؟';
-      if(m.rsvp && m.rsvp[p.id] === 'yes') { statusColor = 'var(--green)'; statusText = 'حاضر'; }
-      else if(m.rsvp && m.rsvp[p.id] === 'no') { statusColor = 'var(--red)'; statusText = 'غايب'; }
-      
-      html += `<div class="lineup-player ${sel?'selected':''}" onclick="toggleLineup('${m.id}', '${p.id}', ${canEdit})">
-        ${canEdit ? `<input type="checkbox" class="lineup-checkbox" ${sel?'checked':''} style="pointer-events:none;">` : ''}
-        <div class="lineup-avatar">${p.photo?`<img src="${p.photo}">`:'👤'}</div>
-        <div class="lineup-name">${esc(p.name)}<div class="lineup-pos">${esc(p.position||'')}</div></div>
-        <div style="font-size:11px;font-weight:800;color:${statusColor};border:1px solid ${statusColor};padding:2px 8px;border-radius:10px;">${statusText}</div>
-      </div>`; 
-    });
+  const sel = m.lineup.includes(p.id); 
+  let statusColor = '#7a8499', statusText = '؟';
+  if(m.rsvp && m.rsvp[p.id] === 'yes') { statusColor = 'var(--green)'; statusText = 'حاضر'; }
+  else if(m.rsvp && m.rsvp[p.id] === 'no') { statusColor = 'var(--red)'; statusText = 'غايب'; }
+  
+  html += `<div class="lineup-player ${sel?'selected':''}" onclick="toggleLineup('${m.id}', '${p.id}', ${canEdit})">
+    ${canEdit ? `<input type="checkbox" class="lineup-checkbox" ${sel?'checked':''} style="pointer-events:none;">` : ''}
+    <div class="lineup-avatar">${p.photo?`<img src="${p.photo}">`:'👤'}</div>
+    <div class="lineup-name" style="color:#fff !important; display:block;">${esc(p.name)}<div class="lineup-pos">${esc(p.position||'')}</div></div>
+    <div style="font-size:11px;font-weight:800;color:${statusColor};border:1px solid ${statusColor};padding:2px 8px;border-radius:10px;">${statusText}</div>
+  </div>`; 
+});
     if(canEdit) html += `<div class="lineup-actions"><button onclick="selectAllLineup('${m.id}')">الكل</button><button onclick="clearLineup('${m.id}')">إلغاء الكل</button></div>`;
   }
   html += `</div></div>`;
