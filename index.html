@@ -1124,6 +1124,7 @@ function buildCardHTML(p, ovr, tier, isLegend, forPreview, isCleanCapture = fals
     <div class="fifa-card-3d"><div class="fifa-card" ${isCleanCapture?'':'onclick="this.classList.toggle(\'flipped\')"'}>
       <div class="fifa-face fifa-front"><div class="fifa-content">
         ${editBtn}${delBtn}
+       ${p.isJoker ? `<div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%) rotate(-15deg); font-size:80px; opacity:0.15; z-index:1; pointer-events:none;">🃏</div>` : ''}
         <div class="fifa-top"><div class="fifa-rating-block"><div class="fifa-overall">${ovr}</div><div class="fifa-position">${p.position||'لاعب'}</div></div>
           <div class="fifa-photo-wrap ${auraClass}" style="border-radius:50%;"><div class="fifa-photo-circle">${photo} ${d.motm>0?'<div class="star-badge" style="font-size:12px; top:-5px; right:-5px;">👑</div>':''}</div></div></div>
         <div class="fifa-name-bar"><div class="fifa-name">${esc(p.name)}</div></div>
