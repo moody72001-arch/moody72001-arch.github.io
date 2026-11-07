@@ -895,7 +895,7 @@ function renderPlayers() {
           ${p.photo ? `<img src="${p.photo}">` : '<span>👤</span>'}
           ${hasStars ? '<div class="star-badge">👑</div>' : ''}
         </div>
-        <div class="player-info" onclick="openProfile('${p.id}')"><div class="player-name">${esc(p.name)}</div><div class="player-pos">${esc(p.position||'لاعب')}</div></div>
+        <div class="player-info" onclick="openProfile('${p.id}')"><div class="player-name">${esc(p.name)}</div><div class="player-pos">${esc(p.position||'لاعب')}${p.isJoker?' 🃏':''}</div>
         <div class="player-actions">
           ${isAdmin ? `<button class="icon-action" onclick="uploadPhoto('${p.id}')">📷</button>` : ''}
           ${(isAdmin || isCoach) ? `<button class="icon-action" onclick="editPlayerStats('${p.id}')">📊</button>` : ''}
