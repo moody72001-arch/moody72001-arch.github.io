@@ -1155,7 +1155,7 @@ function buildCardHTML(p, ovr, tier, isLegend, forPreview, isCleanCapture = fals
         ${editBtn}${delBtn}
         <div class="fifa-top"><div class="fifa-rating-block"><div class="fifa-overall">${ovr}</div><div class="fifa-position">${p.position||'لاعب'}</div></div>
           <div class="fifa-photo-wrap ${auraClass}" style="border-radius:50%;"><div class="fifa-photo-circle">${photo} ${d.motm>0?'<div class="star-badge" style="font-size:12px; top:-5px; right:-5px;">👑</div>':''}</div></div></div>
-        <div class="fifa-name-bar"><div class="fifa-name">${esc(p.name)}</div></div>
+        <div class="fifa-name-bar" style="position:relative;"><div class="fifa-name">${esc(p.name)}</div>${p.isJoker ? `<div class="joker-badge-card">🃏 JOKER</div>` : ''}</div>
         <div class="fifa-season-stats"><div class="fifa-season-stat"><b>${d.matches}</b><span>MATCH</span></div><div class="fifa-season-stat"><b>${d.goals}</b><span>GOALS</span></div><div class="fifa-season-stat"><b>${d.assists}</b><span>ASSIST</span></div></div>
         <div class="fifa-extra"><span class="fifa-stars">${'★'.repeat(Math.floor(ovr/20))}</span>${expandBtn}<span>#${p.number || ''}</span></div>
       </div></div>
