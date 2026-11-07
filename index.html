@@ -905,6 +905,13 @@ window.editPlayerStats = function(id) {
   const s = p.stats || { pace:70, shooting:70, passing:70, dribbling:70, defending:70, physical:70 };
   openModal(`<h3>📊 إحصائيات ${esc(p.name)}</h3>
   <label class="form-label" style="display:flex;align-items:center;gap:10px;cursor:pointer;background:rgba(212,175,55,.1);padding:12px;border-radius:10px;border:1px solid rgba(212,175,55,.4);margin-top:12px;"><input type="checkbox" id="ep_joker" ${p.isJoker?'checked':''} style="width:20px;height:20px;margin:0;padding:0;accent-color:#d4af37;flex-shrink:0;"><span style="font-size:13px;font-weight:800;color:#f5d76e;">🃏 لاعب جوكر</span></label>
+   <label class="form-label">المركز</label>
+<select id="ep_pos">
+  <option ${p.position==='حارس'?'selected':''}>حارس</option>
+  <option ${p.position==='مدافع'?'selected':''}>مدافع</option>
+  <option ${p.position==='وسط'?'selected':''}>وسط</option>
+  <option ${p.position==='مهاجم'?'selected':''}>مهاجم</option>
+</select>
     <div class="grid-3">
       <div><label class="form-label">سرعة</label><input id="ep_pace" type="number" value="${s.pace}"></div>
       <div><label class="form-label">تسديد</label><input id="ep_sho" type="number" value="${s.shooting}"></div>
@@ -920,6 +927,7 @@ window.editPlayerStats = function(id) {
 window.savePlayerStats = async function(id) {
   if(!isAdmin && !isCoach) return;
   const p = state.players.find(x => x.id === id); if(!p) return;
+ p.position = $('#ep_pos').value;
   p.isJoker = $('#ep_joker').checked;
   p.stats = { pace: +$('#ep_pace').value, shooting: +$('#ep_sho').value, passing: +$('#ep_pas').value, dribbling: +$('#ep_dri').value, defending: +$('#ep_def').value, physical: +$('#ep_phy').value };
   await save(); closeModal();
