@@ -1025,7 +1025,7 @@ window.openProfile = function(id) {
   if(p.motm >= 3) $('#profileAvatar').classList.add('star-aura'); else $('#profileAvatar').classList.remove('star-aura');
   
   $('#profileName').textContent = p.name;
-  $('#profilePos').textContent = `${p.position} • التقييم ${calculateOVR(p)}`;
+  $('#profilePos').textContent = `${p.position}${p.isJoker?' 🃏':''} • التقييم ${calculateOVR(p)}`;
   
   const xp = getPlayerXP(p, p);
   const level = Math.floor(xp / 100) + 1;
