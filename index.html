@@ -1257,9 +1257,50 @@ window.saveEditLegend = async function(id) { const p = state.legendary.find(x =>
 window.deleteLegend = async function(id) { if(id.startsWith('leg_auto_')) return alert("هذا الكارت تلقائي."); if(!confirm('حذف الكارت؟')) return; state.legendary = state.legendary.filter(x => x.id !== id); await save(); closeModal(); };
 window.previewCard = function(id, isLegend) { let p = isLegend ? state.legendary.find(x => x.id === id) : state.players.find(x => x.id === id); if(id.startsWith('leg_auto_')) p = state.players.find(x => 'leg_auto_' + x.id === id); if(!p) return; $('#previewContent').innerHTML = `<button class="preview-close" onclick="closePreview()">×</button>` + buildCardHTML(p, calculateOVR(p), isLegend?'legendary':getCardTier(calculateOVR(p)), isLegend, true, false); $('#previewOverlay').classList.add('show'); };
 window.closePreview = function() { $('#previewOverlay').classList.remove('show'); };
-window.shareCard = async function(id) { const realId = id.startsWith('leg_auto_') ? id.substring(9) : id; const p = state.players.find(x => x.id === realId) || state.legendary.find(x => x.id === realId); if(!p) return; const captureDiv = document.getElementById('capture-container'); captureDiv.innerHTML = buildCardHTML(p, calculateOVR(p), getCardTier(calculateOVR(p)), false, false, true); const cardEl = captureDiv.firstElementChild; try { const canvas = await html2canvas(cardEl, { scale: 3, backgroundColor: null, useCORS: true }); const link = document.createElement('a'); link.download = `Card_${realId}.png`; link.href = canvas.toDataURL("image/png"); link.click(); captureDiv.innerHTML = ''; } catch(e) { alert("حدث خطأ: " + e.message); captureDiv.innerHTML = ''; } };
-
-// ============ 3. الماتشات ============
+// ============ 3. الماتشات ============window.shareCard = async function(id) {
+    const realId = id.startsWith('leg_auto_') ? id.substring(9) : id;
+    const p = state.players.find(x => x.id === realId) || state.legendary.find(x => x.id === realId);
+    if(!p) return;
+    
+    const ovr = calculateOVR(p);
+    const tier = getCardTier(ovr);
+    const playerData = getPlayerData(p);
+    
+    const captureDiv = document.getElementById('capture-container');
+    
+    captureDiv.innerHTML = `
+        <div id="story-capture" style="width: 400px; height: 711px; background: linear-gradient(135deg, #050a15, #0a1428); display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; position: relative; overflow: hidden; font-family: 'Cairo', sans-serif;">
+            <div style="position: absolute; top: 30px; color: var(--gold); font-size: 24px; font-weight: 900;">فريق بني برزه</div>
+            <div style="transform: scale(1.1); margin-top: 20px;">
+                ${buildCardHTML(p, ovr, tier, false, false, true)}
+            </div>
+            <div style="display: flex; gap: 15px; margin-top: 40px; background: rgba(0,0,0,0.5); padding: 15px 30px; border-radius: 15px; border: 1px solid var(--border);">
+                <div style="text-align: center; color: #fff;"><div style="font-size: 20px; font-weight: 900; color: var(--gold);">${playerData.matches}</div><div style="font-size: 12px;">ماتش</div></div>
+                <div style="width: 1px; background: rgba(255,255,255,0.2);"></div>
+                <div style="text-align: center; color: #fff;"><div style="font-size: 20px; font-weight: 900; color: var(--green);">${playerData.goals}</div><div style="font-size: 12px;">هدف</div></div>
+                <div style="width: 1px; background: rgba(255,255,255,0.2);"></div>
+                <div style="text-align: center; color: #fff;"><div style="font-size: 20px; font-weight: 900; color: var(--blue-lt);">${playerData.assists}</div><div style="font-size: 12px;">أسيست</div></div>
+                <div style="width: 1px; background: rgba(255,255,255,0.2);"></div>
+                <div style="text-align: center; color: #fff;"><div style="font-size: 20px; font-weight: 900; color: var(--gold);">${playerData.motm}</div><div style="font-size: 12px;">نجمة</div></div>
+            </div>
+            <div style="position: absolute; bottom: 30px; color: var(--dim); font-size: 12px;">الملف الرسمي للاعب ⚽</div>
+        </div>
+    `;
+    
+    const storyEl = document.getElementById('story-capture');
+    
+    try {
+        const canvas = await html2canvas(storyEl, { scale: 2, backgroundColor: '#050a15', useCORS: true });
+        const link = document.createElement('a');
+        link.download = `Story_${realId}.png`;
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+        captureDiv.innerHTML = '';
+    } catch(e) {
+        alert("حدث خطأ: " + e.message);
+        captureDiv.innerHTML = '';
+    }
+};
 let countdownInterval;
 window.switchMatchesTab = function(tab) { matchesSubTab = tab; renderMatches(); };
 
