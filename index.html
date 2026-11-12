@@ -824,14 +824,14 @@ function getPlayerXP(p, data) {
 
 function getPlayerData(p) {
   let searchId = p.id;
-  if(searchId && searchId.startsWith('leg_auto_')) searchId = searchId.substring(9); // Fix 1
+  if(searchId && searchId.startsWith('leg_auto_')) searchId = searchId.substring(9);
   
   let goals=0, assists=0, matches=0, motm=0, worst=0, bad=0, ratingSum=0, ratingCount=0, trophies=[], recentMatches=[], saves=0, tackles=0;
   state.matches.forEach(m => {
     if(m.archived) {
       if((m.lineup||[]).includes(searchId)) {
         matches++; goals += (m.goals||{})[searchId] || 0; assists += (m.assists||{})[searchId] || 0;
-       saves += (m.saves||{})[searchId] || 0; tackles += (m.tackles||{})[searchId] || 0;
+        saves += (m.saves||{})[searchId] || 0; tackles += (m.tackles||{})[searchId] || 0;
         if (m.ratings && m.ratings[searchId]) { ratingSum += m.ratings[searchId]; ratingCount++; recentMatches.push({ opponent: m.opponentTeam, rating: m.ratings[searchId], date: m.date, goals: (m.goals||{})[searchId] || 0 }); }
       }
       if (m.motm === searchId) { motm++; trophies.push(m); }
@@ -841,14 +841,23 @@ function getPlayerData(p) {
   });
   const avgRating = ratingCount > 0 ? (ratingSum / ratingCount) : 0;
   recentMatches.sort((a,b) => new Date(b.date) - new Date(a.date));
-  return { ...p, id: searchId, goals, assists, matches, motm, worst, bad, avgRating, trophies, recentMatches , saves, tackles};
+  return { ...p, id: searchId, goals, assists, matches, motm, worst, bad, avgRating, trophies, recentMatches, saves, tackles };
 }
 
 function calculateOVR(p) {
   const data = getPlayerData(p);
   const stats = p.stats || { pace: 70, shooting: 70, passing: 70, dribbling: 70, defending: 70, physical: 70 };
   const statsAvg = (Number(stats.pace) + Number(stats.shooting) + Number(stats.passing) + Number(stats.dribbling) + Number(stats.defending) + Number(stats.physical)) / 6;
-  let ovr = statsAvg + (data.goals * 0.1) + (data.assists * 0.05) + (data.motm * 0.25) + (data.avgRating * 0.1) - (data.bad * 0.3) - (data.worst * 0.5);
+  
+  let ovr = statsAvg + (data.goals * 0.2) + (data.assists * 0.05) + (data.motm * 0.25) + (data.avgRating * 0.2) - (data.bad * 0.3) - (data.worst * 1.0);
+  
+  // مكافأة عادلة للمدافعين والحراس
+  if (p.position === 'مدافع') {
+    ovr += (data.tackles * 0.2) + (Number(stats.defending) * 0.05);
+  } else if (p.position === 'حارس') {
+    ovr += (data.saves * 0.2) + (Number(stats.defending) * 0.05);
+  }
+  
   return Math.min(99, Math.max(40, Math.round(ovr)));
 }
 
