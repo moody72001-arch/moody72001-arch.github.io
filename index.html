@@ -880,7 +880,7 @@ function renderPlayers() {
           ${p.photo ? `<img src="${p.photo}">` : '<span>👤</span>'}
           ${hasStars ? '<div class="star-badge">👑</div>' : ''}
         </div>
-        <div class="player-info" onclick="openProfile('${p.id}')"><div class="player-name">${esc(p.name)}</div><div class="player-pos">${esc(p.position||'لاعب')}</div></div>
+        <div class="player-info" onclick="openProfile('${p.id}')"><div class="player-name">${esc(p.name)} ${data.goals >= 10 ? '🔥' : ''}</div><div class="player-pos">${esc(p.position||'لاعب')}</div></div>
         <div class="player-actions">
           ${isAdmin ? `<button class="icon-action" onclick="uploadPhoto('${p.id}')">📷</button>` : ''}
           ${(isAdmin || isCoach) ? `<button class="icon-action" onclick="editPlayerStats('${p.id}')">📊</button>` : ''}
@@ -1146,7 +1146,7 @@ function buildCardHTML(p, ovr, tier, isLegend, forPreview, isCleanCapture = fals
        ${p.isJoker ? `<div style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%) rotate(-15deg); font-size:80px; opacity:0.15; z-index:1; pointer-events:none;">🃏</div>` : ''}
         <div class="fifa-top"><div class="fifa-rating-block"><div class="fifa-overall">${ovr}</div><div class="fifa-position">${p.position||'لاعب'}</div></div>
           <div class="fifa-photo-wrap ${auraClass}" style="border-radius:50%;"><div class="fifa-photo-circle">${photo} ${d.motm>0?'<div class="star-badge" style="font-size:12px; top:-5px; right:-5px;">👑</div>':''}</div></div></div>
-        <div class="fifa-name-bar"><div class="fifa-name">${esc(p.name)}</div></div>
+        <div class="fifa-name-bar"><div class="fifa-name">${esc(p.name)} ${d.goals >= 10 ? '🔥' : ''}</div></div>
         <div class="fifa-season-stats"><div class="fifa-season-stat"><b>${d.matches}</b><span>MATCH</span></div><div class="fifa-season-stat"><b>${d.goals}</b><span>GOALS</span></div><div class="fifa-season-stat"><b>${d.assists}</b><span>ASSIST</span></div></div>
         <div class="fifa-extra"><span class="fifa-stars">${'★'.repeat(Math.floor(ovr/20))}</span>${expandBtn}<span>#${p.number || ''}</span></div>
       </div></div>
