@@ -826,11 +826,12 @@ function getPlayerData(p) {
   let searchId = p.id;
   if(searchId && searchId.startsWith('leg_auto_')) searchId = searchId.substring(9); // Fix 1
   
-  let goals=0, assists=0, matches=0, motm=0, worst=0, bad=0, ratingSum=0, ratingCount=0, trophies=[], recentMatches=[];
+  let goals=0, assists=0, matches=0, motm=0, worst=0, bad=0, ratingSum=0, ratingCount=0, trophies=[], recentMatches=[], saves=0, tackles=0;
   state.matches.forEach(m => {
     if(m.archived) {
       if((m.lineup||[]).includes(searchId)) {
         matches++; goals += (m.goals||{})[searchId] || 0; assists += (m.assists||{})[searchId] || 0;
+       saves += (m.saves||{})[searchId] || 0; tackles += (m.tackles||{})[searchId] || 0;
         if (m.ratings && m.ratings[searchId]) { ratingSum += m.ratings[searchId]; ratingCount++; recentMatches.push({ opponent: m.opponentTeam, rating: m.ratings[searchId], date: m.date, goals: (m.goals||{})[searchId] || 0 }); }
       }
       if (m.motm === searchId) { motm++; trophies.push(m); }
@@ -840,7 +841,7 @@ function getPlayerData(p) {
   });
   const avgRating = ratingCount > 0 ? (ratingSum / ratingCount) : 0;
   recentMatches.sort((a,b) => new Date(b.date) - new Date(a.date));
-  return { ...p, id: searchId, goals, assists, matches, motm, worst, bad, avgRating, trophies, recentMatches };
+  return { ...p, id: searchId, goals, assists, matches, motm, worst, bad, avgRating, trophies, recentMatches , saves, tackles};
 }
 
 function calculateOVR(p) {
@@ -1296,7 +1297,7 @@ function renderMatches() {
 }
 function startCountdown(dateStr, timeStr) { const matchDate = new Date(dateStr + 'T' + (timeStr || '00:00') + ':00').getTime(); countdownInterval = setInterval(() => { const now = new Date().getTime(); const distance = matchDate - now; if (distance < 0) { clearInterval(countdownInterval); const timerEl = document.getElementById('countdownTimer'); if(timerEl) timerEl.innerHTML = '<div style="color:var(--green);font-weight:900;font-size:18px;">الماتش بدأ! ⚽</div>'; return; } const days = Math.floor(distance / (1000 * 60 * 60 * 24)); const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)); const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)); const seconds = Math.floor((distance % (1000 * 60)) / 1000); const dEl = document.getElementById('cd-days'); if(dEl) dEl.innerText = days; const hEl = document.getElementById('cd-hours'); if(hEl) hEl.innerText = hours; const mEl = document.getElementById('cd-mins'); if(mEl) mEl.innerText = minutes; const sEl = document.getElementById('cd-secs'); if(sEl) sEl.innerText = seconds; }, 1000); }
 
-window.addMatch = async function() { if(!isAdmin) return; const d = $('#m_date').value, place = $('#m_place').value; const t1 = $('#m_t1').value, t2 = $('#m_t2').value; if(!d || !t2) return alert("اكمل البيانات"); state.matches.push({ id: uid(), date: d, timeFrom: $('#m_from').value, timeTo: $('#m_to').value, ourTeam: t1, opponentTeam: t2, ourScore: null, theirScore: null, place: place, lineup: [], rsvp: {}, goals: {}, assists: {}, ratings: {}, motm: null, worst: null, bad: [], archived: false, comments: [], predictions: {} }); await save(); };
+window.addMatch = async function() { if(!isAdmin) return; const d = $('#m_date').value, place = $('#m_place').value; const t1 = $('#m_t1').value, t2 = $('#m_t2').value; if(!d || !t2) return alert("اكمل البيانات"); state.matches.push({ id: uid(), date: d, timeFrom: $('#m_from').value, timeTo: $('#m_to').value, ourTeam: t1, opponentTeam: t2, ourScore: null, theirScore: null, place: place, lineup: [], rsvp: {}, goals: {}, assists: {}, ratings: {}, saves: {}, tackles: {},motm: null, worst: null, bad: [], archived: false, comments: [], predictions: {} }); await save(); };
 
 window.openMatchDetail = function(id) {
   const m = state.matches.find(x => x.id === id); if(!m) return;
@@ -1368,7 +1369,7 @@ window.openMatchDetail = function(id) {
       const p = state.players.find(x=>x.id===pid); if(!p) return;
       const g = (m.goals||{})[pid]||0, a = (m.assists||{})[pid]||0, r = (m.ratings||{})[pid]||0;
       const isBest = m.motm===pid, isWorst = m.worst===pid, isBad = (m.bad||[]).includes(pid);
-      html += `<div class="pm-row"><div class="pm-name">${esc(p.name)} ${isBest?'<span class="pill pill-gold">⭐ أفضل</span>':''} ${isWorst?'<span class="pill pill-red">💩 أوحش</span>':''} ${isBad?'<span class="pill pill-gray">👎 وحش</span>':''}</div><div class="pm-controls"><div class="pm-ctrl"><label>أهداف</label><input type="number" value="${g}" ${canEdit?'':'disabled'} onchange="setStat('${m.id}','goals','${pid}',this.value)"></div><div class="pm-ctrl"><label>أسيست</label><input type="number" value="${a}" ${canEdit?'':'disabled'} onchange="setStat('${m.id}','assists','${pid}',this.value)"></div><div class="pm-ctrl"><label>تقييم</label><input type="number" value="${r}" ${canEdit?'':'disabled'} onchange="setStat('${m.id}','ratings','${pid}',this.value)"></div></div>${canEdit ? `<div class="pm-actions"><button class="pm-award best ${isBest?'active':''}" onclick="setAward('${m.id}','motm','${pid}')">⭐ أفضل</button><button class="pm-award worst ${isWorst?'active':''}" onclick="setAward('${m.id}','worst','${pid}')">💩 أوحش</button><button class="pm-award bad ${isBad?'active':''}" onclick="toggleBad('${m.id}','${pid}')">👎 وحش</button></div>` : ''}</div>`;
+      html += `<div class="pm-row"><div class="pm-name">${esc(p.name)} ${isBest?'<span class="pill pill-gold">⭐ أفضل</span>':''} ${isWorst?'<span class="pill pill-red">💩 أوحش</span>':''} ${isBad?'<span class="pill pill-gray">👎 وحش</span>':''}</div><div class="pm-controls"><div class="pm-ctrl"><label>أهداف</label><input type="number" value="${g}" ${canEdit?'':'disabled'} onchange="setStat('${m.id}','goals','${pid}',this.value)"></div><div class="pm-ctrl"><label>أسيست</label><input type="number" value="${a}" ${canEdit?'':'disabled'} onchange="setStat('${m.id}','assists','${pid}',this.value)"></div><div class="pm-ctrl"><label>تقييم</label><input type="number" value="${r}" ${canEdit?'':'disabled'} onchange="setStat('${m.id}','ratings','${pid}',this.value)"></div>${p.position === 'حارس' ? `<div class="pm-ctrl" style="grid-column: span 3; margin-top:5px; background:rgba(39,174,96,0.1); border:1px solid rgba(39,174,96,0.3); border-radius:8px; padding:5px;"><label style="color:var(--green);">تصديات 🧤</label><input type="number" value="${sv}" ${canEdit?'':'disabled'} onchange="setStat('${m.id}','saves','${pid}',this.value)"></div>` : ''}${p.position === 'مدافع' ? `<div class="pm-ctrl" style="grid-column: span 3; margin-top:5px; background:rgba(59,130,246,0.1); border:1px solid rgba(59,130,246,0.3); border-radius:8px; padding:5px;"><label style="color:var(--blue-lt);">استخلاص 🛡️</label><input type="number" value="${tk}" ${canEdit?'':'disabled'} onchange="setStat('${m.id}','tackles','${pid}',this.value)"></div>` : ''}</div>${canEdit ? `<div class="pm-actions"><button class="pm-award best ${isBest?'active':''}" onclick="setAward('${m.id}','motm','${pid}')">⭐ أفضل</button><button class="pm-award worst ${isWorst?'active':''}" onclick="setAward('${m.id}','worst','${pid}')">💩 أوحش</button><button class="pm-award bad ${isBad?'active':''}" onclick="toggleBad('${m.id}','${pid}')">👎 وحش</button></div>` : ''}</div>`;
     });
   }
 
