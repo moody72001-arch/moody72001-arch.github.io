@@ -849,13 +849,16 @@ function calculateOVR(p) {
   const stats = p.stats || { pace: 70, shooting: 70, passing: 70, dribbling: 70, defending: 70, physical: 70 };
   const statsAvg = (Number(stats.pace) + Number(stats.shooting) + Number(stats.passing) + Number(stats.dribbling) + Number(stats.defending) + Number(stats.physical)) / 6;
   
-  let ovr = statsAvg + (data.goals * 0.2) + (data.assists * 0.05) + (data.motm * 0.25) + (data.avgRating * 0.2) - (data.bad * 0.3) - (data.worst * 1.0);
+  // التقييم: لو أقل من 5 يبقى صفر، لو 5 أو أكتر يتضرب في 0.1
+  let ratingBonus = data.avgRating >= 5 ? (data.avgRating * 0.1) : 0;
   
-  // مكافأة عادلة للمدافعين والحراس
+  let ovr = statsAvg + (data.goals * 0.1) + (data.assists * 0.05) + (data.motm * 0.25) + ratingBonus - (data.bad * 0.5) - (data.worst * 1.0);
+  
+  // مكافأة الدفاع (تصديات للحارس، واستخلاص للمدافع)
   if (p.position === 'مدافع') {
-    ovr += (data.tackles * 0.2) + (Number(stats.defending) * 0.05);
+    ovr += (data.tackles * 0.1);
   } else if (p.position === 'حارس') {
-    ovr += (data.saves * 0.2) + (Number(stats.defending) * 0.05);
+    ovr += (data.saves * 0.1);
   }
   
   return Math.min(99, Math.max(40, Math.round(ovr)));
