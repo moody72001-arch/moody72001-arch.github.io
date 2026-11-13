@@ -504,6 +504,22 @@ input,select,button,textarea{font-family:inherit}
 /* Walk of Shame */
 .shame-card{background:linear-gradient(135deg, #4a1515, #1a0a0a);border:1px solid var(--red);border-radius:14px;padding:15px;text-align:center;margin-bottom:20px;}
 .shame-title{color:var(--red);font-weight:900;font-size:16px;margin-bottom:10px;}
+@keyframes spinSuit {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+.joker-suit {
+  position: absolute;
+  font-size: 18px;
+  color: rgba(245,215,110,0.6);
+  animation: spinSuit 4s linear infinite;
+  pointer-events: none;
+  z-index: 5;
+}
+.joker-suit.top-right { top: 10px; right: 10px; }
+.joker-suit.top-left { top: 10px; left: 10px; animation-direction: reverse; }
+.joker-suit.bottom-right { bottom: 10px; right: 10px; animation-direction: reverse; }
+.joker-suit.bottom-left { bottom: 10px; left: 10px; }
 </style>
 </head>
 <body>
