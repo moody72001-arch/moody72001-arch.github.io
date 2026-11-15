@@ -743,7 +743,11 @@ window.logout = async function() {
 };
 
 onAuthStateChanged(auth, (user) => {
-  if (user) { currentUserPhone = user.email.replace('@futsal.com', ''); checkUserStatus(user.uid); } 
+  if (user) { 
+  currentUserPhone = user.email.replace('@futsal.com', ''); 
+  updateDoc(doc(db, "users", user.uid), { lastSeen: new Date().toLocaleString('ar-EG', { hour: '2-digit', minute: '2-digit', day: 'numeric', month: 'short' }) }).catch(e=>console.log(e));
+  checkUserStatus(user.uid); 
+}
   else { $('#authScreen').style.display = 'flex'; $('#app').classList.remove('show'); isAdmin = false; isCoach = false; }
 });
 
@@ -1667,7 +1671,7 @@ function renderAdmin() {
     <div class="admin-section"><div class="admin-section-header"><div class="admin-section-icon">👑</div><div class="admin-section-title">الصلاحيات (${approvedUsers.length})</div></div><div class="admin-card">`;
   approvedUsers.forEach(u => {
     const isMain = u.phone === 'admin';
-    html += `<div class="perm-row ${isMain?'main':''}"><div class="perm-info"><div class="perm-name">${esc(u.name)} ${isMain?'👑':''}</div><div class="perm-meta"><span class="perm-role ${isMain?'role-main':'role-'+u.role}">${isMain?'الأدمن الرئيسي':(u.role==='coach'?'مدير فني':(u.role==='supervisor'?'مشرف':'لاعب'))}</span><span>${esc(u.phone)}</span></div></div>`;
+    html += `<div class="perm-row ${isMain?'main':''}"><div class="perm-info"><div class="perm-name">${esc(u.name)} ${isMain?'👑':''}</div><div class="perm-meta"><span class="perm-role ${isMain?'role-main':'role-'+u.role}">${isMain?'الأدمن الرئيسي':(u.role==='coach'?'مدير فني':(u.role==='supervisor'?'مشرف':'لاعب'))}</span><span>${esc(u.phone)}</span><span style="color:var(--gold); font-size:10px; font-weight:800; margin-right:5px;">👁️ ${u.lastSeen || 'غير محدد'}</span></div></div>`;
     if(isMain) html += `<div class="perm-lock">🔒</div>`;
     else html += `<select onchange="changeRole('${u.uid}', this.value)" style="width:auto;padding:6px;font-size:11px;background:rgba(0,0,0,.5);border:1px solid rgba(59,130,246,.35);border-radius:8px;color:#fff"><option value="player" ${u.role==='player'?'selected':''}>لاعب</option><option value="coach" ${u.role==='coach'?'selected':''}>مدير فني</option><option value="supervisor" ${u.role==='supervisor'?'selected':''}>مشرف</option></select>`;
     html += `</div>`;
