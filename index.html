@@ -667,7 +667,7 @@ const db = getFirestore(app);
 const TEAM_ID = "my-team";
 const teamDocRef = doc(db, "teams", TEAM_ID);
 
-let state = { players: [], matches: [], legendary: [], rules: "", announcements: [], notifs: [], team: { name: "فريق بني برزه", logo: "", loginBg: "", motivation: "" }, admins: [], coaches: [], board: [], moments: [] };
+let state = { players: [], matches: [], legendary: [], rules: "", announcements: [], notifs: [], team: { name: "فريق بني برزه", logo: "", loginBg: "", motivation: "" }, admins: [], coaches: [], board: [], moments: [], mysteryGame: null };
 let pendingUsers = [];
 let approvedUsers = [];
 let unsubscribeTeam = null;
@@ -1562,7 +1562,49 @@ window.switchCommunityTab = function(t) { communityTab = t; renderCommunity(); }
 function renderCommunity() {
   const el = $('#panel-5');
   let html = `<div class="cards-subtabs"><button class="subtabs-btn ${communityTab==='moments'?'active':''}" onclick="switchCommunityTab('moments')">📸 لقطات اللاعيبة</button><button class="subtabs-btn ${communityTab==='board'?'active':''}" onclick="switchCommunityTab('board')">💬 لوحة النقاش</button></div>`;
+if (state.mysteryGame && state.mysteryGame.active) {
+    let game = state.mysteryGame;
+    let targetPlayer = state.players.find(p => p.id === game.targetId);
+    if (targetPlayer) {
+        let hasGuessedCorrectly = game.attempts.some(a => a.phone === currentUserPhone && a.correct);
+        let imgStyle = hasGuessedCorrectly ? 'filter:none;' : 'filter:blur(12px);';
+        
+        html += `<div class="info-card" style="background:linear-gradient(135deg,#1a1a2e,#0f3460); border:2px solid var(--gold); text-align:center; margin-bottom:20px;">
+            <h3 style="color:var(--gold); font-weight:900; margin-bottom:15px;">🕵️ تحدي اللاعب الغامض</h3>
+            <div style="width:100px; height:100px; margin:0 auto 15px auto; border-radius:50%; border:3px solid var(--blue-mid); overflow:hidden; box-shadow:0 0 15px rgba(59,130,246,0.5);">
+                <img src="${targetPlayer.photo || 'https://via.placeholder.com/100/050a15/3b82f6?text=👤'}" style="width:100%; height:100%; object-fit:cover; ${imgStyle}">
+            </div>
+            <div style="font-size:14px; color:#fff; font-weight:800; margin-bottom:10px;">تلميحات:</div>
+            <div style="display:flex; justify-content:center; gap:10px; margin-bottom:15px; flex-wrap:wrap;">
+                <span class="pill" style="font-size:12px;">المركز: ${esc(targetPlayer.position)}</span>
+                <span class="pill" style="font-size:12px;">الأهداف: ${getPlayerData(targetPlayer).goals}</span>
+                <span class="pill" style="font-size:12px;">التقييم: ${calculateOVR(targetPlayer)}</span>
+            </div>`;
 
+        if (hasGuessedCorrectly) {
+            html += `<div style="color:var(--green); font-weight:900; font-size:18px;">🎉 مبروك! إنت عرفت مين هو (${esc(targetPlayer.name)})</div>`;
+        } else {
+            let options = state.players.map(p => `<option value="${p.name}">${esc(p.name)}</option>`).join('');
+            html += `<div style="display:flex; gap:5px; margin-bottom:15px;">
+                <select id="mysteryGuessInput" style="flex:1; padding:10px; background:#000; border:1px solid #333; border-radius:8px; color:#fff;">
+                    <option value="">-- اختار اللاعب --</option>
+                    ${options}
+                </select>
+                <button class="btn-purple" style="width:auto; margin:0; padding:0 15px;" onclick="submitMysteryGuess()">تخمين</button>
+            </div>`;
+        }
+
+        html += `<div style="font-size:12px; font-weight:800; color:var(--dim); margin-bottom:5px;">آخر المحاولات:</div>
+            <div style="display:flex; justify-content:center; flex-wrap:wrap; gap:5px;">`;
+        
+        game.attempts.slice(-5).forEach(a => {
+            html += `<span style="font-size:11px; padding:3px 8px; border-radius:10px; background:rgba(0,0,0,0.5); border:1px solid ${a.correct?'var(--green)':'var(--red)'}; color:#fff;">${esc(a.name)} ${a.correct?'✅':'❌'}</span>`;
+        });
+        
+        if(game.attempts.length === 0) html += `<span style="font-size:11px; color:var(--dim);">مفيش محاولات لسه. كن الأول!</span>`;
+        html += `</div></div>`;
+    }
+}
   if(communityTab === 'moments') {
       html += `<button class="btn-purple" onclick="uploadMoment()" style="margin-bottom:15px; background:linear-gradient(135deg,#d4af37,#8a6d1f); color:#000;">📷 شارك لقطة جديدة</button>`;
       if(!state.moments || !state.moments.length) html += `<div class="empty-state">مفيش لقطات لسه، كن أول واحد يشارك!</div>`;
@@ -1658,6 +1700,24 @@ window.showPendingModal = function() {
   else pendingUsers.forEach(u => { html += `<div class="pending-request"><div class="pr-info"><div class="pr-name">${esc(u.name)}</div><div class="pr-phone">📱 ${esc(u.phone)}</div><div class="pr-date">🎂 ${esc(u.dob)}</div></div><div class="pr-actions"><button class="btn-approve" onclick="approveUser('${u.uid}')">✓</button><button class="btn-reject" onclick="rejectUser('${u.uid}')">✗</button></div></div>`; });
   openModal(html);
 };
+window.startMysteryGame = async function() {
+    if(!isAdmin) return;
+    const sel = $('#mysteryPlayerSelect');
+    if(!sel || !sel.value) return alert('اختار لاعب الأول');
+    
+    state.mysteryGame = { targetId: sel.value, attempts: [], active: true };
+    await save(); 
+    renderAdmin();
+    alert('تم بدء التحدي!');
+};
+
+window.endMysteryGame = async function() {
+    if(!isAdmin) return;
+    if(!confirm('إنهاء التحدي؟')) return;
+    state.mysteryGame = null;
+    await save();
+    renderAdmin();
+};
 function renderAdmin() {
   if(!isAdmin) return;
   const el = $('#panel-7');
@@ -1677,6 +1737,14 @@ function renderAdmin() {
     html += `</div>`;
   });
   html += `</div></div>`;
+  html += `<div class="admin-section"><div class="admin-section-header"><div class="admin-section-icon">🕵️</div><div class="admin-section-title">تحدي اللاعب الغامض</div></div><div class="admin-card">
+${state.mysteryGame ? `<div style="color:var(--green); font-weight:bold; margin-bottom:10px; text-align:center;">اللعبة شغالة حالياً! (اللاعب المختار)</div><button class="btn-purple btn-danger" onclick="endMysteryGame()">إنهاء التحدي</button>` : `
+  <select id="mysteryPlayerSelect" style="width:100%;padding:10px;margin-bottom:10px;background:#000;border:1px solid var(--border);color:#fff;border-radius:8px;">
+    ${state.players.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('')}
+  </select>
+  <button class="btn-purple" onclick="startMysteryGame()">بدء تحدي جديد 🕵️</button>
+`}
+</div></div>`;
   el.innerHTML = html;
 }
 window.saveMotivation = async function() { state.team.motivation = $('#motivationInput').value; await save(); alert('تم الحفظ'); };
