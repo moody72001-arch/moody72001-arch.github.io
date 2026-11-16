@@ -1559,6 +1559,28 @@ window.triggerSparkles = function(e) { const emojis = ['✨', '⭐', '🌟', '�
 
 // ============ 6. المجتمع ============
 window.switchCommunityTab = function(t) { communityTab = t; renderCommunity(); };
+window.submitMysteryGuess = async function() {
+    if(!state.mysteryGame || !state.mysteryGame.active) return;
+    
+    const sel = document.getElementById('mysteryGuessInput');
+    if(!sel || !sel.value) return alert('اختار لاعب الأول!');
+
+    const game = state.mysteryGame;
+    const isCorrect = (sel.value === game.targetId);
+    let myPlayer = state.players.find(p => p.phone === currentUserPhone);
+let myName = myPlayer ? myPlayer.name : (currentUserPhone === 'admin' ? 'المدير' : currentUserPhone);
+
+    if(!game.attempts) game.attempts = [];
+    if(game.attempts.some(a => a.phone === currentUserPhone && a.correct)) return alert('إنت خمنت صح قبل كده!');
+
+    game.attempts.push({ phone: currentUserPhone, name: myName, correct: isCorrect });
+
+    if(isCorrect) alert('🎉 مبروك! إنت عرفت اللاعب صح!');
+    else alert('❌ إجابة غلط، جرب تاني!');
+
+    await save();
+    renderCommunity();
+};
 function renderCommunity() {
   const el = $('#panel-5');
   let html = `<div class="cards-subtabs"><button class="subtabs-btn ${communityTab==='moments'?'active':''}" onclick="switchCommunityTab('moments')">📸 لقطات اللاعيبة</button><button class="subtabs-btn ${communityTab==='board'?'active':''}" onclick="switchCommunityTab('board')">💬 لوحة النقاش</button></div>`;
@@ -1584,7 +1606,7 @@ if (state.mysteryGame && state.mysteryGame.active) {
         if (hasGuessedCorrectly) {
             html += `<div style="color:var(--green); font-weight:900; font-size:18px;">🎉 مبروك! إنت عرفت مين هو (${esc(targetPlayer.name)})</div>`;
         } else {
-            let options = state.players.map(p => `<option value="${p.name}">${esc(p.name)}</option>`).join('');
+            let options = state.players.map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('');
             html += `<div style="display:flex; gap:5px; margin-bottom:15px;">
                 <select id="mysteryGuessInput" style="flex:1; padding:10px; background:#000; border:1px solid #333; border-radius:8px; color:#fff;">
                     <option value="">-- اختار اللاعب --</option>
@@ -1770,4 +1792,4 @@ window.showView('login');
 </script>
 
 </body>
-  </html>
+      </html>
